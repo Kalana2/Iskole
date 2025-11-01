@@ -1,0 +1,8 @@
+:root {
+    --primary-color: #4a90e2; /* A modern blue */
+    --text-color: #333;
+    --card-bg: #fff;
+    --bg-color: #f4f7f6; /* Light gray background */
+    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+    --border-radius: 12px;
+}
