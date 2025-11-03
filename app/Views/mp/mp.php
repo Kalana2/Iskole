@@ -15,6 +15,10 @@
         include __DIR__ . '/management.php';
     } else if ($active === 'Academic') {
         include __DIR__ . '/academic.php';
+    } else if ($active === 'Requests') {
+        include __DIR__ . '/requests.php';
+    } else if ($active === 'Report') {
+        include __DIR__ . '/report.php';
     } else {
         include __DIR__ . '/../templates/announcements.php';
         include __DIR__ . '/../templates/createAnnouncement.php';
