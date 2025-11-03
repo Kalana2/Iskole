@@ -39,9 +39,6 @@ class LoginController extends Controller
             return;
         }
 
-        // Save session and redirect
-
-        // Set session keys (both snake_case and camelCase) so App and other code find them
         $userId = isset($user['userID']) ? (int) $user['userID'] : (int) ($user['id'] ?? 0);
         $userRole = isset($user['role']) ? (int) $user['role'] : 0;
         $userEmail = $user['email'] ?? '';
@@ -63,9 +60,8 @@ class LoginController extends Controller
         $_SESSION['userEmail'] = $userEmail;
         $_SESSION['user_role'] = $userRole;
         $_SESSION['userRole'] = $userRole;
-        $_SESSION['name'] = $userName;
 
-        // header('Location: /admin');
+
         $this->roleRedirect($user['role']);
         exit;
     }
