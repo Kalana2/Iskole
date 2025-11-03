@@ -1,5 +1,5 @@
 <?php
-// filepath: /home/snake/Projects/Iskole/app/Views/templates/navigation.php
+
 // Reusable navigation bar partial
 // Usage:
 //   $items = ['Announcements', 'Academic', 'Requests']; // or $navItems
