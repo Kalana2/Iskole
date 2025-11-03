@@ -1,7 +1,7 @@
 <?php
-// filepath: /home/snake/Projects/Iskole/app/Views/mp/announcements.php
+// filepath: /home/snake/Projects/Iskole/app/Views/templates/announcements.php
 ?>
-<link rel="stylesheet" href="/css/mp/announcements.css">
+<link rel="stylesheet" href="/css/announcements/announcements.css">
 
 <section class="mp-announcements theme-light" aria-labelledby="ann-title">
     <div class="ann-header">

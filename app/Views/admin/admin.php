@@ -2,7 +2,9 @@
     <?php
     // Provide navigation items and active label for MP
     $items = ['Announcements', 'Management'];
-    $active = 'Announcements';
+    $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
+    $active = in_array($tab, $items) ? $tab : 'Announcements';
+    // $active = 'Management';
     include_once __DIR__ . '/../templates/navigation.php';
     ?>
 

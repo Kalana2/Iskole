@@ -1,3 +1,3 @@
-<section class="management">
+<div class="managemnt">
     <?php include_once __DIR__ . '/../templates/addNewUser.php'; ?>
-</section>
+</div>
