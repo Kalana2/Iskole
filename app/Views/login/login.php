@@ -3,7 +3,7 @@
         <img src="/assets/logo.png" alt="Iskole Logo" height="100" width="100">
     </div>
     <h1>Login</h1>
-    <div class="form">
+    <div class="login-form">
         <?php if (!empty($error)): ?>
             <div class="error"><?php echo htmlspecialchars($error, ENT_QUOTES, 'UTF-8'); ?></div>
         <?php endif; ?>

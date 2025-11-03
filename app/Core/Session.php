@@ -6,7 +6,10 @@ class Session
 
     private function __construct()
     {
-        session_start();
+        // Only start session if none exists to avoid warnings and output before headers
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
     }
 
     public static function getInstance()

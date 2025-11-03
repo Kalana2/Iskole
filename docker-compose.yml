@@ -8,13 +8,16 @@ services:
       - "8083:80"
     volumes:
       - .:/var/www/html
-    depends_on:
-      - db
+      - ./docker/php.ini:/usr/local/etc/php/conf.d/dev.ini
+    env_file:
+      - .env
     environment:
-      - MYSQL_HOST=db
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=root
-      - MYSQL_DB=iskole
+      - MYSQL_HOST=${MYSQL_HOST}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_DB=${MYSQL_DB}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
     restart: unless-stopped
 
   db:
@@ -27,7 +30,12 @@ services:
     volumes:
       - db_data:/var/lib/mysql
     ports:
-      - "3308:3306" 
+      - "3308:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

@@ -1,4 +1,6 @@
 <?php
+require_once '../app/Core/Controller.php';
+require_once '../app/Core/Session.php';
 class LoginController extends Controller
 {
     public function index()
@@ -27,8 +29,9 @@ class LoginController extends Controller
         // Load user model
         $userModel = $this->model('UserModel');
 
-        $user = $userModel->findByEmail($email);
-        if (!$user || !password_verify($password, $user['password_hash'])) {
+        $user = $userModel->getUserByEmail($email);
+
+        if (!$user || !password_verify($password, $user['password'])) {
             $this->view('login/index', [
                 'error' => 'Invalid credentials.',
                 'old' => ['email' => $email]
@@ -37,17 +40,67 @@ class LoginController extends Controller
         }
 
         // Save session and redirect
-        $_SESSION['user_id'] = (int) $user['id'];
-        $_SESSION['user_email'] = $user['email'];
 
-        header('Location: /home');
+        // Set session keys (both snake_case and camelCase) so App and other code find them
+        $userId = isset($user['userID']) ? (int) $user['userID'] : (int) ($user['id'] ?? 0);
+        $userRole = isset($user['role']) ? (int) $user['role'] : 0;
+        $userEmail = $user['email'] ?? '';
+        $userName = $user['fName'] ?? ($user['firstName'] ?? '');
+
+        // Using Session helper
+        $this->session->set('user_id', $userId);
+        $this->session->set('userId', $userId);
+        $this->session->set('user_email', $userEmail);
+        $this->session->set('userEmail', $userEmail);
+        $this->session->set('user_role', $userRole);
+        $this->session->set('userRole', $userRole);
+        $this->session->set('name', $userName);
+
+        // Also ensure superglobal is set for any direct checks
+        $_SESSION['user_id'] = $userId;
+        $_SESSION['userId'] = $userId;
+        $_SESSION['user_email'] = $userEmail;
+        $_SESSION['userEmail'] = $userEmail;
+        $_SESSION['user_role'] = $userRole;
+        $_SESSION['userRole'] = $userRole;
+        $_SESSION['name'] = $userName;
+
+        // header('Location: /admin');
+        $this->roleRedirect($user['role']);
         exit;
     }
 
     public function logout()
     {
-        session_destroy();
+        $this->session->destroy();
         header('Location: /login');
+        exit;
+    }
+
+    public function roleRedirect($role)
+    {
+        // ensure role is integer
+        $role = (int) $role;
+        switch ($role) {
+            case 0:
+                header('Location: /admin');
+                break;
+            case 1:
+                header('Location: /mp');
+                break;
+            case 2:
+                header('Location: /teacher');
+                break;
+            case 3:
+                header('Location: /student');
+                break;
+            case 4:
+                header('Location: /parent');
+                break;
+            default:
+                header('Location: /notfound');
+                break;
+        }
         exit;
     }
 }

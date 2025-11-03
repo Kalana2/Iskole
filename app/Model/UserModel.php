@@ -1,32 +1,10 @@
 <?php
 class UserModel
 {
-    private $db;
-
-    public function __construct()
-    {
-        $this->db = Database::getInstance();
-    }
-
-    public function findByEmail(string $email)
-    {
-        $stmt = $this->db->prepare('SELECT id, email, password_hash FROM users WHERE email = :email LIMIT 1');
-        $stmt->execute([':email' => $email]);
-        return $stmt->fetch(PDO::FETCH_ASSOC);
-    }
-
-    public function create(string $email, string $password)
-    {
-        $hash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $this->db->prepare('INSERT INTO users (email, password_hash, created_at) VALUES (:email, :hash, NOW())');
-        $stmt->execute([':email' => $email, ':hash' => $hash]);
-        return (int) $this->db->lastInsertId();
-    }
-}
-
-class User
-{
-    private $pdo;
+    protected $pdo;
+    private $userTable = 'user';
+    private $userAddressTable = 'userAddresses';
+    private $userNameTable = 'userName'; // fName, lName
 
     public function __construct()
     {
@@ -35,14 +13,63 @@ class User
 
     public function getUserByUsername($username)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE username = :username");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->userTable} WHERE username = :username");
         $stmt->execute(['username' => $username]);
         return $stmt->fetch();
     }
     public function getUserByEmail($email)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->userTable}        WHERE email = :email");
         $stmt->execute(['email' => $email]);
         return $stmt->fetch();
     }
+    // gender, email, phone, createDate, role, active, dateOfBirth, password, pwdChanged
+    public function createUser($data)
+    {
+        try {
+            $this->pdo->beginTransaction();
+
+            $sql = "INSERT INTO {$this->userTable} (gender, email, phone, createDate, role, active, dateOfBirth, password, pwdChanged) VALUES (:gender, :email, :phone, :createDate, :role, :active, :dateOfBirth, :password, :pwdChanged)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'gender' => $data['gender'],
+                'email' => $data['email'],
+                'phone' => $data['phone'],
+                'createDate' => $data['createDate'],
+                'role' => $data['role'],
+                'active' => $data['active'],
+                'dateOfBirth' => $data['dateOfBirth'],
+                'password' => $data['password'],
+                'pwdChanged' => $data['pwdChanged']
+            ]);
+            $userId = $this->pdo->lastInsertId();
+
+            $sql = "INSERT INTO {$this->userAddressTable} (userId, address_line1, address_line2, address_line3) VALUES (:userId, :address_line1, :address_line2, :address_line3)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'userId' => $userId,
+                'address_line1' => $data['address_line1'],
+                'address_line2' => $data['address_line2'],
+                'address_line3' => $data['address_line3']
+            ]);
+
+            $sql = "INSERT INTO {$this->userNameTable} (userId, firstName, lastName) VALUES (:userId, :firstName, :lastName)";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'userId' => $userId,
+                'firstName' => $data['fName'],
+                'lastName' => $data['lName']
+            ]);
+
+            $this->pdo->commit();
+
+            return $userId;
+        } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
+            throw new Exception("Error Processing Request: " . $e->getMessage());
+        }
+    }
+
 }

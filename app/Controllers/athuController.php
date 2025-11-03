@@ -11,12 +11,12 @@ class AthuController extends Controller
             $email = $_POST['email'];
             $password = $_POST['password'];
 
-            $userModel = new User();
+            $userModel = new UserModel();
             $user = $userModel->getUserByEmail($email);
 
             // if ($user && password_verify($password, $user['password'])) {
             if ($user && $password == $user['password']) {
-                Session::getInstance()->set('user', $user);
+                $this->session->set('user', $user);
                 header('Location: /dashboard');
             } else {
                 $this->view('login', ['error' => 'Invalid credentials']);
