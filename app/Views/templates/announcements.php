@@ -1,5 +1,5 @@
 <?php
-// filepath: /home/snake/Projects/Iskole/app/Views/mp/announcemets.php
+// filepath: /home/snake/Projects/Iskole/app/Views/mp/announcements.php
 ?>
 <link rel="stylesheet" href="/css/mp/announcements.css">
 

@@ -25,11 +25,12 @@ $active = $active ?? null; // string label or integer index
                     } elseif (is_int($active)) {
                         $isActive = ($active === $index);
                     }
+                    $href = '?tab=' . urlencode($label);
                 ?>
                 <li role="none">
-                    <span role="menuitem" class="<?php echo $isActive ? 'active' : ''; ?>">
+                    <a role="menuitem" href="<?php echo $href; ?>" class="<?php echo $isActive ? 'active' : ''; ?>" <?php echo $isActive ? 'aria-current="page"' : ''; ?>>
                         <?php echo htmlspecialchars($label, ENT_QUOTES, 'UTF-8'); ?>
-                    </span>
+                    </a>
                 </li>
             <?php endforeach; ?>
         </ul>
