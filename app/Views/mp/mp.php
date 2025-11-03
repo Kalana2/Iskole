@@ -13,6 +13,8 @@
     // $announcements = [ [ 'title' => '...', 'body' => '...', 'author' => '...', 'date' => 'YYYY-MM-DD', 'tags' => ['general'], 'pinned' => true, 'unread' => true ] ];
     if ($active === 'Management') {
         include __DIR__ . '/management.php';
+    } else if ($active === 'Academic') {
+        include __DIR__ . '/academic.php';
     } else {
         include __DIR__ . '/../templates/announcements.php';
         include __DIR__ . '/../templates/createAnnouncement.php';
