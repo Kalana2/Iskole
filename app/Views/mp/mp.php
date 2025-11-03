@@ -15,6 +15,7 @@
         include __DIR__ . '/management.php';
     } else {
         include __DIR__ . '/../templates/announcements.php';
+        include __DIR__ . '/../templates/createAnnouncement.php';
     }
     ?>
 </div>

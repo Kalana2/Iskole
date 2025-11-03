@@ -4,11 +4,11 @@
     $items = ['Announcements', 'Management'];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
     $active = in_array($tab, $items) ? $tab : 'Announcements';
-    // $active = 'Management';
     include_once __DIR__ . '/../templates/navigation.php';
     ?>
 
     <?php
+
     // If you have real data, set $announcements before including this file.
     // Example:
     // $announcements = [ [ 'title' => '...', 'body' => '...', 'author' => '...', 'date' => 'YYYY-MM-DD', 'tags' => ['general'], 'pinned' => true, 'unread' => true ] ];

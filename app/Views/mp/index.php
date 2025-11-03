@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard</title>
     <link rel="stylesheet" href="/css/variables.css">
-    <link rel="stylesheet" href="/css/mp/management.css">
+
 </head>
 
 <body>
