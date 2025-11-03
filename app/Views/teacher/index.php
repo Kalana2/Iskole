@@ -9,7 +9,7 @@
 
 <body>
     <?php include_once __DIR__ . '/../header/index.php'; ?>
-
+    <?php include_once __DIR__ . '/teacher.php'; ?>
     <h1>Teacher Dashboard</h1>
 
 </body>

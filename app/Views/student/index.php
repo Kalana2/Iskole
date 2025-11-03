@@ -10,6 +10,7 @@
 <body>
     <?php include_once __DIR__ . '/../header/index.php'; ?>
 
+    <?php include_once __DIR__ . '/student.php'; ?>
     <h1>Student Dashboard</h1>
 
 </body>
