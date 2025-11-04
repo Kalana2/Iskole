@@ -11,8 +11,6 @@
     <?php include_once __DIR__ . '/../header/index.php'; ?>
     <?php include_once __DIR__ . '/parent.php'; ?>
 
-    <h1>Parent Dashboard</h1>
-
 </body>
 
 </html>
