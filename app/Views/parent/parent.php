@@ -13,27 +13,27 @@
     // Example:
     // $announcements = [ [ 'title' => '...', 'body' => '...', 'author' => '...', 'date' => 'YYYY-MM-DD', 'tags' => ['general'], 'pinned' => true, 'unread' => true ] ];
     if ($active === 'Announcements') {
-        include __DIR__ . '/parentannouncements.php';
+        include __DIR__ . '/parentAnnouncements.php';
     } else if ($active === 'Acedemics') {
         // Shared academic overview template
-        include __DIR__ . '/parentacademicOverview.php';
+        include __DIR__ . '/parentAcademicOverview.php';
     } else if ($active === 'Attendance') {
         // No dedicated attendance view for parent yet — use a generic report placeholder
-        include __DIR__ . '/parentreport.php';
+        include __DIR__ . '/parentAttendance.php';
     } else if ($active === 'Time Table') {
         // No dedicated timetable template — use report placeholder for now
-        include __DIR__ . '/parenttimetable.php';
+        include __DIR__ . '/parentTimeTable.php';
     } else if ($active === 'Behavior') {
         // No dedicated behavior view yet — use report placeholder
-        include __DIR__ . '/parentbehavior.php';
+        include __DIR__ . '/parentBehavior.php';
     } else if ($active === 'Teachers') {
         // Use shared user directory to list teachers
-        include __DIR__ . '/parentcontact.php';
+        include __DIR__ . '/parentContact.php';
     } else if ($active === 'Requests') {
-        include __DIR__ . '/parentrequests.php';
+        include __DIR__ . '/parentRequests.php';
     } else {
         // Fallback
-        include __DIR__ . '/parentannouncements.php';
+        include __DIR__ . '/parentAnnouncements.php';
     }
     ?>
 </div>
