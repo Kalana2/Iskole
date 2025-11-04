@@ -1,0 +1,691 @@
+:root {
+  --blur-bg: rgba(255, 255, 255, 0.7);
+  --text: #1f2543;
+  --muted: #6b7280;
+  --primary: #667eea;
+  --primary-2: #764ba2;
+  --ring: rgba(102, 126, 234, 0.45);
+  --card: #ffffff;
+  --border: rgba(17, 24, 39, 0.08);
+  --success-light: #10b981;
+  --success-dark: #059669;
+  --info-light: #3b82f6;
+  --info-dark: #2563eb;
+  --warning: #f59e0b;
+  --interval-bg: #cce4fe;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+/* Main container */
+.timetable-section {
+  min-height: 100vh;
+  padding: 1rem;
+}
+
+.box {
+  max-width: 1600px;
+  margin: 1.25rem auto;
+  padding: 0.5rem 1rem 2rem;
+}
+
+/* Header section */
+.heading-section {
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  margin-bottom: 1.5rem;
+}
+
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.heading-text {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+}
+
+.sub-heding-text {
+  margin: 0.25rem 0 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+.teacher-info-badge {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 0.95rem;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border: 1px solid var(--border);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.stat-icon {
+  font-size: 2.5rem;
+  filter: grayscale(0.2);
+}
+
+.stat-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Current Day Indicator */
+.current-day-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.1),
+    rgba(118, 75, 162, 0.1)
+  );
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.indicator-icon {
+  font-size: 1.25rem;
+}
+
+.indicator-text {
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.indicator-text strong {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Timetable Container */
+.timetable-container {
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+}
+
+.table-wrapper {
+  overflow-x: auto;
+}
+
+/* Timetable Table */
+.timetable-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.timetable-table thead {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.15),
+    rgba(118, 75, 162, 0.15)
+  );
+  border-bottom: 2px solid rgba(102, 126, 234, 0.3);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.timetable-table th {
+  padding: 1rem 0.75rem;
+  text-align: center;
+  font-weight: 700;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.time-column {
+  text-align: left;
+  width: 180px;
+}
+
+.day-column {
+  position: relative;
+  min-width: 150px;
+}
+
+.day-column.current-day {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.25),
+    rgba(118, 75, 162, 0.25)
+  );
+  position: relative;
+}
+
+.today-badge {
+  display: inline-block;
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  color: #ffffff;
+  border-radius: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+}
+
+/* Table Body */
+.timetable-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.timetable-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.period-row:hover {
+  background: rgba(102, 126, 234, 0.03);
+}
+
+.period-row.current-period {
+  background: rgba(16, 185, 129, 0.08);
+  border-left: 4px solid var(--success-dark);
+}
+
+/* Time Cell */
+.time-cell {
+  padding: 1.25rem 0.75rem;
+  background: rgba(102, 126, 234, 0.05);
+  font-weight: 600;
+}
+
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.period-number {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.time-range {
+  font-size: 0.8rem;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+}
+
+/* Class Cell */
+.class-cell {
+  padding: 0.75rem;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.class-cell.today-cell {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.class-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.12),
+    rgba(118, 75, 162, 0.12)
+  );
+  border-radius: 10px;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+
+.class-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+  border-color: rgba(102, 126, 234, 0.4);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.18),
+    rgba(118, 75, 162, 0.18)
+  );
+}
+
+.class-name {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.class-details {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.room-info {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.room-icon {
+  font-size: 0.85rem;
+}
+
+/* Free Period */
+.free-period {
+  padding: 0.75rem;
+  background: rgba(0, 0, 0, 0.02);
+  border-radius: 10px;
+  border: 1px dashed rgba(0, 0, 0, 0.1);
+}
+
+.free-text {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+  opacity: 0.6;
+}
+
+/* Interval Row */
+.interval-row {
+  background: var(--interval-bg);
+  border-top: 2px solid rgba(59, 130, 246, 0.3);
+  border-bottom: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.interval-cell {
+  padding: 1rem;
+  text-align: center;
+}
+
+.interval-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.interval-icon {
+  font-size: 1.5rem;
+}
+
+.interval-text {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.interval-time {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-family: "Courier New", monospace;
+}
+
+/* Legend */
+.legend-container {
+  padding: 1.25rem 1.5rem;
+  background: var(--card);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border);
+}
+
+.legend-title {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.legend-items {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.legend-box {
+  width: 24px;
+  height: 24px;
+  border-radius: 6px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.class-box {
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.12),
+    rgba(118, 75, 162, 0.12)
+  );
+  border-color: rgba(102, 126, 234, 0.2);
+}
+
+.free-box {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px dashed rgba(0, 0, 0, 0.2);
+}
+
+.today-box {
+  background: rgba(102, 126, 234, 0.05);
+  border-color: rgba(102, 126, 234, 0.3);
+}
+
+.interval-box {
+  background: var(--interval-bg);
+  border-color: rgba(59, 130, 246, 0.3);
+}
+
+.legend-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Animation */
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stats-grid,
+.current-day-indicator,
+.timetable-container,
+.legend-container {
+  animation: slideUp 0.4s ease-out backwards;
+}
+
+.stats-grid {
+  animation-delay: 0.1s;
+}
+
+.current-day-indicator {
+  animation-delay: 0.2s;
+}
+
+.timetable-container {
+  animation-delay: 0.3s;
+}
+
+.legend-container {
+  animation-delay: 0.4s;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .timetable-table {
+    font-size: 0.85rem;
+  }
+
+  .class-name {
+    font-size: 0.9rem;
+  }
+
+  .class-details {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .box {
+    padding: 0.25rem 0.5rem 1rem;
+  }
+
+  .heading-section {
+    padding: 0.75rem 1rem;
+  }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .heading-text {
+    font-size: 1.2rem;
+  }
+
+  .sub-heding-text {
+    font-size: 0.85rem;
+  }
+
+  .teacher-info-badge {
+    gap: 1rem;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-icon {
+    font-size: 2rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  .current-day-indicator {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+
+  .timetable-table {
+    font-size: 0.8rem;
+  }
+
+  .timetable-table th,
+  .time-cell {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .class-cell {
+    padding: 0.5rem;
+  }
+
+  .class-card {
+    padding: 0.5rem;
+  }
+
+  .class-name {
+    font-size: 0.85rem;
+  }
+
+  .class-details {
+    font-size: 0.7rem;
+  }
+
+  .interval-content {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .legend-items {
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .time-column {
+    width: 100px;
+  }
+
+  .time-info {
+    font-size: 0.7rem;
+  }
+
+  .period-number {
+    font-size: 0.75rem;
+  }
+
+  .time-range {
+    font-size: 0.7rem;
+  }
+
+  .day-column {
+    min-width: 80px;
+  }
+
+  .timetable-table th {
+    font-size: 0.75rem;
+    padding: 0.6rem 0.3rem;
+  }
+
+  .class-card {
+    padding: 0.4rem;
+  }
+
+  .class-name {
+    font-size: 0.75rem;
+  }
+
+  .room-info {
+    font-size: 0.65rem;
+  }
+
+  .today-badge {
+    display: block;
+    margin-left: 0;
+    margin-top: 0.25rem;
+    font-size: 0.6rem;
+  }
+
+  .interval-text {
+    font-size: 0.85rem;
+  }
+
+  .interval-time {
+    font-size: 0.75rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .heading-section {
+    background: #1a1f3a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .stats-grid,
+  .current-day-indicator,
+  .legend-container {
+    display: none;
+  }
+
+  .timetable-container {
+    box-shadow: none;
+    page-break-inside: avoid;
+  }
+
+  .class-card {
+    box-shadow: none;
+  }
+
+  .class-card:hover {
+    transform: none;
+  }
+
+  .period-row:hover {
+    background: transparent;
+  }
+}
