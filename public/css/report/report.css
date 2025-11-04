@@ -1,18 +1,38 @@
-:root{
-  --blur-bg: rgba(255,255,255,0.7);
+:root {
+  --blur-bg: rgba(255, 255, 255, 0.7);
   --text: #1f2543;
-  --muted:#6b7280;
-  --primary:#667eea;
-  --primary-2:#764ba2;
-  --ring: rgba(102,126,234,.45);
-  --card:#ffffff;
-  --border: rgba(17,24,39,0.08);
+  --muted: #6b7280;
+  --primary: #667eea;
+  --primary-2: #764ba2;
+  --ring: rgba(102, 126, 234, 0.45);
+  --card: #ffffff;
+  --border: rgba(17, 24, 39, 0.08);
 }
 
-.mp-management{ max-width: 1100px; margin: 1.25rem auto; padding: .5rem 1rem 2rem; }
-.mgmt-header{ display:flex; align-items:center; justify-content:space-between; padding: .9rem 1rem; border-radius: 16px; background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%); color:#fff; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
-.mgmt-header .title-wrap h2{ margin:0; font-size:1.35rem; }
-.mgmt-header .subtitle{ margin:.2rem 0 0; color: rgba(255,255,255,.85); font-size: .95rem; }
+.mp-management {
+  max-width: 1400px;
+  margin: 1.25rem auto;
+  padding: 0.5rem 1rem 2rem;
+}
+.mgmt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  color: #fff;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+.mgmt-header .title-wrap h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+.mgmt-header .subtitle {
+  margin: 0.2rem 0 0;
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 0.95rem;
+}
 
 .reports-entry {
   padding: 2rem;
@@ -449,7 +469,7 @@
 }
 
 .timeline-item:not(:last-child)::after {
-  content: '';
+  content: "";
   position: absolute;
   left: 11px;
   top: 30px;
@@ -537,4 +557,11 @@
 }
 
 /* Shared card wrapper to match User Directory/Add New User */
-.card{ margin-top: 1rem; background: var(--card); border:1px solid var(--border); border-radius: 16px; box-shadow: 0 8px 24px rgba(0,0,0,.1); padding: 1.25rem; }
+.card {
+  margin-top: 1rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  padding: 1.25rem;
+}

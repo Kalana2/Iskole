@@ -26,7 +26,7 @@
 }
 
 .box {
-  max-width: 1600px;
+  max-width: 1400px;
   margin: 1.25rem auto;
   padding: 0.5rem 1rem 2rem;
 }
@@ -196,7 +196,7 @@
 /* Stats Grid */
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -216,6 +216,7 @@
 .stat-card:hover {
   transform: translateY(-2px);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+  border-color: rgba(102, 126, 234, 0.2);
 }
 
 .stat-card.present-stat:hover {
@@ -335,7 +336,7 @@
   text-align: left;
   font-weight: 700;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   white-space: nowrap;
