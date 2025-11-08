@@ -138,6 +138,7 @@
 .badge {
   display: inline-flex;
   align-items: center;
+  width: auto;
   gap: 0.35rem;
   padding: 0.25rem 0.5rem;
   border-radius: 8px;

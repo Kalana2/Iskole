@@ -119,7 +119,7 @@ if (!isset($materials) || empty($materials)) {
                 aria-label="Material: <?php echo htmlspecialchars($material['title']); ?>">
                 <div class="ann-card-header">
                     <div class="ann-badges">
-                        <span class="badge">Grade <?php echo htmlspecialchars($material['grade']); ?> <?php echo htmlspecialchars($material['class']); ?></span>
+                        <span class="badge"><?php echo htmlspecialchars($material['grade']); ?> <?php echo htmlspecialchars($material['class']); ?></span>
                         <span class="badge"><?php echo htmlspecialchars($material['subjectName']); ?></span>
                         <?php if ($material['visibility'] == 1): ?>
                             <span class="badge" style="background: rgba(45, 212, 191, 0.2); border-color: rgba(45, 212, 191, 0.4); color: #047857;">Visible</span>

@@ -41,88 +41,77 @@
             'reg_number' => '2024002',
             'name' => 'Nimal Silva',
             'status' => 'present',
-            'attendance_rate' => 88,
-            'last_absent' => '2025-10-28'
+            'attendance_rate' => 88
         ],
         [
             'id' => 3,
             'reg_number' => '2024003',
             'name' => 'Kumari Fernando',
             'status' => 'present',
-            'attendance_rate' => 98,
-            'last_absent' => null
+            'attendance_rate' => 98
         ],
         [
             'id' => 4,
             'reg_number' => '2024004',
             'name' => 'Saman Rajapaksa',
             'status' => 'absent',
-            'attendance_rate' => 85,
-            'last_absent' => '2025-11-04'
+            'attendance_rate' => 85
         ],
         [
             'id' => 5,
             'reg_number' => '2024005',
             'name' => 'Dilini Wickramasinghe',
             'status' => 'present',
-            'attendance_rate' => 92,
-            'last_absent' => '2025-10-15'
+            'attendance_rate' => 92
         ],
         [
             'id' => 6,
             'reg_number' => '2024006',
             'name' => 'Kasun Bandara',
             'status' => 'present',
-            'attendance_rate' => 90,
-            'last_absent' => '2025-10-20'
+            'attendance_rate' => 90
         ],
         [
             'id' => 7,
             'reg_number' => '2024007',
             'name' => 'Chamari Jayawardena',
             'status' => 'late',
-            'attendance_rate' => 87,
-            'last_absent' => '2025-10-25'
+            'attendance_rate' => 87
         ],
         [
             'id' => 8,
             'reg_number' => '2024008',
             'name' => 'Tharindu Gunasekara',
             'status' => 'present',
-            'attendance_rate' => 83,
-            'last_absent' => '2025-11-01'
+            'attendance_rate' => 83
         ],
         [
             'id' => 9,
             'reg_number' => '2024009',
             'name' => 'Nethmi Rathnayake',
             'status' => 'present',
-            'attendance_rate' => 100,
-            'last_absent' => null
+            'attendance_rate' => 100
         ],
         [
             'id' => 10,
             'reg_number' => '2024010',
             'name' => 'Isuru Mendis',
             'status' => 'present',
-            'attendance_rate' => 91,
-            'last_absent' => '2025-10-18'
+            'attendance_rate' => 91
         ],
         [
             'id' => 11,
             'reg_number' => '2024011',
             'name' => 'Sanduni Perera',
             'status' => 'absent',
-            'attendance_rate' => 78,
-            'last_absent' => '2025-11-04'
+            'attendance_rate' => 78
         ],
         [
             'id' => 12,
             'reg_number' => '2024012',
             'name' => 'Lahiru Fernando',
             'status' => 'present',
-            'attendance_rate' => 94,
-            'last_absent' => '2025-10-10'
+            'attendance_rate' => 94
         ]
     ];
 
@@ -137,6 +126,22 @@
     $lateCount = count(array_filter($students, function ($s) {
         return $s['status'] === 'late';
     }));
+    // Normalize any existing 'late' statuses to 'present' since late feature removed
+    foreach ($students as &$s) {
+        if ($s['status'] === 'late') {
+            $s['status'] = 'present';
+        }
+    }
+
+    // Recalculate statistics after normalization
+    $totalStudents = count($students);
+    $presentCount = count(array_filter($students, function ($s) {
+        return $s['status'] === 'present';
+    }));
+    $absentCount = count(array_filter($students, function ($s) {
+        return $s['status'] === 'absent';
+    }));
+
     $attendancePercentage = $totalStudents > 0 ? round(($presentCount / $totalStudents) * 100) : 0;
     ?>
     <link rel="stylesheet" href="/css/attendance/attendance.css">
@@ -247,13 +252,7 @@
                             <div class="stat-label">Absent</div>
                         </div>
                     </div>
-                    <div class="stat-card late-stat">
-                        <div class="stat-icon">⏰</div>
-                        <div class="stat-content">
-                            <div class="stat-value"><?php echo $lateCount; ?></div>
-                            <div class="stat-label">Late</div>
-                        </div>
-                    </div>
+                    <!-- Late stat removed (feature deprecated) -->
                     <div class="stat-card total-stat">
                         <div class="stat-icon">👥</div>
                         <div class="stat-content">
@@ -308,9 +307,6 @@
                                             <td class="col-name">
                                                 <div class="student-info">
                                                     <strong class="student-name"><?php echo htmlspecialchars($student['name']); ?></strong>
-                                                    <?php if ($student['last_absent']): ?>
-                                                        <small class="last-absent">Last absent: <?php echo date('M j', strtotime($student['last_absent'])); ?></small>
-                                                    <?php endif; ?>
                                                 </div>
                                             </td>
                                             <td class="col-rate">
@@ -334,11 +330,7 @@
                                                         title="Mark Present">
                                                         ✓
                                                     </button>
-                                                    <button type="button" class="action-btn btn-late <?php echo $student['status'] === 'late' ? 'active' : ''; ?>"
-                                                        onclick="markStatus(<?php echo $student['id']; ?>, 'late')"
-                                                        title="Mark Late">
-                                                        ⏰
-                                                    </button>
+                                                    <!-- "Late" option removed -->
                                                     <button type="button" class="action-btn btn-absent <?php echo $student['status'] === 'absent' ? 'active' : ''; ?>"
                                                         onclick="markStatus(<?php echo $student['id']; ?>, 'absent')"
                                                         title="Mark Absent">
@@ -358,10 +350,7 @@
                                 <span class="btn-icon">✗</span>
                                 <span class="btn-text">Cancel</span>
                             </button>
-                            <button type="button" class="btn btn-secondary" onclick="saveDraft()">
-                                <span class="btn-icon">💾</span>
-                                <span class="btn-text">Save Draft</span>
-                            </button>
+                            <!-- Save Draft removed -->
                             <button type="submit" class="btn btn-primary">
                                 <span class="btn-icon">✓</span>
                                 <span class="btn-text">Submit Attendance</span>
@@ -395,9 +384,10 @@
             statusBadge.className = `status-badge status-${status}`;
             statusBadge.textContent = status.charAt(0).toUpperCase() + status.slice(1);
 
-            // Update active button
+            // Update active button (guard in case button removed)
             buttons.forEach(btn => btn.classList.remove('active'));
-            row.querySelector(`.btn-${status}`).classList.add('active');
+            const targetBtn = row.querySelector(`.btn-${status}`);
+            if (targetBtn) targetBtn.classList.add('active');
 
             // Update row data attribute
             row.dataset.status = status;
@@ -435,18 +425,16 @@
             }
         }
 
-        // Update statistics
+        // Update statistics (late removed)
         function updateStatistics() {
             const rows = document.querySelectorAll('.student-row');
             let present = 0,
-                absent = 0,
-                late = 0;
+                absent = 0;
 
             rows.forEach(row => {
                 const status = row.dataset.status;
                 if (status === 'present') present++;
                 else if (status === 'absent') absent++;
-                else if (status === 'late') late++;
             });
 
             const total = rows.length;
@@ -454,7 +442,6 @@
 
             document.querySelector('.present-stat .stat-value').textContent = present;
             document.querySelector('.absent-stat .stat-value').textContent = absent;
-            document.querySelector('.late-stat .stat-value').textContent = late;
             document.querySelector('.total-stat .stat-value').textContent = percentage + '%';
         }
 
@@ -465,12 +452,7 @@
             }
         }
 
-        // Save draft
-        function saveDraft() {
-            console.log('Saving draft...');
-            // TODO: Implement AJAX save functionality
-            alert('Draft saved successfully! (This is a demo)');
-        }
+        // Save draft removed (feature deprecated)
 
         // Form submission
         document.getElementById('attendanceForm')?.addEventListener('submit', function(e) {
