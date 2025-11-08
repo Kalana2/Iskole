@@ -12,7 +12,6 @@ $attendanceStats = [
     'total_days' => 180,
     'present_days' => 165,
     'absent_days' => 10,
-    'late_days' => 5,
     'attendance_rate' => 91.67,
     'this_month_rate' => 95.45,
     'last_month_rate' => 88.24
@@ -26,19 +25,22 @@ $weeklyData = [
     ['week' => 'Week 4 (Oct 28-Nov 1)', 'present' => 4, 'absent' => 0, 'late' => 1, 'total' => 5]
 ];
 
-// Recent attendance records
-$recentAttendance = [
-    ['date' => '2025-11-04', 'day' => 'Monday', 'status' => 'present', 'time_in' => '07:45 AM', 'remarks' => ''],
-    ['date' => '2025-11-01', 'day' => 'Friday', 'status' => 'present', 'time_in' => '07:50 AM', 'remarks' => ''],
-    ['date' => '2025-10-31', 'day' => 'Thursday', 'status' => 'present', 'time_in' => '07:42 AM', 'remarks' => ''],
-    ['date' => '2025-10-30', 'day' => 'Wednesday', 'status' => 'late', 'time_in' => '08:15 AM', 'remarks' => 'Heavy traffic'],
-    ['date' => '2025-10-29', 'day' => 'Tuesday', 'status' => 'present', 'time_in' => '07:48 AM', 'remarks' => ''],
-    ['date' => '2025-10-28', 'day' => 'Monday', 'status' => 'present', 'time_in' => '07:40 AM', 'remarks' => ''],
-    ['date' => '2025-10-25', 'day' => 'Friday', 'status' => 'absent', 'time_in' => '-', 'remarks' => 'Medical leave'],
-    ['date' => '2025-10-24', 'day' => 'Thursday', 'status' => 'present', 'time_in' => '07:55 AM', 'remarks' => ''],
-    ['date' => '2025-10-23', 'day' => 'Wednesday', 'status' => 'present', 'time_in' => '07:47 AM', 'remarks' => ''],
-    ['date' => '2025-10-22', 'day' => 'Tuesday', 'status' => 'present', 'time_in' => '07:52 AM', 'remarks' => '']
+// 12-month attendance summary (backend should supply this in production)
+$monthlyData = [
+    ['month' => 'Jan', 'present' => 20, 'absent' => 2, 'total' => 22],
+    ['month' => 'Feb', 'present' => 18, 'absent' => 2, 'total' => 20],
+    ['month' => 'Mar', 'present' => 21, 'absent' => 1, 'total' => 22],
+    ['month' => 'Apr', 'present' => 19, 'absent' => 3, 'total' => 22],
+    ['month' => 'May', 'present' => 20, 'absent' => 2, 'total' => 22],
+    ['month' => 'Jun', 'present' => 17, 'absent' => 5, 'total' => 22],
+    ['month' => 'Jul', 'present' => 22, 'absent' => 0, 'total' => 22],
+    ['month' => 'Aug', 'present' => 21, 'absent' => 1, 'total' => 22],
+    ['month' => 'Sep', 'present' => 20, 'absent' => 2, 'total' => 22],
+    ['month' => 'Oct', 'present' => 20, 'absent' => 2, 'total' => 22],
+    ['month' => 'Nov', 'present' => 15, 'absent' => 0, 'total' => 15],
+    ['month' => 'Dec', 'present' => 0, 'absent' => 0, 'total' => 0]
 ];
+
 ?>
 
 <link rel="stylesheet" href="/css/studentAttendance/studentAttendance.css">
@@ -98,17 +100,6 @@ $recentAttendance = [
                     <div class="stat-sublabel">With valid reasons</div>
                 </div>
             </div>
-
-            <div class="stat-card late-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo $attendanceStats['late_days']; ?></div>
-                    <div class="stat-label">Late Arrivals</div>
-                    <div class="stat-sublabel">After 8:00 AM</div>
-                </div>
-            </div>
         </div>
 
         <!-- Charts Section -->
@@ -117,7 +108,7 @@ $recentAttendance = [
                 <div class="chart-header">
                     <h3 class="chart-title">
                         <i class="fas fa-chart-bar"></i>
-                        4-Week Attendance Summary
+                        12-Month Attendance Overview
                     </h3>
                 </div>
                 <div class="chart-wrapper">
@@ -144,63 +135,7 @@ $recentAttendance = [
                         <span class="legend-color absent-color"></span>
                         <span class="legend-label">Absent (<?php echo $attendanceStats['absent_days']; ?>)</span>
                     </div>
-                    <div class="legend-item">
-                        <span class="legend-color late-color"></span>
-                        <span class="legend-label">Late (<?php echo $attendanceStats['late_days']; ?>)</span>
-                    </div>
                 </div>
-            </div>
-        </div>
-
-        <!-- Recent Attendance -->
-        <div class="recent-attendance-card">
-            <div class="card-header">
-                <h3 class="card-title">
-                    <i class="fas fa-history"></i>
-                    Recent Attendance Records
-                </h3>
-            </div>
-            <div class="attendance-table-wrapper">
-                <table class="attendance-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Day</th>
-                            <th>Status</th>
-                            <th>Time In</th>
-                            <th>Remarks</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($recentAttendance as $record): ?>
-                            <tr>
-                                <td>
-                                    <span class="date-display"><?php echo date('M d, Y', strtotime($record['date'])); ?></span>
-                                </td>
-                                <td>
-                                    <span class="day-display"><?php echo $record['day']; ?></span>
-                                </td>
-                                <td>
-                                    <span class="status-badge <?php echo $record['status']; ?>">
-                                        <?php if ($record['status'] == 'present'): ?>
-                                            <i class="fas fa-check-circle"></i> Present
-                                        <?php elseif ($record['status'] == 'absent'): ?>
-                                            <i class="fas fa-times-circle"></i> Absent
-                                        <?php else: ?>
-                                            <i class="fas fa-clock"></i> Late
-                                        <?php endif; ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="time-display"><?php echo $record['time_in']; ?></span>
-                                </td>
-                                <td>
-                                    <span class="remarks-text"><?php echo $record['remarks'] ?: '-'; ?></span>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
@@ -209,11 +144,11 @@ $recentAttendance = [
 <!-- Pass data to JavaScript -->
 <script>
     const attendanceData = {
-        weekly: <?php echo json_encode($weeklyData); ?>,
+        // 'monthly' should be supplied by backend in production. Sample is provided above as $monthlyData.
+        monthly: <?php echo json_encode($monthlyData); ?>,
         distribution: {
             present: <?php echo $attendanceStats['present_days']; ?>,
-            absent: <?php echo $attendanceStats['absent_days']; ?>,
-            late: <?php echo $attendanceStats['late_days']; ?>
+            absent: <?php echo $attendanceStats['absent_days']; ?>
         }
     };
 </script>

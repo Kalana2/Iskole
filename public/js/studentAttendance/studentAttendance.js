@@ -31,11 +31,14 @@ function initAttendanceChart() {
     attendanceChart.destroy();
   }
 
-  const weeklyData = attendanceData.weekly;
-  const labels = weeklyData.map((d) => d.week);
-  const presentData = weeklyData.map((d) => d.present);
-  const absentData = weeklyData.map((d) => d.absent);
-  const lateData = weeklyData.map((d) => d.late);
+  // Use monthly data provided by backend: array of { month, present, absent, total }
+  const monthlyData = attendanceData.monthly || [];
+  const labels = monthlyData.map((d) => d.month);
+  const presentData = monthlyData.map((d) => d.present);
+  const absentData = monthlyData.map((d) => d.absent);
+  const maxDays = monthlyData.length
+    ? Math.max(...monthlyData.map((m) => m.total || m.present + m.absent))
+    : 0;
 
   const config = {
     type: "bar",
@@ -55,14 +58,6 @@ function initAttendanceChart() {
           data: absentData,
           backgroundColor: colorScheme.danger,
           borderColor: "rgba(239, 68, 68, 1)",
-          borderWidth: 2,
-          borderRadius: 8,
-        },
-        {
-          label: "Late",
-          data: lateData,
-          backgroundColor: colorScheme.warning,
-          borderColor: "rgba(245, 158, 11, 1)",
           borderWidth: 2,
           borderRadius: 8,
         },
@@ -138,7 +133,8 @@ function initAttendanceChart() {
         y: {
           stacked: true,
           beginAtZero: true,
-          max: 5,
+          // Dynamically set max based on the largest total days in the monthly dataset
+          max: maxDays > 0 ? Math.ceil(maxDays + 1) : undefined,
           grid: {
             color: "rgba(0, 0, 0, 0.05)",
             drawBorder: false,
@@ -176,20 +172,16 @@ function initDistributionChart() {
   }
 
   const distribution = attendanceData.distribution;
-  const total = distribution.present + distribution.absent + distribution.late;
+  const total = distribution.present + distribution.absent;
 
   const config = {
     type: "doughnut",
     data: {
-      labels: ["Present", "Absent", "Late"],
+      labels: ["Present", "Absent"],
       datasets: [
         {
-          data: [distribution.present, distribution.absent, distribution.late],
-          backgroundColor: [
-            colorScheme.success,
-            colorScheme.danger,
-            colorScheme.warning,
-          ],
+          data: [distribution.present, distribution.absent],
+          backgroundColor: [colorScheme.success, colorScheme.danger],
           borderColor: "#ffffff",
           borderWidth: 3,
           hoverOffset: 8,
@@ -283,17 +275,22 @@ function printAttendance() {
 
 // Calculate attendance trends (based on 4 weeks)
 function calculateTrend() {
-  if (typeof attendanceData === "undefined" || !attendanceData.weekly.length) {
+  // Use monthly data to compute trend (average of monthly present/total)
+  if (
+    typeof attendanceData === "undefined" ||
+    !attendanceData.monthly ||
+    !attendanceData.monthly.length
+  ) {
     return null;
   }
 
-  const weeklyData = attendanceData.weekly;
+  const monthlyData = attendanceData.monthly;
 
   const avgAttendance =
-    weeklyData.reduce((sum, week) => {
-      const rate = week.total > 0 ? (week.present / week.total) * 100 : 0;
+    monthlyData.reduce((sum, month) => {
+      const rate = month.total > 0 ? (month.present / month.total) * 100 : 0;
       return sum + rate;
-    }, 0) / weeklyData.length;
+    }, 0) / monthlyData.length;
 
   return {
     average: avgAttendance.toFixed(2),
