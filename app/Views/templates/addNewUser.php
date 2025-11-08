@@ -1,4 +1,4 @@
- <link rel="stylesheet" href="/css/addNewUser/addNewUser.css">
+<link rel="stylesheet" href="/css/addNewUser/addNewUser.css">
 <section class="mp-management" aria-labelledby="mgmt-form-title">
     <header class="mgmt-header">
         <div class="title-wrap">
@@ -8,15 +8,15 @@
     </header>
 
     <div class="card">
-        <form action="../../Controllers/addNewUser/addNewUser.php" method="post" novalidate>
+        <form action="../../Controllers/addNewUser/addNewUser.php" method="post" >
             <div class="form-grid">
                 <div class="field">
                     <label for="fName">First Name</label>
-                    <input type="text" id="fName" name="fName" placeholder="John" title="Enter first name" required>
+                    <input type="text" id="fName" name="fName" placeholder="Kalana" title="Enter first name" required>
                 </div>
                 <div class="field">
                     <label for="lName">Last Name</label>
-                    <input type="text" id="lName" name="lName" placeholder="Doe" title="Enter last name" required>
+                    <input type="text" id="lName" name="lName" placeholder="Jinendra" title="Enter last name" required>
                 </div>
 
                 <div class="field span-2">
@@ -196,6 +196,24 @@
         if (roleSelect) {
             roleSelect.addEventListener('change', updateVisibility);
             updateVisibility();
+        }
+
+        // Enforce DOB to be at least 3 years before today
+        const dobInput = document.getElementById('dob');
+        if (dobInput) {
+            const today = new Date();
+            const maxDate = new Date(today.getFullYear() - 3, today.getMonth(), today.getDate());
+            const maxStr = maxDate.toISOString().split('T')[0];
+            dobInput.setAttribute('max', maxStr);
+
+            const validateDob = () => {
+                dobInput.setCustomValidity('');
+                if (dobInput.value && new Date(dobInput.value) > maxDate) {
+                    dobInput.setCustomValidity('Date of birth must be at least 3 years before today.');
+                }
+            };
+            dobInput.addEventListener('input', validateDob);
+            validateDob();
         }
     })();
 </script>
