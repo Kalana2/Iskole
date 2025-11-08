@@ -1,4 +1,29 @@
 <!-- filepath: /home/snake/Projects/Iskole/app/Views/templates/report.php -->
+<?php
+// Sample behavior reports (replace later with DB fetch)
+$behaviorReports = [
+  [
+    'id' => 1,
+    'teacher_name' => 'Mr. John Silva',
+    'teacher_subject' => 'Mathematics',
+    'report_date' => '2025-11-01',
+    'report_type' => 'positive',
+    'title' => 'Excellent Leadership in Group Work',
+    'description' => 'Showed exceptional leadership during group activities. Actively helped struggling classmates understand complex algebra concepts. Demonstrated patience and clear communication skills while explaining solutions.',
+    'category' => 'Academic Excellence'
+  ],
+  [
+    'id' => 2,
+    'teacher_name' => 'Mrs. Sarah Perera',
+    'teacher_subject' => 'Science',
+    'report_date' => '2025-10-30',
+    'report_type' => 'positive',
+    'title' => 'Outstanding Lab Safety and Participation',
+    'description' => 'Displayed outstanding participation in today\'s chemistry lab experiment. Followed all safety protocols perfectly and assisted team members in setting up equipment correctly. Shows great attention to detail.',
+    'category' => 'Safety & Conduct'
+  ],
+];
+?>
 <section class="reports-entry tab-panel mp-management">
   <div class="reports-section">
     <header class="mgmt-header">
@@ -92,204 +117,95 @@
               <button class="toggle-btn" data-chart="radar">Radar Chart</button>
             </div>
           </h3>
-
-          <!-- <div class="chart-controls">
-            <div class="term-selector" id="termSelector">
-              <label for="term-select">Select Term:</label>
-              <select id="term-select" name="term">
-                <option value="term1">Term 1</option>
-                <option value="term2">Term 2</option>
-                <option value="term3" selected>Term 3</option>
-              </select>
-            </div>
-          </div> -->
-
           <div class="chart-container">
             <canvas id="performanceChart"></canvas>
           </div>
-
-          <!-- Subject Details Table -->
-          <!-- <div class="subject-details">
-            <h4>Detailed Marks</h4>
-            <div class="subjects-grid">
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">Religion</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">89/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 89%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">Sinhala</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">77/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 77%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">Mathematics</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">92/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 92%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">Science</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">88/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 88%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">English</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">85/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 85%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="C">
-                <div class="subject-header">
-                  <span class="subject-name">History</span>
-                  <span class="badge C">C</span>
-                </div>
-                <div class="subject-score">60/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 60%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="B">
-                <div class="subject-header">
-                  <span class="subject-name">Geography</span>
-                  <span class="badge B">B</span>
-                </div>
-                <div class="subject-score">73/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 73%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="B">
-                <div class="subject-header">
-                  <span class="subject-name">Health & PE</span>
-                  <span class="badge B">B</span>
-                </div>
-                <div class="subject-score">74/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 74%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="A">
-                <div class="subject-header">
-                  <span class="subject-name">Tamil</span>
-                  <span class="badge A">A</span>
-                </div>
-                <div class="subject-score">99/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 99%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="C">
-                <div class="subject-header">
-                  <span class="subject-name">Aesthetics</span>
-                  <span class="badge C">C</span>
-                </div>
-                <div class="subject-score">55/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 55%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="W">
-                <div class="subject-header">
-                  <span class="subject-name">Citizenship</span>
-                  <span class="badge W">W</span>
-                </div>
-                <div class="subject-score">30/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 30%"></div>
-                </div>
-              </div>
-
-              <div class="subject-card" data-grade="S">
-                <div class="subject-header">
-                  <span class="subject-name">Practical Skills</span>
-                  <span class="badge S">S</span>
-                </div>
-                <div class="subject-score">45/100</div>
-                <div class="progress-bar-mini">
-                  <div class="progress-fill" style="width: 45%"></div>
-                </div>
-              </div>
-            </div>
-          </div> -->
         </div>
 
         <!-- Behavior Section -->
         <div class="behavior-section">
-          <div class="behavior-report">
-            <h3 class="report-title">Behavior Report</h3>
+          <div class="behavior-form-wrapper">
+            <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
               <form action="" id="behaviorForm">
-                <label for="behavior-update">Add Behavior Update:</label>
-                <textarea id="behavior-update" name="behavior-update" rows="4" placeholder="Enter behavior observation..."></textarea>
+                <div class="form-row">
+                  <label for="report_type">Report Type</label>
+                  <select id="report_type" name="report_type" required>
+                    <option value="positive" selected>Positive</option>
+                    <option value="neutral">Neutral</option>
+                    <option value="concern">Concern</option>
+                  </select>
+                </div>
+                <div class="form-row">
+                  <label for="category">Category</label>
+                  <input type="text" id="category" name="category" placeholder="e.g. Academic Excellence" />
+                </div>
+                <div class="form-row">
+                  <label for="title">Title</label>
+                  <input type="text" id="title" name="title" placeholder="e.g. Excellent Leadership in Group Work" required />
+                </div>
+                <div class="form-row">
+                  <label for="description">Description</label>
+                  <textarea id="description" name="description" rows="4" placeholder="Enter detailed observation..." required></textarea>
+                </div>
                 <button type="submit" class="update-behavior-btn">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                     <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                   </svg>
-                  Add Update
+                  Add Report
                 </button>
               </form>
             </div>
           </div>
 
-          <div class="recent-behavior-updates">
-            <h3 class="report-title">Recent Behavior Updates</h3>
-            <div class="timeline">
-              <div class="timeline-item">
-                <div class="timeline-marker positive"></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">Nov 1, 2025</div>
-                  <p>Improved participation in class discussions.</p>
+          <div class="behavior-report-list">
+            <h3 class="report-title">Recent Behavior Reports</h3>
+            <?php if (!empty($behaviorReports)): ?>
+              <?php foreach ($behaviorReports as $report): ?>
+                <?php
+                  $reportDate = isset($report['report_date']) && $report['report_date'] !== '' ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
+                  $reportType = $report['report_type'] ?? 'neutral';
+                  $teacherName = $report['teacher_name'] ?? 'Unknown Teacher';
+                  $teacherSubject = $report['teacher_subject'] ?? '';
+                  $category = $report['category'] ?? 'General';
+                  $typeIcons = [ 'positive' => '✓', 'neutral' => '◉', 'concern' => '⚠' ];
+                ?>
+                <div class="behavior-report <?php echo htmlspecialchars($reportType); ?>" data-type="<?php echo htmlspecialchars($reportType); ?>">
+                  <div class="report-header">
+                    <div class="report-info">
+                      <div class="teacher-details">
+                        <span class="reporter"><?php echo htmlspecialchars($teacherName); ?></span>
+                        <?php if ($teacherSubject): ?><span class="subject-badge"><?php echo htmlspecialchars($teacherSubject); ?></span><?php endif; ?>
+                      </div>
+                      <div class="report-meta">
+                        <span class="repo-date"><?php echo htmlspecialchars($reportDate); ?></span>
+                        <span class="category-badge"><?php echo htmlspecialchars($category); ?></span>
+                      </div>
+                    </div>
+                    <div class="report-type-indicator">
+                      <span class="type-badge <?php echo htmlspecialchars($reportType); ?>">
+                        <?php echo $typeIcons[$reportType] ?? '◉'; ?>
+                        <?php echo ucfirst($reportType); ?>
+                      </span>
+                    </div>
+                  </div>
+                  <?php if (!empty($report['title'])): ?>
+                    <div class="report-title">
+                      <?php echo htmlspecialchars($report['title']); ?>
+                    </div>
+                  <?php endif; ?>
+                  <div class="report-content">
+                    <p><?php echo htmlspecialchars($report['description'] ?? 'No description provided'); ?></p>
+                  </div>
                 </div>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No Behavior Reports</h3>
+                <p>There are no behavior reports available at this time.</p>
               </div>
-              <div class="timeline-item">
-                <div class="timeline-marker positive"></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">Oct 28, 2025</div>
-                  <p>Completed all homework assignments on time.</p>
-                </div>
-              </div>
-              <div class="timeline-item">
-                <div class="timeline-marker positive"></div>
-                <div class="timeline-content">
-                  <div class="timeline-date">Oct 25, 2025</div>
-                  <p>Helped classmates with difficult subjects.</p>
-                </div>
-              </div>
-            </div>
+            <?php endif; ?>
           </div>
         </div>
       </div>

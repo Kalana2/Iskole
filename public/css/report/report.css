@@ -450,52 +450,125 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
-.behavior-update form {
+.behavior-report-list {
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
 
-.behavior-update label {
-  font-weight: 600;
-  color: #1a1a2e;
-  font-size: 1rem;
-}
-
-.behavior-update textarea {
-  padding: 1rem;
-  border: 2px solid #e5e7eb;
+.behavior-report {
+  background: #fff;
   border-radius: 12px;
-  font-size: 1rem;
-  font-family: inherit;
-  resize: vertical;
-  transition: border-color 0.2s;
+  padding: 1.5rem;
+  border: 1px solid #e5e7eb;
+  border-left: 4px solid #e5e7eb;
 }
 
-.behavior-update textarea:focus {
-  outline: none;
-  border-color: #667eea;
+.behavior-report.positive {
+  border-left-color: #10b981;
+  background: linear-gradient(to right, #ecfdf5 0%, white 15%);
 }
 
-.update-behavior-btn {
+.behavior-report.neutral {
+  border-left-color: #6b7280;
+  background: linear-gradient(to right, #f9fafb 0%, white 15%);
+}
+
+.behavior-report.concern {
+  border-left-color: #f59e0b;
+  background: linear-gradient(to right, #fffbeb 0%, white 15%);
+}
+
+.report-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.report-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.teacher-details {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  padding: 0.875rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  gap: 0.75rem;
+  flex-wrap: wrap;
 }
 
-.update-behavior-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+.reporter {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.subject-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.report-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.repo-date {
+  font-size: 0.875rem;
+  color: #6b7280;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.repo-date::before {
+  content: "📅";
+}
+
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.625rem;
+  background: #f3f4f6;
+  color: #4b5563;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  border: 1px solid #e5e7eb;
+}
+
+.type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.type-badge.positive {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+}
+
+.type-badge.neutral {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: #fff;
+}
+
+.type-badge.concern {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #fff;
 }
 
 /* Timeline */
@@ -607,4 +680,27 @@
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   padding: 1.25rem;
+}
+
+/* Form Row */
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+.form-row input,
+.form-row select,
+.form-row textarea {
+  padding: 0.75rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  font-size: 1rem;
+  outline: none;
+}
+.form-row input:focus,
+.form-row select:focus,
+.form-row textarea:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }

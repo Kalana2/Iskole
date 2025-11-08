@@ -259,16 +259,95 @@ function setupBehaviorForm() {
     behaviorForm.addEventListener("submit", function (e) {
       e.preventDefault();
 
-      const textarea = document.getElementById("behavior-update");
-      const behaviorText = textarea.value.trim();
+      // Fields now exclude teacher name/subject
+      const reportType =
+        document.getElementById("report_type")?.value || "neutral";
+      const category =
+        document.getElementById("category")?.value.trim() || "General";
+      const title = document.getElementById("title")?.value.trim() || "";
+      const description =
+        document.getElementById("description")?.value.trim() || "";
 
-      if (behaviorText) {
-        // Add behavior update to timeline
-        addBehaviorUpdate(behaviorText);
-        textarea.value = "";
-      }
+      if (!title || !description) return;
+
+      addBehaviorReportCard({
+        teacher_name: "Teacher",
+        teacher_subject: "",
+        report_type: reportType,
+        category,
+        title,
+        description,
+      });
+
+      behaviorForm.reset();
     });
   }
+}
+
+// Create and prepend a behavior report card matching parentBehavior styles
+function addBehaviorReportCard(report) {
+  const list = document.querySelector(".behavior-report-list");
+  if (!list) return;
+
+  const typeIcons = { positive: "✓", neutral: "◉", concern: "⚠" };
+  const dateStr = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
+  const card = document.createElement("div");
+  card.className = `behavior-report ${report.report_type}`;
+  card.setAttribute("data-type", report.report_type);
+  card.style.animation = "fadeIn 0.3s ease";
+
+  card.innerHTML = `
+    <div class="report-header">
+      <div class="report-info">
+        <div class="teacher-details">
+          <span class="reporter">${escapeHtml(report.teacher_name)}</span>
+        </div>
+        <div class="report-meta">
+          <span class="repo-date">${dateStr}</span>
+          <span class="category-badge">${escapeHtml(report.category)}</span>
+        </div>
+      </div>
+      <div class="report-type-indicator">
+        <span class="type-badge ${report.report_type}">
+          ${typeIcons[report.report_type] || "◉"}
+          ${capitalize(report.report_type)}
+        </span>
+      </div>
+    </div>
+    ${
+      report.title
+        ? `<div class="report-title">${escapeHtml(report.title)}</div>`
+        : ""
+    }
+    <div class="report-content">
+      <p>${escapeHtml(report.description)}</p>
+    </div>
+  `;
+
+  const heading = list.querySelector("h3.report-title");
+  if (heading && heading.nextSibling) {
+    list.insertBefore(card, heading.nextSibling);
+  } else {
+    list.appendChild(card);
+  }
+}
+
+function escapeHtml(str) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function capitalize(str) {
+  return (str || "").charAt(0).toUpperCase() + (str || "").slice(1);
 }
 
 // Add behavior update to timeline
