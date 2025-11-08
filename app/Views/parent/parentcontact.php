@@ -213,29 +213,9 @@ $stats = [
                     <div class="teacher-main-info">
                         <h3 class="teacher-name"><?php echo $teacher['name']; ?></h3>
                         <div class="subject-badge"><?php echo $teacher['subject']; ?></div>
-                        <div class="teacher-meta">
-                            <span class="meta-item">
-                                <i class="fas fa-briefcase"></i>
-                                <?php echo $teacher['experience']; ?> experience
-                            </span>
-                            <span class="meta-item">
-                                <i class="fas fa-door-open"></i>
-                                Room <?php echo $teacher['room']; ?>
-                            </span>
-                        </div>
                     </div>
 
-                    <div class="teacher-details">
-                        <div class="specialization">
-                            <i class="fas fa-graduation-cap"></i>
-                            <span><?php echo $teacher['specialization']; ?></span>
-                        </div>
-
-                        <div class="availability">
-                            <i class="fas fa-clock"></i>
-                            <span><?php echo $teacher['availability']; ?></span>
-                        </div>
-                    </div>
+                    <!-- specialization and availability removed per UI update -->
 
                     <div class="contact-methods">
                         <a href="mailto:<?php echo $teacher['email']; ?>" class="contact-method email-method" title="Send Email">
@@ -249,16 +229,7 @@ $stats = [
                         </a>
                     </div>
 
-                    <div class="card-actions">
-                        <button class="action-btn primary-btn" onclick="sendMessage('<?php echo $teacher['name']; ?>')">
-                            <i class="fas fa-paper-plane"></i>
-                            Send Message
-                        </button>
-                        <button class="action-btn secondary-btn" onclick="scheduleMeeting('<?php echo $teacher['name']; ?>')">
-                            <i class="fas fa-calendar-plus"></i>
-                            Schedule Meeting
-                        </button>
-                    </div>
+                    <!-- message and schedule buttons removed per request -->
                 </div>
             <?php endforeach; ?>
         </div>
@@ -340,11 +311,5 @@ $stats = [
         }
     });
 
-    function sendMessage(teacherName) {
-        alert('Opening messaging interface for ' + teacherName + '...\n\nThis feature will allow you to send direct messages to the teacher.');
-    }
-
-    function scheduleMeeting(teacherName) {
-        alert('Opening meeting scheduler for ' + teacherName + '...\n\nThis feature will allow you to request a meeting with the teacher.');
-    }
+    // Messaging and scheduling actions removed from UI; contact via email/phone instead.
 </script>
