@@ -205,19 +205,6 @@
                             </select>
                         </div>
 
-                        <div class="form-group">
-                            <label for="examType" class="form-label">Exam Type</label>
-                            <select name="examType" id="examType" class="form-select" required>
-                                <option value="">Select Exam Type</option>
-                                <?php foreach ($examTypes as $exam): ?>
-                                    <option value="<?php echo $exam['value']; ?>"
-                                        <?php echo $selectedExamType === $exam['value'] ? 'selected' : ''; ?>>
-                                        <?php echo $exam['label']; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-
                         <div class="form-group btn-group">
                             <button type="submit" class="btn btn-search">
                                 <span class="btn-icon">🔍</span>
@@ -270,17 +257,6 @@
                             <div class="stat-value"><?php echo $classAverage; ?>%</div>
                             <div class="stat-label">Class Average</div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Progress Bar -->
-                <div class="progress-container">
-                    <div class="progress-header">
-                        <span class="progress-label">Completion Progress</span>
-                        <span class="progress-percentage"><?php echo $completionPercentage; ?>%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: <?php echo $completionPercentage; ?>%"></div>
                     </div>
                 </div>
 
