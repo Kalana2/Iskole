@@ -214,33 +214,25 @@ function initChart() {
 // Chart toggle functionality
 function setupChartToggle() {
   const toggleButtons = document.querySelectorAll(".toggle-btn");
+  // Term selector removed in My Marks view; keep null-safe code
   const termSelector = document.getElementById("termSelector");
 
   toggleButtons.forEach((btn) => {
     btn.addEventListener("click", function () {
       toggleButtons.forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
-
       currentChartType = this.dataset.chart;
-
-      // Show term selector for both chart types
-      if (termSelector) {
-        termSelector.style.display = "flex";
-      }
-
       initChart();
     });
   });
 }
 
-// Term selector functionality
+// Term selector functionality (retained for pages that still have it, safe no-op otherwise)
 function setupTermSelector() {
   const termSelect = document.getElementById("term-select");
-
   if (termSelect) {
     termSelect.addEventListener("change", function (e) {
       currentTerm = e.target.value;
-      // Update chart for both radar and line charts
       initChart();
     });
   }

@@ -7,6 +7,7 @@
     <title>Student</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/report/report.css">
+    <link rel="stylesheet" href="/css/myMarks/myMarks.css">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
