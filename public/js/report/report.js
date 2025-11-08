@@ -23,7 +23,8 @@ const studentData = {
 
 // Chart.js configuration
 let performanceChart = null;
-let currentChartType = "bar";
+let currentChartType = "line";
+let currentTerm = "term3";
 
 // Color scheme
 const colorScheme = {
@@ -46,35 +47,71 @@ function initChart() {
   }
 
   const labels = studentData.subjects.map((s) => s.name);
-  const scores = studentData.subjects.map((s) => s.score);
 
-  // Create gradient
-  const gradient = ctx.getContext("2d").createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, "rgba(102, 126, 234, 0.8)");
-  gradient.addColorStop(1, "rgba(118, 75, 162, 0.8)");
+  // Define datasets for all three terms
+  const termDatasets = [
+    {
+      key: "term1",
+      label: "Term 1",
+      data: studentData.terms.term1,
+      borderColor: "rgba(239, 68, 68, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(239, 68, 68, 0.15)"
+          : "rgba(239, 68, 68, 0.1)",
+    },
+    {
+      key: "term2",
+      label: "Term 2",
+      data: studentData.terms.term2,
+      borderColor: "rgba(245, 158, 11, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(245, 158, 11, 0.15)"
+          : "rgba(245, 158, 11, 0.1)",
+    },
+    {
+      key: "term3",
+      label: "Term 3",
+      data: studentData.terms.term3,
+      borderColor: "rgba(16, 185, 129, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(16, 185, 129, 0.15)"
+          : "rgba(16, 185, 129, 0.1)",
+    },
+  ];
+
+  // Apply highlighting based on selected term
+  const datasets = termDatasets.map((dataset) => {
+    const isSelected = dataset.key === currentTerm;
+    return {
+      label: dataset.label,
+      data: dataset.data,
+      borderColor: isSelected
+        ? dataset.borderColor
+        : dataset.borderColor.replace("0.8", "0.3"),
+      backgroundColor: isSelected
+        ? dataset.backgroundColor
+        : dataset.backgroundColor.replace(/0\.1\d?/, "0.05"),
+      borderWidth: isSelected ? 3 : 1,
+      pointBackgroundColor: isSelected
+        ? dataset.borderColor
+        : dataset.borderColor.replace("0.8", "0.3"),
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: dataset.borderColor,
+      pointRadius: isSelected ? 4 : 3,
+      tension: 0.4,
+      fill: currentChartType === "line",
+    };
+  });
 
   const config = {
     type: currentChartType,
     data: {
       labels: labels,
-      datasets: [
-        {
-          label: "Term 3 Scores",
-          data: scores,
-          backgroundColor:
-            currentChartType === "radar"
-              ? "rgba(102, 126, 234, 0.2)"
-              : gradient,
-          borderColor: "rgba(102, 126, 234, 1)",
-          borderWidth: 2,
-          borderRadius: currentChartType === "bar" ? 8 : 0,
-          pointBackgroundColor: "rgba(102, 126, 234, 1)",
-          pointBorderColor: "#fff",
-          pointHoverBackgroundColor: "#fff",
-          pointHoverBorderColor: "rgba(102, 126, 234, 1)",
-          tension: 0.4,
-        },
-      ],
+      datasets: datasets,
     },
     options: {
       responsive: true,
@@ -82,7 +119,16 @@ function initChart() {
       aspectRatio: 2,
       plugins: {
         legend: {
-          display: false,
+          display: true,
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 12,
+              weight: "600",
+            },
+          },
         },
         tooltip: {
           backgroundColor: "rgba(0, 0, 0, 0.8)",
@@ -99,7 +145,7 @@ function initChart() {
             label: function (context) {
               const score = context.parsed.y || context.parsed.r;
               const subject = studentData.subjects[context.dataIndex];
-              return `Score: ${score}/100 (Grade: ${subject.grade})`;
+              return `${context.dataset.label}: ${score}/100 (Grade: ${subject.grade})`;
             },
           },
         },
@@ -127,7 +173,8 @@ function initChart() {
                 },
               },
             }
-          : {
+          : currentChartType === "line"
+          ? {
               x: {
                 grid: {
                   display: false,
@@ -156,51 +203,10 @@ function initChart() {
                   },
                 },
               },
-            },
+            }
+          : {},
     },
   };
-
-  // Modify for line chart
-  if (currentChartType === "line") {
-    config.data.datasets = [
-      {
-        label: "Term 1",
-        data: studentData.terms.term1,
-        borderColor: "rgba(239, 68, 68, 0.8)",
-        backgroundColor: "rgba(239, 68, 68, 0.1)",
-        tension: 0.4,
-        fill: true,
-      },
-      {
-        label: "Term 2",
-        data: studentData.terms.term2,
-        borderColor: "rgba(245, 158, 11, 0.8)",
-        backgroundColor: "rgba(245, 158, 11, 0.1)",
-        tension: 0.4,
-        fill: true,
-      },
-      {
-        label: "Term 3",
-        data: studentData.terms.term3,
-        borderColor: "rgba(16, 185, 129, 0.8)",
-        backgroundColor: "rgba(16, 185, 129, 0.1)",
-        tension: 0.4,
-        fill: true,
-      },
-    ];
-    config.options.plugins.legend = {
-      display: true,
-      position: "top",
-      labels: {
-        usePointStyle: true,
-        padding: 15,
-        font: {
-          size: 12,
-          weight: "600",
-        },
-      },
-    };
-  }
 
   performanceChart = new Chart(ctx, config);
 }
@@ -208,6 +214,7 @@ function initChart() {
 // Chart toggle functionality
 function setupChartToggle() {
   const toggleButtons = document.querySelectorAll(".toggle-btn");
+  const termSelector = document.getElementById("termSelector");
 
   toggleButtons.forEach((btn) => {
     btn.addEventListener("click", function () {
@@ -215,9 +222,28 @@ function setupChartToggle() {
       this.classList.add("active");
 
       currentChartType = this.dataset.chart;
+
+      // Show term selector for both chart types
+      if (termSelector) {
+        termSelector.style.display = "flex";
+      }
+
       initChart();
     });
   });
+}
+
+// Term selector functionality
+function setupTermSelector() {
+  const termSelect = document.getElementById("term-select");
+
+  if (termSelect) {
+    termSelect.addEventListener("change", function (e) {
+      currentTerm = e.target.value;
+      // Update chart for both radar and line charts
+      initChart();
+    });
+  }
 }
 
 // Search functionality
@@ -308,6 +334,7 @@ document.addEventListener("DOMContentLoaded", function () {
   if (typeof Chart !== "undefined") {
     initChart();
     setupChartToggle();
+    setupTermSelector();
   } else {
     console.error(
       "Chart.js is not loaded. Please include Chart.js in your HTML."

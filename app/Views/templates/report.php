@@ -13,7 +13,7 @@
         <input type="text" placeholder="Search student..." id="searchInput">
         <button type="submit" class="search-btn">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
           </svg>
           Search
         </button>
@@ -39,7 +39,7 @@
                 <span class="value">A</span>
               </div>
               <div class="info-item">
-                <span class="label">Student #:</span>
+                <span class="label">Student ID:</span>
                 <span class="value">101</span>
               </div>
               <div class="info-item">
@@ -65,7 +65,6 @@
             <div class="stat-content">
               <h4>Overall Average</h4>
               <p class="stat-value">72.3%</p>
-              <span class="stat-trend positive">+5.2% from last term</span>
             </div>
           </div>
           <div class="stat-card">
@@ -73,7 +72,6 @@
             <div class="stat-content">
               <h4>Section Rank</h4>
               <p class="stat-value">#5</p>
-              <span class="stat-trend">of 45 students</span>
             </div>
           </div>
           <div class="stat-card">
@@ -81,7 +79,6 @@
             <div class="stat-content">
               <h4>Class Rank</h4>
               <p class="stat-value">#1</p>
-              <span class="stat-trend positive">Top performer</span>
             </div>
           </div>
         </div>
@@ -91,18 +88,28 @@
           <h3 class="report-title">
             <span>Performance Report</span>
             <div class="chart-toggle">
-              <button class="toggle-btn active" data-chart="bar">Bar Chart</button>
+              <button class="toggle-btn active" data-chart="line">Trend</button>
               <button class="toggle-btn" data-chart="radar">Radar Chart</button>
-              <button class="toggle-btn" data-chart="line">Trend</button>
             </div>
           </h3>
-          
+
+          <!-- <div class="chart-controls">
+            <div class="term-selector" id="termSelector">
+              <label for="term-select">Select Term:</label>
+              <select id="term-select" name="term">
+                <option value="term1">Term 1</option>
+                <option value="term2">Term 2</option>
+                <option value="term3" selected>Term 3</option>
+              </select>
+            </div>
+          </div> -->
+
           <div class="chart-container">
             <canvas id="performanceChart"></canvas>
           </div>
 
           <!-- Subject Details Table -->
-          <div class="subject-details">
+          <!-- <div class="subject-details">
             <h4>Detailed Marks</h4>
             <div class="subjects-grid">
               <div class="subject-card" data-grade="A">
@@ -237,7 +244,7 @@
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
         </div>
 
         <!-- Behavior Section -->
@@ -250,7 +257,7 @@
                 <textarea id="behavior-update" name="behavior-update" rows="4" placeholder="Enter behavior observation..."></textarea>
                 <button type="submit" class="update-behavior-btn">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                    <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M8 2v12M2 8h12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                   </svg>
                   Add Update
                 </button>

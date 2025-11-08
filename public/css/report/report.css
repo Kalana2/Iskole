@@ -267,6 +267,50 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+/* Chart Controls */
+.chart-controls {
+  margin: 1rem 0;
+}
+
+.term-selector {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f3f4f6;
+  border-radius: 10px;
+  width: fit-content;
+}
+
+.term-selector label {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+.term-selector select {
+  padding: 0.5rem 1rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 8px;
+  background: white;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.2s;
+  outline: none;
+}
+
+.term-selector select:hover {
+  border-color: #667eea;
+}
+
+.term-selector select:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
 /* Chart Container */
 .chart-container {
   margin: 2rem 0;

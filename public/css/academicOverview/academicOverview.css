@@ -1,575 +1,202 @@
-/* filepath: /home/snake/Projects/Iskole/public/css/academicOverview/academicOverview.css */
-:root {
-  --blur-bg: rgba(255, 255, 255, 0.7);
-  --text: #1f2543;
-  --muted: #6b7280;
-  --primary: #667eea;
-  --primary-2: #764ba2;
-  --ring: rgba(102, 126, 234, 0.45);
-  --card: #ffffff;
-  --border: rgba(17, 24, 39, 0.08);
+﻿/* Academic Overview styles — aligned to project branding variables */
+/* Uses variables defined in public/css/variables.css: --primary-color, --text-color, --card-bg, --bg-color, --shadow-light, --border-radius */
+
+body {
+  background: var(--bg-color);
 }
 
-* {
-  box-sizing: border-box;
-}
-
-/* Main container */
 .mp-academic {
-  max-width: 1400px;
-  margin: 1.25rem auto;
-  padding: 0.5rem 1rem 2rem;
-  scroll-behavior: smooth;
+  max-width: 1200px;
+  margin: 18px auto;
+  padding: 24px;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  color: var(--text-color);
+  /* local theme aliases */
+  --ao-muted: rgba(51, 51, 51, 0.58);
+  --ao-success: #16a34a;
+  --ao-danger: #ef4444;
+  --ao-shadow: var(--shadow-light);
 }
 
-/* Header matching userDirectory style */
 .mgmt-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
-  color: #fff;
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  gap: 12px;
+  margin-bottom: 12px;
 }
 .mgmt-header .title-wrap h2 {
   margin: 0;
-  font-size: 1.35rem;
+  font-size: 1.4rem;
 }
-.mgmt-header .subtitle {
-  margin: 0.2rem 0 0;
-  color: rgba(255, 255, 255, 0.85);
+.mgmt-header .title-wrap .subtitle {
+  margin-top: 4px;
   font-size: 0.95rem;
 }
 
-/* Quick Grade Navigation */
 .grade-nav {
   display: flex;
-  gap: 0.75rem;
-  margin: 1rem 0;
-  padding: 1rem;
-  background: var(--card);
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  gap: 10px;
+  margin: 14px 0 18px;
   flex-wrap: wrap;
-  animation: slideDown 0.4s ease-out;
 }
-
 .grade-nav-btn {
-  flex: 1 1 auto;
-  min-width: 120px;
-  padding: 0.7rem 1.25rem;
-  border: 2px solid var(--primary);
   background: transparent;
-  color: var(--primary);
-  border-radius: 8px;
-  font-weight: 700;
-  font-size: 0.95rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 8px 14px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  color: var(--text-color);
+  box-shadow: none;
+  transition: all 0.18s ease;
+  font-weight: 600;
 }
-
-.grade-nav-btn::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-2));
-  transition: left 0.4s ease;
-  z-index: -1;
-}
-
-.grade-nav-btn:hover::before {
-  left: 0;
-}
-
 .grade-nav-btn:hover {
-  color: #fff;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transform: translateY(-3px);
+  box-shadow: var(--ao-shadow);
 }
-
-.grade-nav-btn:active {
-  transform: translateY(0) scale(0.98);
-}
-
 .grade-nav-btn.active {
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
+  background: var(--primary-color);
   color: #fff;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  border: 0;
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.12);
 }
 
-/* Card styling */
+.grade-section {
+  margin-bottom: 20px;
+}
 .card {
-  margin-top: 1rem;
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  padding: 1.25rem;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 18px;
+  box-shadow: var(--ao-shadow);
+  border: 1px solid rgba(15, 23, 42, 0.03);
 }
 
-/* Chart container */
-.chart-container {
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid var(--border);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  transition: all 0.3s ease;
-  animation: slideDown 0.5s ease-out;
-}
-
-.chart-container:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  transform: translateY(-2px);
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.chart-container h3 {
-  margin: 0 0 1rem 0;
-  color: var(--text);
-  font-size: 1.1rem;
-  font-weight: 700;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-}
-
-/* Grade block */
-.grade {
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  margin: 1rem 0;
-  overflow: hidden;
-  background: var(--card);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  scroll-margin-top: 20px;
-}
-
-.grade:hover {
-  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
-}
-
-.grade-heading {
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-  padding: 0.85rem 1rem;
-  font-weight: 700;
-  color: var(--text);
-  border-bottom: 1px solid var(--border);
-  transition: background 0.3s ease;
-  cursor: pointer;
-  user-select: none;
-}
-
-.grade-heading:hover {
-  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
-}
-
-.grade-heading:active {
-  transform: scale(0.99);
-}
-
-.grade-info {
-  padding: 1rem;
-  animation: fadeIn 0.4s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Grade summary and subject cards */
-.grade-box {
-  border: 1px solid var(--border);
-  background: #fff;
-  border-radius: 12px;
-  padding: 1.25rem;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  flex: 1 1 280px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.grade-box:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
-}
-
-.grade-sum .grade-box {
-  flex: 1 1 100%;
-}
-
-/* Grade summary specific styling */
-.grade-summary-box .summary-data {
+.charts-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2rem;
-  align-items: center;
-}
-
-.summary-stats {
-  display: grid;
-  gap: 1rem;
-}
-
-.stat-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border-left: 3px solid #667eea;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-.stat-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: var(--text);
-}
-
-.stat-value.success {
-  color: #667eea;
-}
-
-.stat-value.danger {
-  color: #dc3545;
-}
-
-.summary-chart {
-  position: relative;
-  height: 200px;
-}
-
-.summary-chart canvas {
-  max-height: 200px;
-}
-
-@media (max-width: 900px) {
-  .grade-summary-box .summary-data {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-
-  .summary-chart {
-    height: 180px;
-  }
-}
-
-.row {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  gap: 1rem;
-  margin-bottom: 1rem;
-}
-
-.row > .grade-box {
-  grid-column: span 6;
-}
-
-@media (max-width: 900px) {
-  .row > .grade-box {
-    grid-column: span 12;
-  }
-}
-
-/* Headings inside boxes */
-.grade-box .heading {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text);
-  margin-bottom: 0.75rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 2px solid rgba(102, 126, 234, 0.2);
-}
-
-/* Progress (linear) */
-.progress-container {
-  position: relative;
-  height: 12px;
-  background: #f1f5f9;
-  border-radius: 999px;
-  overflow: hidden;
-  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
-}
-.progress-bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, var(--primary), var(--primary-2));
-  border-radius: 999px;
-  transition: width 0.6s ease;
-  box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
-}
-.progress-text {
-  margin-top: 0.5rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-  font-weight: 600;
-}
-
-/* Side-by-side comparison */
-.comparison {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(140px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: 1fr;
+  gap: 18px;
   align-items: start;
-  margin-top: 1rem;
 }
 
-.higher-than-75,
-.lower-than-30 {
+.chart-container {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(0, 0, 0, 0.01)
+  );
+  padding: 12px;
+  border-radius: 10px;
+}
+.chart-container h3 {
+  margin: 0 0 6px 0;
+  font-size: 1.05rem;
+}
+.chart-subtitle {
+  margin: 0 0 12px 0;
+  color: var(--ao-muted);
+  font-size: 0.9rem;
+}
+
+.chart-wrapper {
+  background: transparent;
+  padding: 8px;
+  border-radius: 8px;
+  min-height: 240px;
+  display: flex;
+  align-items: center;
+}
+.chart-wrapper canvas {
+  width: 100% !important;
+  display: block;
+}
+
+/* Specific sizes for top/bottom charts */
+.chart-top .chart-wrapper canvas {
+  height: 260px !important;
+}
+.chart-bottom .chart-wrapper canvas {
+  height: 340px !important;
+}
+
+.chart-stats {
+  display: flex;
+  gap: 12px;
+  margin-top: 12px;
+}
+.stat-item {
+  background: linear-gradient(180deg, #fafafa, #fff);
+  padding: 10px 12px;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  text-align: center;
+  min-width: 130px;
 }
-
-.higher-than-75 span:first-child,
-.lower-than-30 span:first-child {
-  display: inline-block;
+.stat-item .stat-label {
   font-size: 0.85rem;
-  color: var(--muted);
-  margin-bottom: 0.75rem;
-  font-weight: 600;
+  color: var(--ao-muted);
 }
-
-/* Circular progress */
-.circular-progress {
-  --size: 90px;
-  width: var(--size);
-  height: var(--size);
-  border-radius: 50%;
-  background: conic-gradient(var(--primary) 0% 50%, #e5e7eb 50% 100%);
-  display: grid;
-  place-items: center;
-  position: relative;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-.circular-progress::after {
-  content: "";
-  width: calc(var(--size) - 20px);
-  height: calc(var(--size) - 20px);
-  border-radius: 50%;
-  background: #fff;
-}
-.circular-progress span {
-  position: absolute;
+.stat-item .stat-value {
   font-weight: 700;
-  font-size: 1rem;
-  color: var(--text);
+  font-size: 1.05rem;
+  margin-top: 6px;
+}
+.stat-item.pass {
+  border-left: 6px solid var(--ao-success);
+}
+.stat-item.fail {
+  border-left: 6px solid var(--ao-danger);
 }
 
-/* See more button */
-.see-more {
-  user-select: none;
-  cursor: pointer;
-  color: var(--primary);
-  font-weight: 700;
-  margin-top: 1rem;
-  padding: 0.6rem 1rem;
-  border-radius: 8px;
-  background: rgba(102, 126, 234, 0.08);
-  display: inline-block;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.see-more::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transition: left 0.5s ease;
-}
-
-.see-more:hover::before {
-  left: 100%;
-}
-
-.see-more:hover {
-  background: rgba(102, 126, 234, 0.15);
-  transform: translateX(4px) scale(1.02);
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-}
-
-.see-more:active {
-  transform: translateX(2px) scale(0.98);
-}
-
-.see-more::after {
-  content: "▼";
-  display: inline-block;
-  margin-left: 0.5rem;
-  transition: transform 0.3s ease;
-}
-
-.see-more.expanded::after {
-  transform: rotate(180deg);
-}
-
-/* Utilities */
-.subject-avg {
-  margin-bottom: 0.75rem;
-}
-.data {
-  display: grid;
-  gap: 0.75rem;
-}
-
-/* Hide boxes initially */
-[class^="hide-box-"] {
-  overflow: hidden;
-  max-height: 0;
+.chart-container {
   opacity: 0;
-  transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease,
-    transform 0.4s ease;
-  transform: translateY(-10px);
+  transform: translateY(8px);
+  transition: all 0.45s cubic-bezier(0.2, 0.9, 0.2, 1);
 }
-
-[class^="hide-box-"].expanded {
-  max-height: 5000px;
+.chart-container.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
-/* Responsive tweaks */
-@media (max-width: 720px) {
-  .mgmt-header {
-    align-items: flex-start;
-    gap: 0.5rem;
-    flex-direction: column;
-  }
-  .comparison {
+@media (max-width: 900px) {
+  .charts-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
   }
-  .circular-progress {
-    --size: 80px;
-  }
-  .grade-nav {
-    flex-direction: column;
-  }
-  .grade-nav-btn {
-    min-width: 100%;
+  .chart-wrapper canvas {
+    height: 360px !important;
   }
 }
 
-/* Scroll to Top Button */
 .scroll-to-top {
   position: fixed;
-  bottom: 30px;
-  right: 30px;
-  width: 50px;
-  height: 50px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-2));
-  border: none;
-  border-radius: 50%;
+  right: 18px;
+  bottom: 18px;
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--primary-color);
   color: #fff;
-  font-size: 1.5rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: var(--shadow-light);
   opacity: 0;
-  visibility: hidden;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 1000;
+  transform: translateY(12px);
+  transition: all 0.18s ease;
+  z-index: 60;
 }
-
 .scroll-to-top.visible {
   opacity: 1;
-  visibility: visible;
+  transform: translateY(0);
 }
-
-.scroll-to-top:hover {
-  transform: translateY(-4px) scale(1.1);
-  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
-}
-
-.scroll-to-top:active {
-  transform: translateY(-2px) scale(1.05);
-}
-
 .scroll-to-top::before {
   content: "↑";
-  display: block;
-  animation: bounceUp 1.5s ease-in-out infinite;
+  font-weight: 800;
 }
 
-@keyframes bounceUp {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-/* Grade selection animations */
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-    transform: scale(1);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-}
-
-@keyframes fadeInScale {
-  from {
-    opacity: 0;
-    transform: scale(0.95) translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-/* Hide grades by default - will be shown via JS */
-.grade {
-  display: none;
-}
-
-.grade.active-grade {
-  display: block;
+.grade-section[style*="display: none"] {
+  display: none !important;
 }
