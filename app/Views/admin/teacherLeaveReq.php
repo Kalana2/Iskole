@@ -1,0 +1,3 @@
+<section class="teacher-leave-requests">
+    <?php include_once __DIR__ . '/../templates/requests.php'; ?>
+</section>
