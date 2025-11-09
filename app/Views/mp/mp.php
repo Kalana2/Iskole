@@ -18,7 +18,7 @@
     } else if ($active === 'Requests') {
         include __DIR__ . '/requests.php';
     } else if ($active === 'Attendance') {
-        include __DIR__ . '/teacherAttendence.php';
+        include __DIR__ . '/teacherAttendance.php';
     } else if ($active === 'Report') {
         include __DIR__ . '/report.php';
     } else {

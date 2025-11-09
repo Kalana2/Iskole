@@ -23,7 +23,7 @@
     } else if ($active === 'Time Table') {
         include __DIR__ . '/timetable.php';
     } else if ($active === 'Mark Entry') {
-        include __DIR__ . '/markEntry.php';
+        include __DIR__ . '/examMarks.php';
     } else if ($active === 'Attendance') {
         include __DIR__ . '/attendance.php';
     } else if ($active === 'Student Absence') {

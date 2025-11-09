@@ -89,7 +89,7 @@ if (!isset($materials) || empty($materials)) {
     <div class="ann-header">
         <div class="ann-title-wrap">
             <h2 id="materials-title">Uploaded Materials</h2>
-            <p class="ann-subtitle">Materials uploaded by you</p>
+            <p class="ann-subtitle">Materials uploaded</p>
         </div>
         <div class="ann-actions">
             <div class="chip-group" role="tablist" aria-label="Material filters">
