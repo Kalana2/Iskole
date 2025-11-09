@@ -1,2 +1,3 @@
-<?php
-// Teacher leave request management CRUD operations to be done here
+<section class="teacher-leave-requests">
+    <?php include_once __DIR__ . '/../templates/requests.php'; ?>
+</section>
