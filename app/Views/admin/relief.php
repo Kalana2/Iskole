@@ -1,2 +1,3 @@
-<?php
-// teacher relief crud operations to be done here
+<section class="relief">
+    <?php include_once __DIR__ . '/../templates/reliefManagement.php'; ?>
+</section>

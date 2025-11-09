@@ -26,6 +26,7 @@
         include __DIR__ . '/timeTable.php';
     } elseif ($active === 'Relief') {
         include __DIR__ . '/relief.php';
+        // include_once __DIR__ . '/../templates/reliefManagement.php';
     } elseif ($active === 'Class & Subjects') {
         include __DIR__ . '/classAndSubjects.php';
     } elseif ($active === 'Exam Time Table') {
