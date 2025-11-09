@@ -5,4 +5,10 @@ class AdminController extends Controller
     {
         $this->view('admin/index');
     }
+
+    // timetable management page
+    public function timeTable()
+    {
+        $this->view('admin/timeTable');
+    }
 }
