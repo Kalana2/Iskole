@@ -1,7 +1,7 @@
 <div class="mp-container">
     <?php
     // Provide navigation items and active label for MP
-    $items = ['Announcements', 'Academic', 'Requests', 'Management', 'Attendance', 'Report'];
+    $items = ['Announcements', 'Academic', 'Requests', 'Management', 'Attendance', 'Report', 'Teacher Attendance', 'Relief'];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
     $active = in_array($tab, $items) ? $tab : 'Announcements';
     include_once __DIR__ . '/../templates/navigation.php';
@@ -21,6 +21,10 @@
         include __DIR__ . '/teacherAttendance.php';
     } else if ($active === 'Report') {
         include __DIR__ . '/report.php';
+    } else if ($active === 'Teacher Attendance') {
+        include __DIR__ . '/teacherAttendance.php';
+    } else if ($active === 'Relief') {
+        include __DIR__ . '/relief.php';
     } else {
         include __DIR__ . '/../templates/announcements.php';
         include __DIR__ . '/../templates/createAnnouncement.php';

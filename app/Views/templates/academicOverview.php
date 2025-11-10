@@ -23,6 +23,17 @@
 
     </div>
 
+    <!-- Term Selector -->
+    <div class="term-select" style="margin-top:12px;">
+        <label for="termSelect" class="visually-hidden">Select term</label>
+        <label style="font-weight:600; margin-right:8px;">Term:</label>
+        <select id="termSelect" aria-label="Select term" onchange="onTermChange(this.value)">
+            <option value="term-1">Term 1</option>
+            <option value="term-2">Term 2</option>
+            <option value="term-3">Term 3</option>
+        </select>
+    </div>
+
     <?php
     // Sample data - Replace with actual data from database
     $gradeData = [
@@ -136,5 +147,52 @@
     <!-- Scroll to Top Button -->
     <button class="scroll-to-top" id="scrollToTopBtn" aria-label="Scroll to top"></button>
 </section>
+
+<script>
+    // Term selection persistence and event emission
+    (function() {
+        function emit(term) {
+            try {
+                document.dispatchEvent(new CustomEvent('termChange', {
+                    detail: {
+                        term: term
+                    }
+                }));
+            } catch (e) {
+                // older browsers fallback
+                var evt = document.createEvent('CustomEvent');
+                evt.initCustomEvent('termChange', true, true, {
+                    term: term
+                });
+                document.dispatchEvent(evt);
+            }
+        }
+
+        window.onTermChange = function(term) {
+            try {
+                localStorage.setItem('selectedTerm', term);
+            } catch (e) {}
+            var container = document.querySelector('.mp-academic');
+            if (container) container.dataset.term = term;
+            emit(term);
+            // small visual feedback (can be styled in CSS)
+            console.log('Term changed to', term);
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var select = document.getElementById('termSelect');
+            if (!select) return;
+            var saved = 'term-1';
+            try {
+                saved = localStorage.getItem('selectedTerm') || saved;
+            } catch (e) {}
+            select.value = saved;
+            var container = document.querySelector('.mp-academic');
+            if (container) container.dataset.term = select.value;
+            // emit initial term for other scripts that may need it
+            emit(select.value);
+        });
+    })();
+</script>
 
 <script src="/js/academicOverview/academicOverview.js"></script>
