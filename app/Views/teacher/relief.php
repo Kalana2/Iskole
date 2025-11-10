@@ -92,22 +92,6 @@ foreach ($reliefPeriods as $period) {
                     <div class="stat-label">Total Relief Periods</div>
                 </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-icon">📚</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo count(array_unique(array_column($reliefPeriods, 'date'))); ?>
-                    </div>
-                    <div class="stat-label">Days with Relief</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">👥</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo array_sum(array_column($reliefPeriods, 'student_count')); ?>
-                    </div>
-                    <div class="stat-label">Total Students</div>
-                </div>
-            </div>
         </div>
 
         <!-- Relief Periods by Date -->
@@ -141,10 +125,7 @@ foreach ($reliefPeriods as $period) {
                                     <th>Time</th>
                                     <th>Class</th>
                                     <th>Subject</th>
-                                    <th>Room</th>
                                     <th>Absent Teacher</th>
-                                    <th>Students</th>
-                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -164,18 +145,8 @@ foreach ($reliefPeriods as $period) {
                                         <td data-label="Subject">
                                             <strong><?php echo htmlspecialchars($period['subject']); ?></strong>
                                         </td>
-                                        <td data-label="Room">
-                                            <span class="room-text">Room <?php echo htmlspecialchars($period['room']); ?></span>
-                                        </td>
                                         <td data-label="Absent Teacher">
                                             <?php echo htmlspecialchars($period['absent_teacher']); ?>
-                                        </td>
-                                        <td data-label="Students">
-                                            <span class="student-count"><?php echo $period['student_count']; ?></span>
-                                        </td>
-                                        <td data-label="Action">
-                                            <button class="btn btn-assign"
-                                                data-period-id="<?php echo $period['id']; ?>">Assign</button>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>
@@ -194,46 +165,4 @@ foreach ($reliefPeriods as $period) {
     </div>
 </section>
 
-<!-- Assign Popup Modal -->
-<div class="assign-modal-backdrop" id="assignModal" style="display:none;">
-    <div class="assign-modal">
-        <button type="button" class="assign-close" id="assignClose">&times;</button>
-        <h2 class="assign-title">Assign Relief Period</h2>
-        <form id="assignForm" class="assign-form">
-            <input type="hidden" name="id" />
-            <div class="assign-grid">
-                <label>Period<input name="period" readonly /></label>
-                <label>Time<input name="time" readonly /></label>
-                <label>Class<input name="class" readonly /></label>
-                <label>Subject<input name="subject" readonly /></label>
-            </div>
-            <label>Notes<textarea name="notes" rows="3" placeholder="Add notes"></textarea></label>
-            <div class="assign-actions">
-                <button type="button" class="btn" id="assignCancel">Cancel</button>
-                <button type="submit" class="btn btn-assign">Confirm</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<script>
-    const reliefData = <?php echo json_encode($reliefPeriods); ?>;
-    function openAssignModal(p) {
-        const modal = document.getElementById('assignModal');
-        const f = document.getElementById('assignForm');
-        f.id.value = p.id; f.period.value = p.period; f.time.value = p.time; f.class.value = p.grade + '-' + p.class; f.subject.value = p.subject; f.notes.value = '';
-        modal.style.display = 'flex';
-    }
-    function closeAssignModal() { document.getElementById('assignModal').style.display = 'none'; }
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('.btn-assign').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = parseInt(btn.getAttribute('data-period-id'), 10);
-                const rec = reliefData.find(r => r.id === id); if (rec) openAssignModal(rec);
-            });
-        });
-        document.getElementById('assignClose').addEventListener('click', closeAssignModal);
-        document.getElementById('assignCancel').addEventListener('click', closeAssignModal);
-        document.getElementById('assignForm').addEventListener('submit', e => { e.preventDefault(); alert('Relief assigned'); closeAssignModal(); });
-    });
-</script>
+<!-- Note: Assign modal and assignment actions removed as requested -->
