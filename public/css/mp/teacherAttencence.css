@@ -1,0 +1,34 @@
+/* Teacher Attendance styles (MP)
+   Reuse student attendance styles and add minimal overrides */
+@import url('/css/attendance/attendance.css');
+
+/* Leave status badge */
+.status-badge.status-leave {
+  background: #fff7e6;
+  color: #b26a00;
+  border: 1px solid #ffd699;
+}
+
+/* Leave action button */
+.action-btn.btn-leave {
+  background: #fff7e6;
+  border: 1px solid #ffd699;
+  color: #b26a00;
+  /* keep size from base .action-btn */
+}
+.action-btn.btn-leave:hover {
+  background: #ffe9cc;
+}
+.action-btn.btn-leave.active {
+  background: #ffe0b2;
+  border-color: #ffcc80;
+  color: #8d5300;
+}
+
+/* Leave stat color accent */
+.leave-stat .stat-content .stat-value,
+.leave-stat .stat-content .stat-label {
+  color: #b26a00;
+}
+
+/* Map status-leave badge already defined above */

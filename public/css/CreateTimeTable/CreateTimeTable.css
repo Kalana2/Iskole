@@ -1,0 +1,63 @@
+.admin-timetable-builder input[type="text"],
+.admin-timetable-builder input:not([type]),
+.admin-timetable-builder input[placeholder] {
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 12px;
+  background: #ffffff;
+}
+.admin-timetable-builder .btn {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #e5e7eb;
+  border: none;
+  cursor: pointer;
+}
+.admin-timetable-builder .btn.primary { background: #3b82f6; color: #fff; }
+.admin-timetable-builder .btn.success { background: #10b981; color: #fff; }
+
+.admin-timetable-builder .class-card { gap: 6px; }
+.admin-timetable-builder .class-details span { display: inline-flex; align-items: center; gap: 6px; }
+
+.admin-timetable-builder .timetable-header { margin-bottom:32px; margin-top:0; }
+
+.admin-timetable-builder { padding-top: 0; }
+
+/* Styled selects for Grade and Class */
+.admin-timetable-builder .student-info-badge .info-item select.info-value {
+  padding: 8px 36px 8px 12px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.22); /* was 0.08 */
+  border: 1px solid rgba(255, 255, 255, 0.45); /* stronger border for contrast */
+  color: #ffffff !important; /* ensure readable text */
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  min-width: 180px;
+  height: 40px;
+  line-height: 40px; /* align text vertically */
+  font-size: 0.95rem;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.25);
+  backdrop-filter: blur(2px);
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
+}
+.admin-timetable-builder .student-info-badge .info-item select.info-value:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+.admin-timetable-builder .student-info-badge .info-item select.info-value:focus {
+  outline: none;
+  border-color: var(--today-border);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.25);
+}
+/* Force readable options in the dropdown list */
+.admin-timetable-builder .student-info-badge .info-item select.info-value option {
+  color: #111827; /* dark text */
+  background: #ffffff; /* white background */
+}
