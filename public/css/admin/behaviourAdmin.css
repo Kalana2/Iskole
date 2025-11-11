@@ -1,0 +1,191 @@
+/* Admin styles: behaviour reports, tables, modals and controls
+     Uses variables defined in public/css/variables.css for color/spacing consistency.
+*/
+
+.admin-behaviour-report .card {
+  background: var(--card-bg);
+  color: var(--text-color);
+  padding: 20px;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-light);
+}
+
+.admin-behaviour-report .mgmt-header .title-wrap h2 {
+  margin: 0 0 6px 0;
+  color: var(--primary-color);
+  font-size: 1.25rem;
+}
+.admin-behaviour-report .mgmt-header .subtitle {
+  margin: 0;
+  color: #666;
+  font-size: 0.95rem;
+}
+
+.admin-behaviour-report .search-container {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 18px 0;
+}
+.admin-behaviour-report .search-container input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #e0e6ea;
+  border-radius: 8px;
+  background: #fff;
+}
+.admin-behaviour-report .search-container .search-btn,
+.admin-behaviour-report #clearSearch {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.admin-behaviour-report #clearSearch {
+  background: #7f8fa4;
+}
+
+.reports-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 6px;
+}
+.reports-table thead th {
+  text-align: left;
+  padding: 12px 10px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #444;
+  border-bottom: 1px solid #eef2f4;
+}
+.reports-table tbody td {
+  padding: 12px 10px;
+  vertical-align: middle;
+  border-bottom: 1px solid #f3f6f7;
+}
+.reports-table tbody tr:hover {
+  background: #fbfdff;
+}
+
+.td-type.positive {
+  color: #2e7d32;
+  font-weight: 600;
+}
+.td-type.neutral {
+  color: #6b6b6b;
+}
+.td-type.concern {
+  color: #c62828;
+  font-weight: 600;
+}
+
+.td-actions button {
+  margin-right: 6px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #f6f8fa;
+  color: #333;
+  cursor: pointer;
+}
+.td-actions .btn-more {
+  background: linear-gradient(
+    90deg,
+    rgba(74, 144, 226, 0.12),
+    rgba(74, 144, 226, 0.06)
+  );
+  border-color: rgba(74, 144, 226, 0.18);
+}
+.td-actions .btn-edit {
+  background: #fff3cd;
+  border-color: #f1c40f;
+}
+.td-actions .btn-delete {
+  background: #ffecec;
+  border-color: #f5c6cb;
+  color: #8b0000;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 18, 26, 0.45);
+  z-index: 1200;
+}
+.modal-content {
+  background: var(--card-bg);
+  padding: 18px;
+  border-radius: 10px;
+  max-width: 760px;
+  width: 90%;
+  box-shadow: var(--shadow-light);
+  position: relative;
+}
+.modal .modal-close {
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.form-row {
+  margin-bottom: 10px;
+}
+.form-row label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  color: #444;
+}
+.form-row input[type="text"],
+.form-row select,
+.form-row textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  border: 1px solid #e6eaee;
+  background: #fff;
+}
+
+.actions-row {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+.btn-save {
+  background: var(--primary-color);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn-cancel {
+  background: #f1f1f1;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* Small responsive tweaks */
+@media (max-width: 720px) {
+  .reports-table thead {
+    display: none;
+  }
+  .reports-table tbody td {
+    display: block;
+    width: 100%;
+  }
+  .td-actions {
+    margin-top: 8px;
+  }
+}

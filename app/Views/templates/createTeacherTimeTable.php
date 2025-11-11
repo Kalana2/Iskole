@@ -34,9 +34,9 @@ $periods = [
                                 <?php endforeach; ?>
                             <?php else: ?>
                                 <!-- Fallback sample teachers if none provided to the view -->
-                                <option value="1">John Doe</option>
-                                <option value="2">Jane Smith</option>
-                                <option value="3">Alice Johnson</option>
+                                <option value="1">Seniru Senaweera</option>
+                                <option value="2">Anushi Perera</option>
+                                <option value="3">Aditha Anusara</option>
                             <?php endif; ?>
                         </select>
                     </div>
