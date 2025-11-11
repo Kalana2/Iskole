@@ -1,16 +1,16 @@
 <?php
 // Admin timetable create/edit form and preview
-$days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
+$days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 $periods = [
-    ['time' => '07:50 - 08:30', 'label' => '1'],
-    ['time' => '08:30 - 09:10', 'label' => '2'],
-    ['time' => '09:10 - 09:50', 'label' => '3'],
-    ['time' => '09:50 - 10:30', 'label' => '4'],
-    ['time' => '10:30 - 10:50', 'label' => 'INTERVAL'],
-    ['time' => '10:50 - 11:30', 'label' => '5'],
-    ['time' => '11:30 - 12:10', 'label' => '6'],
-    ['time' => '12:10 - 12:50', 'label' => '7'],
-    ['time' => '12:50 - 01:30', 'label' => '8']
+  ['time' => '07:50 - 08:30', 'label' => '1'],
+  ['time' => '08:30 - 09:10', 'label' => '2'],
+  ['time' => '09:10 - 09:50', 'label' => '3'],
+  ['time' => '09:50 - 10:30', 'label' => '4'],
+  ['time' => '10:30 - 10:50', 'label' => 'INTERVAL'],
+  ['time' => '10:50 - 11:30', 'label' => '5'],
+  ['time' => '11:30 - 12:10', 'label' => '6'],
+  ['time' => '12:10 - 12:50', 'label' => '7'],
+  ['time' => '12:50 - 01:30', 'label' => '8']
 ];
 ?>
 <link rel="stylesheet" href="/css/CreateTimeTable/CreateTimeTable.css">
@@ -21,7 +21,7 @@ $periods = [
     <div class="timetable-header">
       <div class="header-content">
         <div>
-          <h1 class="header-title">Create / Edit Class Timetable</h1>
+          <h1 class="header-title">Create / Edit Student Timetable</h1>
           <p class="header-subtitle">Manage class schedule. Preview matches student timetable.</p>
         </div>
         <div class="student-info-badge">
@@ -57,21 +57,23 @@ $periods = [
             <tr>
               <th class="time-column sticky-column">Time</th>
               <?php foreach ($days as $d): ?>
-                <th class="day-column"><div class="day-header"><span class="day-name"><?= $d ?></span></div></th>
+                <th class="day-column">
+                  <div class="day-header"><span class="day-name"><?= $d ?></span></div>
+                </th>
               <?php endforeach; ?>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($periods as $rowIndex => $p): ?>
-              <tr class="<?= $p['label']==='INTERVAL' ? 'interval-row' : '' ?>">
+              <tr class="<?= $p['label'] === 'INTERVAL' ? 'interval-row' : '' ?>">
                 <td class="time-cell sticky-column">
-                  <?php if ($p['label']==='INTERVAL'): ?>
+                  <?php if ($p['label'] === 'INTERVAL'): ?>
                     <div class="interval-time"><i class="fas fa-coffee"></i><span><?= $p['time'] ?></span></div>
                   <?php else: ?>
                     <div class="time-slot"><span class="period-number">Period <?= $p['label'] ?></span><span class="time-range"><?= $p['time'] ?></span></div>
                   <?php endif; ?>
                 </td>
-                <?php if ($p['label']==='INTERVAL'): ?>
+                <?php if ($p['label'] === 'INTERVAL'): ?>
                   <td colspan="5" class="interval-cell">
                     <div class="interval-content"><i class="fas fa-mug-hot"></i><span>INTERVAL</span><i class="fas fa-utensils"></i></div>
                   </td>
@@ -114,21 +116,23 @@ $periods = [
             <tr>
               <th class="time-column sticky-column">Time</th>
               <?php foreach ($days as $d): ?>
-                <th class="day-column"><div class="day-header"><span class="day-name"><?= $d ?></span></div></th>
+                <th class="day-column">
+                  <div class="day-header"><span class="day-name"><?= $d ?></span></div>
+                </th>
               <?php endforeach; ?>
             </tr>
           </thead>
           <tbody>
             <?php foreach ($periods as $rowIndex => $p): ?>
-              <tr class="<?= $p['label']==='INTERVAL' ? 'interval-row' : '' ?>">
+              <tr class="<?= $p['label'] === 'INTERVAL' ? 'interval-row' : '' ?>">
                 <td class="time-cell sticky-column">
-                  <?php if ($p['label']==='INTERVAL'): ?>
+                  <?php if ($p['label'] === 'INTERVAL'): ?>
                     <div class="interval-time"><i class="fas fa-coffee"></i><span><?= $p['time'] ?></span></div>
                   <?php else: ?>
                     <div class="time-slot"><span class="period-number">Period <?= $p['label'] ?></span><span class="time-range"><?= $p['time'] ?></span></div>
                   <?php endif; ?>
                 </td>
-                <?php if ($p['label']==='INTERVAL'): ?>
+                <?php if ($p['label'] === 'INTERVAL'): ?>
                   <td colspan="5" class="interval-cell">
                     <div class="interval-content"><i class="fas fa-mug-hot"></i><span>INTERVAL</span><i class="fas fa-utensils"></i></div>
                   </td>
@@ -139,7 +143,6 @@ $periods = [
                         <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></div>
                         <div class="class-details">
                           <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></span></span>
-                          <!-- Room preview removed -->
                         </div>
                       </div>
                     </td>
@@ -155,8 +158,12 @@ $periods = [
     <div class="timetable-legend">
       <h3 class="legend-title">Legend</h3>
       <div class="legend-items">
-        <div class="legend-item"><div class="legend-color today-indicator"></div><span>Today's Classes</span></div>
-        <div class="legend-item"><div class="legend-color interval-indicator"></div><span>Break Time</span></div>
+        <div class="legend-item">
+          <div class="legend-color today-indicator"></div><span>Today's Classes</span>
+        </div>
+        <div class="legend-item">
+          <div class="legend-color interval-indicator"></div><span>Break Time</span>
+        </div>
         <div class="legend-item"><i class="fas fa-user-tie"></i><span>Teacher Name</span></div>
         <div class="legend-item"><i class="fas fa-door-open"></i><span>Room Number</span></div>
       </div>
@@ -165,49 +172,51 @@ $periods = [
 </section>
 
 <script>
-(function(){
-  const gradeSel = document.getElementById('gradeSelect');
-  const sectionSel = document.getElementById('sectionSelect');
-  const classInput = document.getElementById('classInput');
-  const gradeInput = document.getElementById('gradeInput');
-  const sectionInput = document.getElementById('sectionInput');
-  const previewBtn = document.getElementById('previewBtn');
-  const previewSection = document.getElementById('previewSection');
+  (function() {
+    const gradeSel = document.getElementById('gradeSelect');
+    const sectionSel = document.getElementById('sectionSelect');
+    const classInput = document.getElementById('classInput');
+    const gradeInput = document.getElementById('gradeInput');
+    const sectionInput = document.getElementById('sectionInput');
+    const previewBtn = document.getElementById('previewBtn');
+    const previewSection = document.getElementById('previewSection');
 
-  function syncMeta(){
-    const g = gradeSel?.value || '';
-    const s = sectionSel?.value || '';
-    if(classInput) classInput.value = g && s ? (g + '-' + s) : '';
-    if(gradeInput) gradeInput.value = g;
-    if(sectionInput) sectionInput.value = s;
-  }
-  gradeSel?.addEventListener('change', syncMeta);
-  sectionSel?.addEventListener('change', syncMeta);
-  syncMeta();
-
-  function fillPreview(){
-    const preview = document.getElementById('previewTable');
-    const inputs = document.querySelectorAll('[name^="cells["]');
-    preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
-
-    inputs.forEach(inp => {
-      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/); // room removed
-      if(!m) return;
-      const day = m[1];
-      const row = m[2];
-      const field = m[3];
-      const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
-      const target = preview.querySelector(sel);
-      if(target) target.textContent = inp.value;
-    });
-  }
-
-  previewBtn?.addEventListener('click', () => {
-    fillPreview();
-    if(previewSection){
-      previewSection.style.display = 'block';
-      previewSection.scrollIntoView({behavior:'smooth'});
+    function syncMeta() {
+      const g = gradeSel?.value || '';
+      const s = sectionSel?.value || '';
+      if (classInput) classInput.value = g && s ? (g + '-' + s) : '';
+      if (gradeInput) gradeInput.value = g;
+      if (sectionInput) sectionInput.value = s;
     }
-  });
-})();
+    gradeSel?.addEventListener('change', syncMeta);
+    sectionSel?.addEventListener('change', syncMeta);
+    syncMeta();
+
+    function fillPreview() {
+      const preview = document.getElementById('previewTable');
+      const inputs = document.querySelectorAll('[name^="cells["]');
+      preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
+
+      inputs.forEach(inp => {
+        const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/); // room removed
+        if (!m) return;
+        const day = m[1];
+        const row = m[2];
+        const field = m[3];
+        const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
+        const target = preview.querySelector(sel);
+        if (target) target.textContent = inp.value;
+      });
+    }
+
+    previewBtn?.addEventListener('click', () => {
+      fillPreview();
+      if (previewSection) {
+        previewSection.style.display = 'block';
+        previewSection.scrollIntoView({
+          behavior: 'smooth'
+        });
+      }
+    });
+  })();
 </script>

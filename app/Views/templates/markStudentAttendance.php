@@ -153,19 +153,10 @@
             <div class="heading-section">
                 <div class="header-content">
                     <div>
-                        <h1 class="heading-text" id="attendance-title">Mark Attendance</h1>
+                        <h1 class="heading-text" id="attendance-title">Student Attendance</h1>
                         <p class="sub-heding-text">Record and manage daily attendance for your classes</p>
                     </div>
-                    <div class="teacher-info-badge">
-                        <div class="info-item">
-                            <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Teacher:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
-                        </div>
-                    </div>
+
                 </div>
             </div>
 

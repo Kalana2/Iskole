@@ -149,16 +149,6 @@
                         <h1 class="heading-text" id="marks-entry-title">Enter Student Marks</h1>
                         <p class="sub-heding-text">Record and manage examination marks for your students</p>
                     </div>
-                    <div class="teacher-info-badge">
-                        <div class="info-item">
-                            <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Teacher:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
-                        </div>
-                    </div>
                 </div>
             </div>
 
