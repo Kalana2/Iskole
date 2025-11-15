@@ -6,6 +6,7 @@ class MpModel extends UserModel
 
     public function createMp($data)
     {
+        $this->pdo->beginTransaction();
         $userId = $this->createUser($data);
 
         $sql = "INSERT INTO $this->mpTable (userID,nic) VALUES (:userId, :nic)";
@@ -15,7 +16,11 @@ class MpModel extends UserModel
                 'userId' => $userId,
                 'nic' => $data['nic']
             ]);
+            $this->pdo->commit();
         } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             throw new Exception("Error Processing Request to mp table: " . $e->getMessage());
         }
 

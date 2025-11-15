@@ -18,6 +18,7 @@ class ParentModel extends UserModel
                 'nic' => $data['nic']
             ]);
         } catch (PDOException $e) {
+
             throw new Exception("Error Processing Request to parent table: " . $e->getMessage());
         }
 
