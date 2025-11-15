@@ -83,7 +83,7 @@ class AddNewUserController extends Controller
                     $model = $this->model('StudentModel');
                     $data = $base + [
                         'grade' => $_POST['grade'] ?? null,
-                        'parentId' => $_POST['parentId'] ?? null, // optional/unknown in form
+                        'classId' => $_POST['class'] ?? null, // optional/unknown in form
                     ];
                     $model->createStudent($data);
                     break;
