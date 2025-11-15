@@ -2,13 +2,13 @@
 include_once 'UserModel.php';
 class MpModel extends UserModel
 {
-    private $mpTable = 'mp';
+    private $mpTable = 'managers';
 
     public function createMp($data)
     {
         $userId = $this->createUser($data);
 
-        $sql = "INSERT INTO $this->mpTable (userId,nic) VALUES (:userId, :nic)";
+        $sql = "INSERT INTO $this->mpTable (userID,nic) VALUES (:userId, :nic)";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
