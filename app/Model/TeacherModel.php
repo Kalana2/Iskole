@@ -6,6 +6,7 @@ class TeacherModel extends UserModel
 
     public function createTeacher($data)
     {
+        $data['role'] = $this->userRoleMap['teacher'];
         $userId = $this->createUser($data);
 
         $sql = "INSERT INTO $this->teacherTable (userID, subjectID, nic, classID, grade) VALUES (:userId, :subject, :nic, :classId, :grade)";

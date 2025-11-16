@@ -8,7 +8,6 @@ class MpModel extends UserModel
     {
         $this->pdo->beginTransaction();
         $userId = $this->createUser($data);
-
         $sql = "INSERT INTO $this->mpTable (userID,nic) VALUES (:userId, :nic)";
         try {
             $stmt = $this->pdo->prepare($sql);

@@ -6,6 +6,7 @@ class ParentModel extends UserModel
 
     public function createParent($data)
     {
+        $data['role'] = $this->userRoleMap['parent'];
         $userId = $this->createUser($data);
 
         $sql = "INSERT INTO $this->parentTable (userID, relationshipType, studentID, nic) VALUES (:userId, :relationshipType, :studentId, :nic)";
