@@ -83,4 +83,28 @@ class UserModel
         }
     }
 
+    public function getRecentUsers($count = 5)
+    {
+        // ensure $count is an integer and has a sensible default
+        $count = (int) $count;
+        if ($count <= 0) {
+            $count = 5;
+        }
+
+        // order by userID descending to get the latest users; bind LIMIT as integer
+        $sql = "SELECT {$this->userTable}.*, {$this->userNameTable}.firstName, {$this->userNameTable}.lastName
+        FROM {$this->userTable}
+        LEFT JOIN {$this->userNameTable}
+        ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        WHERE {$this->userTable}.active = 1
+        ORDER BY {$this->userTable}.userID DESC
+        LIMIT :count";
+
+        $stmt = $this->pdo->prepare($sql);
+        // bind as integer to avoid being passed as a quoted string which breaks LIMIT
+        $stmt->bindValue(':count', $count, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }

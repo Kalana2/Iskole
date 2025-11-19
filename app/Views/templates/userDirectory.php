@@ -1,6 +1,12 @@
 <?php /* filepath: /home/snake/Projects/Iskole/app/Views/templates/userDirectory.php */ ?>
 <link rel="stylesheet" href="/css/userDirectory/userDirectory.css">
 
+<?php 
+    require_once __DIR__ . '/../../Controllers/userDirectoryController.php';
+    $userDirectory = new UserDirectoryController();
+    $users = $userDirectory->getRecentUsers();
+?>
+
 <section class="mp-management" aria-labelledby="user-dir-title">
     <header class="mgmt-header">
         <div class="title-wrap">
@@ -31,39 +37,6 @@
                     </tr>
                 </thead>
                 <tbody id="user-table-body">
-                    <tr class="table-row" data-user-id="166">
-                        <td class="table-data" data-col="name">Thasindu Ramsitha</td>
-                        <td class="table-data" data-col="type">parent</td>
-                        <td class="table-data" data-col="email">parent@gmail.com</td>
-                        <td class="table-data">
-                            <div class="row">
-                                <button class="btn edit-user-btn" data-user-id="166" type="button">Edit</button>
-                                <button class="btn btn-red" data-user-id="166" type="button">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="table-row" data-user-id="165">
-                        <td class="table-data" data-col="name">Aditha Anusara</td>
-                        <td class="table-data" data-col="type">student</td>
-                        <td class="table-data" data-col="email">student@gmail.com</td>
-                        <td class="table-data">
-                            <div class="row">
-                                <button class="btn edit-user-btn" data-user-id="165" type="button">Edit</button>
-                                <button class="btn btn-red" data-user-id="165" type="button">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr class="table-row" data-user-id="164">
-                        <td class="table-data" data-col="name">Seniru Senaweera</td>
-                        <td class="table-data" data-col="type">teacher</td>
-                        <td class="table-data" data-col="email">teacher@gmail.com</td>
-                        <td class="table-data">
-                            <div class="row">
-                                <button class="btn edit-user-btn" data-user-id="164" type="button">Edit</button>
-                                <button class="btn btn-red" data-user-id="164" type="button">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
                     <tr class="table-row" data-user-id="163">
                         <td class="table-data" data-col="name">Kalana JInendra</td>
                         <td class="table-data" data-col="type">mp</td>
@@ -75,6 +48,32 @@
                             </div>
                         </td>
                     </tr>
+
+                    <?php 
+                        if (empty($users)) {
+                            echo "<tr class='table-row'><td class='table-data' colspan='4'>No users found.</td></tr>";
+                        } else {
+                            foreach ($users as $user) {
+                                $id = (int) ($user['userID'] ?? 0);
+                                $name = htmlspecialchars(trim(($user['firstName'] ?? '') . ' ' . ($user['lastName'] ?? '')));
+                                $email = htmlspecialchars($user['email'] ?? '');
+                                $role = htmlspecialchars($user['role'] ?? '');
+                                $stId = !empty($user['studentID']) ? ' (' . htmlspecialchars($user['studentID']) . ')' : '';
+                                $displayName = $name . $stId;
+                                echo "<tr class='table-row' data-user-id='{$id}'>\n" .
+                                     "    <td class='table-data' data-col='name'>{$displayName}</td>\n" .
+                                     "    <td class='table-data' data-col='type'>{$role}</td>\n" .
+                                     "    <td class='table-data' data-col='email'>{$email}</td>\n" .
+                                     "    <td class='table-data'>\n" .
+                                     "        <div class='row'>\n" .
+                                     "            <button class='btn edit-user-btn' data-user-id='{$id}' type='button'>Edit</button>\n" .
+                                     "            <button class='btn btn-red' data-user-id='{$id}' type='button'>Delete</button>\n" .
+                                     "        </div>\n" .
+                                     "    </td>\n" .
+                                     "</tr>";
+                            }
+                        }
+                    ?>
                     <tr class="table-row" data-user-id="45">
                         <td class="table-data" data-col="name">Ruwani Jayawardena</td>
                         <td class="table-data" data-col="type">student</td>
