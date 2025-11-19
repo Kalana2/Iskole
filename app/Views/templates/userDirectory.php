@@ -37,18 +37,6 @@
                     </tr>
                 </thead>
                 <tbody id="user-table-body">
-                    <tr class="table-row" data-user-id="163">
-                        <td class="table-data" data-col="name">Kalana JInendra</td>
-                        <td class="table-data" data-col="type">mp</td>
-                        <td class="table-data" data-col="email">manager@gmail.com</td>
-                        <td class="table-data">
-                            <div class="row">
-                                <button class="btn edit-user-btn" data-user-id="163" type="button">Edit</button>
-                                <button class="btn btn-red" data-user-id="163" type="button">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
-
                     <?php 
                         if (empty($users)) {
                             echo "<tr class='table-row'><td class='table-data' colspan='4'>No users found.</td></tr>";
@@ -74,17 +62,6 @@
                             }
                         }
                     ?>
-                    <tr class="table-row" data-user-id="45">
-                        <td class="table-data" data-col="name">Ruwani Jayawardena</td>
-                        <td class="table-data" data-col="type">student</td>
-                        <td class="table-data" data-col="email">ruwani.jayawardena45@example.com</td>
-                        <td class="table-data">
-                            <div class="row">
-                                <button class="btn edit-user-btn" data-user-id="45" type="button">Edit</button>
-                                <button class="btn btn-red" data-user-id="45" type="button">Delete</button>
-                            </div>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
