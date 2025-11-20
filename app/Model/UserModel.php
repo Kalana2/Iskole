@@ -107,4 +107,83 @@ class UserModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAllUsers()
+    {
+        $sql = "SELECT {$this->userTable}.*, 
+                {$this->userNameTable}.firstName, 
+                {$this->userNameTable}.lastName,
+                {$this->userAddressTable}.address_line1,
+                {$this->userAddressTable}.address_line2,
+                {$this->userAddressTable}.address_line3,
+                students.studentID
+        FROM {$this->userTable}
+        LEFT JOIN {$this->userNameTable}
+        ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        LEFT JOIN {$this->userAddressTable}
+        ON {$this->userTable}.userID = {$this->userAddressTable}.userID
+        LEFT JOIN students
+        ON {$this->userTable}.userID = students.userID
+        WHERE {$this->userTable}.active = 1
+        ORDER BY {$this->userTable}.userID DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getUserDetailsById($userId)
+    {
+        $sql = "SELECT {$this->userTable}.*, 
+                {$this->userNameTable}.firstName, 
+                {$this->userNameTable}.lastName,
+                {$this->userAddressTable}.address_line1,
+                {$this->userAddressTable}.address_line2,
+                {$this->userAddressTable}.address_line3,
+                students.studentID
+        FROM {$this->userTable}
+        LEFT JOIN {$this->userNameTable}
+        ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        LEFT JOIN {$this->userAddressTable}
+        ON {$this->userTable}.userID = {$this->userAddressTable}.userID
+        LEFT JOIN students
+        ON {$this->userTable}.userID = students.userID
+        WHERE {$this->userTable}.userID = :userId";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['userId' => $userId]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function searchUsers($query)
+    {
+        $searchTerm = '%' . $query . '%';
+
+        $sql = "SELECT {$this->userTable}.*, 
+                {$this->userNameTable}.firstName, 
+                {$this->userNameTable}.lastName,
+                {$this->userAddressTable}.address_line1,
+                {$this->userAddressTable}.address_line2,
+                {$this->userAddressTable}.address_line3,
+                students.studentID
+        FROM {$this->userTable}
+        LEFT JOIN {$this->userNameTable}
+        ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        LEFT JOIN {$this->userAddressTable}
+        ON {$this->userTable}.userID = {$this->userAddressTable}.userID
+        LEFT JOIN students
+        ON {$this->userTable}.userID = students.userID
+        WHERE {$this->userTable}.active = 1
+        AND (
+            {$this->userNameTable}.firstName LIKE :search
+            OR {$this->userNameTable}.lastName LIKE :search
+            OR {$this->userTable}.email LIKE :search
+            OR students.studentID LIKE :search
+        )
+        ORDER BY {$this->userTable}.userID DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['search' => $searchTerm]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
 }
