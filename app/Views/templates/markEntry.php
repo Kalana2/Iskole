@@ -1,4 +1,4 @@
-    <?php
+<?php
     
     $teacherInfo = $teacherInfo ?? ['name' => '', 'subject' => ''];
     $grades = $grades ?? [];
@@ -188,7 +188,7 @@
 
                 <!-- Marks Entry Table -->
                 <div class="marks-table-container">
-                    <form action="/markEntry" method="POST" id="marksForm">
+                    <form action="/MarkEntry" method="POST" id="marksForm">
                         <input type="hidden" name="grade" value="<?php echo htmlspecialchars($selectedGrade); ?>">
                         <input type="hidden" name="class" value="<?php echo htmlspecialchars($selectedClass); ?>">
                         <input type="hidden" name="term" value="<?php echo htmlspecialchars($selectedTerm); ?>">
@@ -390,129 +390,127 @@
             // TODO: Implement auto-save via AJAX
         }, 120000);
 
-        // AJAX Load Students
+        // Re-enabled AJAX loading to prevent page refresh
         var _loadBtn = document.getElementById('loadStudentsBtn');
         if (_loadBtn) {
             _loadBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            const grade = document.getElementById('grade').value;
-            const classVal = document.getElementById('class').value;
-            const term = document.getElementById('term').value;
-
-            if (!grade || !classVal) {
-                alert('Please select Grade and Class');
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('grade', grade);
-            formData.append('class', classVal);
-            formData.append('term', term);
-
-            fetch('/markEntry/loadStudents', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Update selection display and stats
-                    updateStudentTable(data);
-                } else {
-                    alert('Error: ' + (data.error || 'Unknown error'));
+                e.preventDefault();
+                const grade = document.getElementById('grade').value;
+                const classVal = document.getElementById('class').value;
+                const term = document.getElementById('term').value;
+                if (!grade || !classVal || !term) {
+                    alert('Please select Grade, Class and Term');
+                    return;
                 }
-            })
-            .catch(error => {
-                console.error('Error loading students:', error);
-                alert('Error loading students: ' + error.message);
-            });
+                const formData = new FormData();
+                formData.append('grade', grade);
+                formData.append('class', classVal);
+                formData.append('term', term);
+                fetch('/MarkEntry/loadStudents', { method: 'POST', body: formData })
+                    .then(r => {
+                        const ct = r.headers.get('Content-Type') || '';
+                        if (!ct.includes('application/json')) return r.text().then(t => { throw new Error('Unexpected response: ' + t.substring(0,120)); });
+                        return r.json();
+                    })
+                    .then(data => {
+                        console.log('Raw API response:', data);
+                        if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+                        updateStudentTable(data);
+                    })
+                    .catch(err => { console.error('Fetch error:', err); alert('Load failed: ' + err.message); });
             });
         }
 
         function updateStudentTable(data) {
-            const tbody = document.querySelector('.marks-table tbody');
-            if (!tbody) return;
-
-            tbody.innerHTML = '';
-            data.students.forEach((student, index) => {
-                const grade = '';
-                let gradeClass = '';
-                if (student.current_marks !== null) {
-                    if (student.current_marks >= 75) {
-                        grade = 'A';
-                        gradeClass = 'grade-a';
-                    } else if (student.current_marks >= 65) {
-                        grade = 'B';
-                        gradeClass = 'grade-b';
-                    } else if (student.current_marks >= 55) {
-                        grade = 'C';
-                        gradeClass = 'grade-c';
-                    } else if (student.current_marks >= 35) {
-                        grade = 'S';
-                        gradeClass = 'grade-s';
-                    } else {
-                        grade = 'W';
-                        gradeClass = 'grade-w';
+            try {
+                console.log('updateStudentTable received:', data);
+                // Ensure stats grid and selection summary exist (server rendered only when initially selected)
+                let summary = document.querySelector('.selection-summary');
+                if (!summary) {
+                    const box = document.querySelector('.box');
+                    if (box) {
+                        summary = document.createElement('div');
+                        summary.className = 'selection-summary';
+                        summary.innerHTML = '<div class="summary-badge"><span class="summary-icon">📋</span><span class="summary-text"></span></div>';
+                        const statsGrid = box.querySelector('.stats-grid');
+                        if (statsGrid) box.insertBefore(summary, statsGrid); else box.appendChild(summary);
                     }
                 }
-
-                const row = document.createElement('tr');
-                row.className = 'student-row ' + (student.current_marks === null ? 'pending' : 'completed');
-                row.innerHTML = `
-                    <td class="col-number">${index + 1}</td>
-                    <td class="col-reg"><span class="reg-badge">${escapeHtml(student.reg_number)}</span></td>
-                    <td class="col-name"><strong>${escapeHtml(student.name)}</strong></td>
-                    <td class="col-prev"><span class="prev-marks">${student.previous_marks || '-'}</span></td>
-                    <td class="col-marks">
-                        <div class="marks-input-wrapper">
-                            <input type="number" name="marks[${student.id}]" class="marks-input" 
-                                min="0" max="100" 
-                                value="${student.current_marks || ''}" 
-                                placeholder="0-100" 
-                                data-student-id="${student.id}" 
-                                onchange="calculateGrade(this)">
-                            <span class="marks-total">/ 100</span>
-                        </div>
-                    </td>
-                    <td class="col-grade">
-                        <span class="grade-badge ${gradeClass}" id="grade-${student.id}">
-                            ${grade || '-'}
-                        </span>
-                    </td>
-                    <td class="col-attendance"><span class="attendance-badge">${student.attendance || '-'}%</span></td>
-                    <td class="col-status">
-                        <span class="status-badge ${student.current_marks !== null ? 'status-entered' : 'status-pending'}">
-                            ${student.current_marks !== null ? 'Entered' : 'Pending'}
-                        </span>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-
-            // Update stats
-            const statsCards = document.querySelectorAll('.stat-card');
-            if (statsCards.length >= 4) {
-                statsCards[0].querySelector('.stat-value').textContent = data.stats.totalStudents;
-                statsCards[1].querySelector('.stat-value').textContent = data.stats.marksEntered;
-                statsCards[2].querySelector('.stat-value').textContent = data.stats.marksPending;
-                statsCards[3].querySelector('.stat-value').textContent = (data.stats.classAverage || 0) + '%';
+                if (summary) {
+                    const termOption = document.querySelector('#term option[value="'+(data.selectedTerm||'')+'"]');
+                    const termLabel = termOption ? termOption.textContent : ('Term '+ (data.selectedTerm || '-'));
+                    summary.querySelector('.summary-text').innerHTML = 'Showing: <strong>Grade '+escapeHtml(data.selectedGrade)+'-'+escapeHtml(data.selectedClass)+'</strong> • <strong>'+escapeHtml(termLabel)+'</strong>';
+                }
+                // Stats
+                if (data.stats) {
+                    const statValues = document.querySelectorAll('.stat-card .stat-value');
+                    if (statValues.length >= 4) {
+                        statValues[0].textContent = data.stats.totalStudents;
+                        statValues[1].textContent = data.stats.marksEntered;
+                        statValues[2].textContent = data.stats.marksPending;
+                        statValues[3].textContent = (data.stats.classAverage || 0) + '%';
+                    }
+                }
+                // Table container creation if needed
+                let tableContainer = document.querySelector('.marks-table-container');
+                const emptyState = document.querySelector('.empty-state');
+                if (!tableContainer) {
+                    if (emptyState) emptyState.remove();
+                    tableContainer = document.createElement('div');
+                    tableContainer.className = 'marks-table-container';
+                    tableContainer.innerHTML = '<form action="/MarkEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Reg Number</th><th>Student Name</th><th>Previous</th><th>Current Marks</th><th>Grade</th><th>Attendance</th><th>Status</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
+                    document.querySelector('.box').appendChild(tableContainer);
+                }
+                const tbody = tableContainer.querySelector('.marks-table tbody');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                (data.students || []).forEach((student, index) => {
+                    let grade = '';
+                    let gradeClass = '';
+                    const cm = student.current_marks;
+                    if (cm !== null && cm !== undefined && cm !== '') {
+                        const m = Number(cm);
+                        if (!isNaN(m)) {
+                            if (m >= 75) { grade = 'A'; gradeClass = 'grade-a'; }
+                            else if (m >= 65) { grade = 'B'; gradeClass = 'grade-b'; }
+                            else if (m >= 55) { grade = 'C'; gradeClass = 'grade-c'; }
+                            else if (m >= 35) { grade = 'S'; gradeClass = 'grade-s'; }
+                            else { grade = 'W'; gradeClass = 'grade-w'; }
+                        }
+                    }
+                    const tr = document.createElement('tr');
+                    tr.className = 'student-row ' + (cm === null || cm === undefined || cm === '' ? 'pending' : 'completed');
+                    tr.innerHTML = '<td>'+(index+1)+'</td>'+
+                        '<td><span class="reg-badge">'+escapeHtml(student.reg_number)+'</span></td>'+
+                        '<td><strong>'+escapeHtml(student.name)+'</strong></td>'+
+                        '<td><span class="prev-marks">'+escapeHtml(student.previous_marks || '-')+'</span></td>'+
+                        '<td><div class="marks-input-wrapper"><input type="number" name="marks['+escapeHtml(student.id)+']" class="marks-input" min="0" max="100" value="'+(cm !== null && cm !== undefined ? escapeHtml(cm) : '')+'" placeholder="0-100" data-student-id="'+escapeHtml(student.id)+'" onchange="calculateGrade(this)"><span class="marks-total">/ 100</span></div></td>'+
+                        '<td><span class="grade-badge '+gradeClass+'" id="grade-'+escapeHtml(student.id)+'">'+(grade||'-')+'</span></td>'+
+                        '<td><span class="attendance-badge">'+escapeHtml(student.attendance || '-')+'%</span></td>'+
+                        '<td><span class="status-badge '+(cm !== null && cm !== undefined && cm !== '' ? 'status-entered':'status-pending')+'">'+(cm !== null && cm !== undefined && cm !== '' ? 'Entered':'Pending')+'</span></td>';
+                    tbody.appendChild(tr);
+                });
+                // Hidden inputs update
+                const gradeInput = tableContainer.querySelector('input[name="grade"]');
+                const classInput = tableContainer.querySelector('input[name="class"]');
+                const termInput = tableContainer.querySelector('input[name="term"]');
+                if (gradeInput) gradeInput.value = data.selectedGrade || '';
+                if (classInput) classInput.value = data.selectedClass || '';
+                if (termInput) termInput.value = data.selectedTerm || '';
+            } catch (err) {
+                console.error('updateStudentTable error:', err);
+                alert('Load failed: '+ err.message);
             }
-
-            // Update hidden form fields
-            document.querySelector('input[name="grade"]').value = data.selectedGrade;
-            document.querySelector('input[name="class"]').value = data.selectedClass;
-            document.querySelector('input[name="term"]').value = data.selectedTerm;
         }
 
         function escapeHtml(text) {
-            if (!text) return '';
-            const map = {
-                '&': '&amp;',
-                '<': '&lt;',
-                '>': '&gt;',
-                '"': '&quot;',
-                "'": '&#039;'
-            };
-            return text.toString().replace(/[&<>"']/g, m => map[m]);
+            if (text === null || text === undefined) return '';
+            if (typeof text === 'object') {
+                console.error('escapeHtml received object:', text);
+                return String(text);
+            }
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            const str = String(text);
+            return str.replace(/[&<>"']/g, m => map[m]);
         }
     </script>
