@@ -46,7 +46,7 @@ class MarkEntryController extends Controller
 			$selectedGrade = $_POST['grade'];
 			$selectedClass = $_POST['class'];
 			$selectedTerm = $_POST['term'] ?? '';
-            //$selectedExamType = $_POST['examType'] ?? '';}
+		}
 
 		$grades = $model->getGrades();
 		$classes = $model->getClasses($selectedGrade ?: null);
@@ -81,5 +81,41 @@ class MarkEntryController extends Controller
 
 		$this->view('templates/markEntry', $data);
 	}
-}}
+
+	public function loadStudents()
+	{
+		// AJAX endpoint: returns student data as JSON without page refresh
+		header('Content-Type: application/json');
+
+		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			http_response_code(400);
+			echo json_encode(['error' => 'Invalid request method']);
+			return;
+		}
+
+		$grade = $_POST['grade'] ?? null;
+		$class = $_POST['class'] ?? null;
+		$term = $_POST['term'] ?? null;
+
+		if (!$grade || !$class) {
+			http_response_code(400);
+			echo json_encode(['error' => 'Grade and class are required']);
+			return;
+		}
+
+		$model = $this->model('MarkEntryModel');
+		$teacherInfo = $model->getTeacherInfo($this->session->get('user_id'));
+		$students = $model->getStudents($grade, $class, $teacherInfo['subjectID'] ?? null, $term ?: null);
+		$stats = $model->calculateStatistics($students);
+
+		echo json_encode([
+			'success' => true,
+			'students' => $students,
+			'stats' => $stats,
+			'selectedGrade' => $grade,
+			'selectedClass' => $class,
+			'selectedTerm' => $term
+		]);
+	}
+}
 

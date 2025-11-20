@@ -1,9 +1,5 @@
     <?php
-    // The controller injects: $teacherInfo, $grades, $classes, $terms,
-    // $selectedGrade, $selectedClass, $selectedTerm, $selectedExamType,
-    // $students, statistics and optional $message.
-
-    // Defensive defaults to avoid PHP notices when called directly.
+    
     $teacherInfo = $teacherInfo ?? ['name' => '', 'subject' => ''];
     $grades = $grades ?? [];
     $classes = $classes ?? [];
@@ -62,9 +58,9 @@
                 </div>
             <?php endif; ?>
 
-            <!-- Filter Form -->
-            <div class="filter-container">
-                <form action="/markEntry" method="POST" class="filter-form" id="filterForm">
+                <!-- Filter Form -->
+                <div class="filter-container">
+                    <form method="POST" class="filter-form" id="filterForm">
                     <div class="filter-grid">
                         <div class="form-group">
                             <label for="grade" class="form-label">Grade</label>
@@ -115,7 +111,7 @@
                         </div>
 
                         <div class="form-group btn-group">
-                            <button type="submit" class="btn btn-search">
+                            <button type="button" class="btn btn-search" id="loadStudentsBtn">
                                 <span class="btn-icon">🔍</span>
                                 <span class="btn-text">Load Students</span>
                             </button>
@@ -192,7 +188,7 @@
 
                 <!-- Marks Entry Table -->
                 <div class="marks-table-container">
-                    <form action="/markEntry/submit" method="POST" id="marksForm">
+                    <form action="/markEntry" method="POST" id="marksForm">
                         <input type="hidden" name="grade" value="<?php echo htmlspecialchars($selectedGrade); ?>">
                         <input type="hidden" name="class" value="<?php echo htmlspecialchars($selectedClass); ?>">
                         <input type="hidden" name="term" value="<?php echo htmlspecialchars($selectedTerm); ?>">
@@ -365,7 +361,9 @@
         }
 
         // Form validation
-        document.getElementById('marksForm')?.addEventListener('submit', function(e) {
+        var _marksForm = document.getElementById('marksForm');
+        if (_marksForm) {
+            _marksForm.addEventListener('submit', function(e) {
             const inputs = document.querySelectorAll('.marks-input');
             let allFilled = true;
 
@@ -384,10 +382,137 @@
 
             // Allow normal form submission to the server
         });
+        }
 
         // Auto-save functionality (every 2 minutes)
         setInterval(function() {
             console.log('Auto-saving draft...');
             // TODO: Implement auto-save via AJAX
         }, 120000);
+
+        // AJAX Load Students
+        var _loadBtn = document.getElementById('loadStudentsBtn');
+        if (_loadBtn) {
+            _loadBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const grade = document.getElementById('grade').value;
+            const classVal = document.getElementById('class').value;
+            const term = document.getElementById('term').value;
+
+            if (!grade || !classVal) {
+                alert('Please select Grade and Class');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('grade', grade);
+            formData.append('class', classVal);
+            formData.append('term', term);
+
+            fetch('/markEntry/loadStudents', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update selection display and stats
+                    updateStudentTable(data);
+                } else {
+                    alert('Error: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error loading students:', error);
+                alert('Error loading students: ' + error.message);
+            });
+            });
+        }
+
+        function updateStudentTable(data) {
+            const tbody = document.querySelector('.marks-table tbody');
+            if (!tbody) return;
+
+            tbody.innerHTML = '';
+            data.students.forEach((student, index) => {
+                const grade = '';
+                let gradeClass = '';
+                if (student.current_marks !== null) {
+                    if (student.current_marks >= 75) {
+                        grade = 'A';
+                        gradeClass = 'grade-a';
+                    } else if (student.current_marks >= 65) {
+                        grade = 'B';
+                        gradeClass = 'grade-b';
+                    } else if (student.current_marks >= 55) {
+                        grade = 'C';
+                        gradeClass = 'grade-c';
+                    } else if (student.current_marks >= 35) {
+                        grade = 'S';
+                        gradeClass = 'grade-s';
+                    } else {
+                        grade = 'W';
+                        gradeClass = 'grade-w';
+                    }
+                }
+
+                const row = document.createElement('tr');
+                row.className = 'student-row ' + (student.current_marks === null ? 'pending' : 'completed');
+                row.innerHTML = `
+                    <td class="col-number">${index + 1}</td>
+                    <td class="col-reg"><span class="reg-badge">${escapeHtml(student.reg_number)}</span></td>
+                    <td class="col-name"><strong>${escapeHtml(student.name)}</strong></td>
+                    <td class="col-prev"><span class="prev-marks">${student.previous_marks || '-'}</span></td>
+                    <td class="col-marks">
+                        <div class="marks-input-wrapper">
+                            <input type="number" name="marks[${student.id}]" class="marks-input" 
+                                min="0" max="100" 
+                                value="${student.current_marks || ''}" 
+                                placeholder="0-100" 
+                                data-student-id="${student.id}" 
+                                onchange="calculateGrade(this)">
+                            <span class="marks-total">/ 100</span>
+                        </div>
+                    </td>
+                    <td class="col-grade">
+                        <span class="grade-badge ${gradeClass}" id="grade-${student.id}">
+                            ${grade || '-'}
+                        </span>
+                    </td>
+                    <td class="col-attendance"><span class="attendance-badge">${student.attendance || '-'}%</span></td>
+                    <td class="col-status">
+                        <span class="status-badge ${student.current_marks !== null ? 'status-entered' : 'status-pending'}">
+                            ${student.current_marks !== null ? 'Entered' : 'Pending'}
+                        </span>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            // Update stats
+            const statsCards = document.querySelectorAll('.stat-card');
+            if (statsCards.length >= 4) {
+                statsCards[0].querySelector('.stat-value').textContent = data.stats.totalStudents;
+                statsCards[1].querySelector('.stat-value').textContent = data.stats.marksEntered;
+                statsCards[2].querySelector('.stat-value').textContent = data.stats.marksPending;
+                statsCards[3].querySelector('.stat-value').textContent = (data.stats.classAverage || 0) + '%';
+            }
+
+            // Update hidden form fields
+            document.querySelector('input[name="grade"]').value = data.selectedGrade;
+            document.querySelector('input[name="class"]').value = data.selectedClass;
+            document.querySelector('input[name="term"]').value = data.selectedTerm;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const map = {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            };
+            return text.toString().replace(/[&<>"']/g, m => map[m]);
+        }
     </script>
