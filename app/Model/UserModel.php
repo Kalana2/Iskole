@@ -186,4 +186,79 @@ class UserModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function editUser($userId, $data)
+    {
+        // Validate and sanitize input data
+        $firstName = htmlspecialchars(trim($data['firstName'] ?? ''));
+        $lastName = htmlspecialchars(trim($data['lastName'] ?? ''));
+        $email = htmlspecialchars(trim($data['email'] ?? ''));
+        $phone = htmlspecialchars(trim($data['phone'] ?? ''));
+        $gender = htmlspecialchars(trim($data['gender'] ?? ''));
+        $dob = htmlspecialchars(trim($data['dateOfBirth'] ?? ''));
+        $address1 = htmlspecialchars(trim($data['address_line1'] ?? ''));
+        $address2 = htmlspecialchars(trim($data['address_line2'] ?? ''));
+        $address3 = htmlspecialchars(trim($data['address_line3'] ?? ''));
+
+        // Update user information in the database
+        $sql = "UPDATE {$this->userTable} SET
+                email = :email,
+                phone = :phone,
+                gender = :gender,
+                dateOfBirth = :dob
+                WHERE userID = :userId";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'email' => $email,
+            'phone' => $phone,
+            'gender' => $gender,
+            'dob' => $dob,
+            'userId' => $userId
+        ]);
+
+        // Update user name
+        $sql = "UPDATE {$this->userNameTable} SET
+                firstName = :firstName,
+                lastName = :lastName
+                WHERE userID = :userId";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'firstName' => $firstName,
+            'lastName' => $lastName,
+            'userId' => $userId
+        ]);
+
+        // Update user address
+        $sql = "UPDATE {$this->userAddressTable} SET
+                address_line1 = :address1,
+                address_line2 = :address2,
+                address_line3 = :address3
+                WHERE userID = :userId";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'address1' => $address1,
+            'address2' => $address2,
+            'address3' => $address3,
+            'userId' => $userId
+        ]);
+
+        return true;
+    }
+
+    public function deleteUser($userId)
+    {
+        try {
+            // Soft delete: set active = 0 instead of actually deleting the record
+            $sql = "UPDATE {$this->userTable} SET active = 0 WHERE userID = :userId";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            throw new Exception("Error deleting user: " . $e->getMessage());
+        }
+    }
+
 }

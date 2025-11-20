@@ -42,4 +42,16 @@ class UserDirectoryController extends Controller
         }
         return $users;
     }
+
+    public function updateUser($userId, $data)
+    {
+        $model = $this->model('UserModel');
+        return $model->editUser($userId, $data);
+    }
+
+    public function deleteUser($userId)
+    {
+        $model = $this->model('UserModel');
+        return $model->deleteUser($userId);
+    }
 }

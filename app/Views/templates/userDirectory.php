@@ -341,7 +341,8 @@
       btn.addEventListener('click', handleEditClick);
     });
     
-    document.querySelectorAll('.btn-red').forEach(btn => {
+    // Only target delete buttons in table rows, not the confirm button in modal
+    document.querySelectorAll('.table-row .btn-red').forEach(btn => {
       btn.removeEventListener('click', handleDeleteClick);
       btn.addEventListener('click', handleDeleteClick);
     });
@@ -357,12 +358,15 @@
     const formData = new FormData(this);
     const data = Object.fromEntries(formData);
     
-    // TODO: Add your AJAX call to update user
     console.log('Updating user:', data);
     
-    // Example AJAX call (uncomment and modify as needed):
-    /*
-    fetch('/api/users/update', {
+    // Disable submit button to prevent multiple submissions
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Saving...';
+    
+    fetch('/api/users?action=update', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -371,50 +375,64 @@
     .then(result => {
       if(result.success) {
         alert('User updated successfully!');
+        closeModal(editModal);
         location.reload();
       } else {
         alert('Error: ' + result.message);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('An error occurred while updating the user.');
+      alert('An error occurred while updating the user: ' + error.message);
+      submitBtn.disabled = false;
+      submitBtn.textContent = originalText;
     });
-    */
-    
-    closeModal(editModal);
-    alert('User update submitted! (Integration pending)');
   });
 
   // Delete confirmation
   document.getElementById('confirm-delete-btn').addEventListener('click', function() {
-    // TODO: Add your AJAX call to delete user
     console.log('Deleting user ID:', currentUserId);
     
-    // Example AJAX call (uncomment and modify as needed):
-    /*
-    fetch('/api/users/delete', {
+    // Validate that we have a user ID
+    if (!currentUserId) {
+      alert('Error: No user selected for deletion');
+      return;
+    }
+    
+    // Disable delete button to prevent multiple submissions
+    const deleteBtn = this;
+    const originalText = deleteBtn.textContent;
+    deleteBtn.disabled = true;
+    deleteBtn.textContent = 'Deleting...';
+    
+    const payload = { userID: parseInt(currentUserId) };
+    console.log('Delete payload:', payload);
+    
+    fetch('/api/users?action=delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userID: currentUserId })
+      body: JSON.stringify(payload)
     })
     .then(response => response.json())
     .then(result => {
       if(result.success) {
         alert('User deleted successfully!');
+        closeModal(deleteModal);
         location.reload();
       } else {
         alert('Error: ' + result.message);
+        deleteBtn.disabled = false;
+        deleteBtn.textContent = originalText;
       }
     })
     .catch(error => {
       console.error('Error:', error);
-      alert('An error occurred while deleting the user.');
+      alert('An error occurred while deleting the user: ' + error.message);
+      deleteBtn.disabled = false;
+      deleteBtn.textContent = originalText;
     });
-    */
-    
-    closeModal(deleteModal);
-    alert('User deletion submitted! (Integration pending)');
   });
 
   // Close modal handlers
