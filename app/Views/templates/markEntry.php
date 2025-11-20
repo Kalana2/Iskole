@@ -1,141 +1,35 @@
     <?php
-    // filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\markEntry.php
+    // The controller injects: $teacherInfo, $grades, $classes, $terms,
+    // $selectedGrade, $selectedClass, $selectedTerm, $selectedExamType,
+    // $students, statistics and optional $message.
 
-    // Teacher information
-    $teacherInfo = [
-        'name' => 'Mr. Perera',
-        'subject' => 'Mathematics',
-        'teacher_id' => 'T-2024-0156'
-    ];
+    // Defensive defaults to avoid PHP notices when called directly.
+    $teacherInfo = $teacherInfo ?? ['name' => '', 'subject' => ''];
+    $grades = $grades ?? [];
+    $classes = $classes ?? [];
+    $terms = $terms ?? [];
+    //$examTypes = $examTypes ?? [];
+    $selectedGrade = $selectedGrade ?? '';
+    $selectedClass = $selectedClass ?? '';
+    $selectedTerm = $selectedTerm ?? '';
+    $selectedExamType = $selectedExamType ?? '';
+    $students = $students ?? [];
+    $message = $message ?? null;
 
-    // Available grades and classes
-    $grades = [
-        ['value' => '6', 'label' => '06'],
-        ['value' => '7', 'label' => '07'],
-        ['value' => '8', 'label' => '08'],
-        ['value' => '9', 'label' => '09'],
-        ['value' => '10', 'label' => '10'],
-        ['value' => '11', 'label' => '11']
-    ];
-
-    $classes = ['A', 'B', 'C'];
-
-    $terms = [
-        ['value' => '1', 'label' => 'Term 1'],
-        ['value' => '2', 'label' => 'Term 2'],
-        ['value' => '3', 'label' => 'Term 3']
-    ];
-
-    $examTypes = [
-        ['value' => 'midterm', 'label' => 'Mid-Term Examination'],
-        ['value' => 'final', 'label' => 'Final Examination'],
-        ['value' => 'monthly', 'label' => 'Monthly Test'],
-        ['value' => 'class', 'label' => 'Class Test']
-    ];
-
-    // Sample selected values (when form is submitted)
-    $selectedGrade = '10';
-    $selectedClass = 'A';
-    $selectedTerm = '1';
-    $selectedExamType = 'midterm';
-
-    // Sample student data for Grade 10-A
-    $students = [
-        [
-            'id' => 1,
-            'reg_number' => '2024001',
-            'name' => 'Amal Perera',
-            'current_marks' => 85,
-            'previous_marks' => 78,
-            'attendance' => 95
-        ],
-        [
-            'id' => 2,
-            'reg_number' => '2024002',
-            'name' => 'Nimal Silva',
-            'current_marks' => 72,
-            'previous_marks' => 70,
-            'attendance' => 88
-        ],
-        [
-            'id' => 3,
-            'reg_number' => '2024003',
-            'name' => 'Kumari Fernando',
-            'current_marks' => 91,
-            'previous_marks' => 89,
-            'attendance' => 98
-        ],
-        [
-            'id' => 4,
-            'reg_number' => '2024004',
-            'name' => 'Saman Rajapaksa',
-            'current_marks' => 68,
-            'previous_marks' => 65,
-            'attendance' => 85
-        ],
-        [
-            'id' => 5,
-            'reg_number' => '2024005',
-            'name' => 'Dilini Wickramasinghe',
-            'current_marks' => 88,
-            'previous_marks' => 85,
-            'attendance' => 92
-        ],
-        [
-            'id' => 6,
-            'reg_number' => '2024006',
-            'name' => 'Kasun Bandara',
-            'current_marks' => null,
-            'previous_marks' => 75,
-            'attendance' => 90
-        ],
-        [
-            'id' => 7,
-            'reg_number' => '2024007',
-            'name' => 'Chamari Jayawardena',
-            'current_marks' => 79,
-            'previous_marks' => 82,
-            'attendance' => 87
-        ],
-        [
-            'id' => 8,
-            'reg_number' => '2024008',
-            'name' => 'Tharindu Gunasekara',
-            'current_marks' => null,
-            'previous_marks' => 70,
-            'attendance' => 83
-        ],
-        [
-            'id' => 9,
-            'reg_number' => '2024009',
-            'name' => 'Nethmi Rathnayake',
-            'current_marks' => 94,
-            'previous_marks' => 92,
-            'attendance' => 100
-        ],
-        [
-            'id' => 10,
-            'reg_number' => '2024010',
-            'name' => 'Isuru Mendis',
-            'current_marks' => 76,
-            'previous_marks' => 73,
-            'attendance' => 91
-        ]
-    ];
-
-    // Calculate statistics
-    $totalStudents = count($students);
-    $marksEntered = count(array_filter($students, function ($s) {
-        return $s['current_marks'] !== null;
+    // Calculate statistics from supplied students if controller didn't
+    $totalStudents = $totalStudents ?? count($students);
+    $marksEntered = $marksEntered ?? count(array_filter($students, function ($s) {
+        return isset($s['current_marks']) && $s['current_marks'] !== null && $s['current_marks'] !== '';
     }));
-    $marksPending = $totalStudents - $marksEntered;
-    $completionPercentage = $totalStudents > 0 ? round(($marksEntered / $totalStudents) * 100) : 0;
-
-    // Calculate class average for entered marks
-    $enteredMarks = array_filter(array_column($students, 'current_marks'), function ($m) {
-        return $m !== null;
-    });
-    $classAverage = !empty($enteredMarks) ? round(array_sum($enteredMarks) / count($enteredMarks), 2) : 0;
+    $marksPending = $marksPending ?? ($totalStudents - $marksEntered);
+    $completionPercentage = $completionPercentage ?? ($totalStudents > 0 ? round(($marksEntered / $totalStudents) * 100) : 0);
+    $classAverage = $classAverage ?? 0;
+    if (empty($classAverage)) {
+        $enteredMarks = array_filter(array_column($students, 'current_marks'), function ($m) {
+            return $m !== null && $m !== '';
+        });
+        $classAverage = !empty($enteredMarks) ? round(array_sum($enteredMarks) / count($enteredMarks), 2) : 0;
+    }
     ?>
     <link rel="stylesheet" href="/css/markEntry/markEntry.css">
 
@@ -162,20 +56,29 @@
                 </div>
             </div>
 
+            <?php if (!empty($message)): ?>
+                <div class="flash-message">
+                    <?php echo htmlspecialchars($message); ?>
+                </div>
+            <?php endif; ?>
+
             <!-- Filter Form -->
             <div class="filter-container">
-                <form action="#" method="POST" class="filter-form" id="filterForm">
+                <form action="/markEntry" method="POST" class="filter-form" id="filterForm">
                     <div class="filter-grid">
                         <div class="form-group">
                             <label for="grade" class="form-label">Grade</label>
                             <select name="grade" id="grade" class="form-select" required>
                                 <option value="">Select Grade</option>
-                                <?php foreach ($grades as $grade): ?>
-                                    <option value="<?php echo $grade['value']; ?>"
-                                        <?php echo $selectedGrade === $grade['value'] ? 'selected' : ''; ?>>
-                                        Grade <?php echo $grade['label']; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php if (empty($grades)): ?>
+                                    <option value="" disabled>No grades available</option>
+                                <?php else: ?>
+                                    <?php foreach ($grades as $grade): ?>
+                                        <option value="<?php echo $grade['value']; ?>" <?php echo $selectedGrade === $grade['value'] ? 'selected' : ''; ?>>
+                                            Grade <?php echo $grade['label']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
 
@@ -183,12 +86,15 @@
                             <label for="class" class="form-label">Class</label>
                             <select name="class" id="class" class="form-select" required>
                                 <option value="">Select Class</option>
-                                <?php foreach ($classes as $class): ?>
-                                    <option value="<?php echo $class; ?>"
-                                        <?php echo $selectedClass === $class ? 'selected' : ''; ?>>
-                                        Class <?php echo $class; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php if (empty($classes)): ?>
+                                    <option value="" disabled>No classes available</option>
+                                <?php else: ?>
+                                    <?php foreach ($classes as $class): ?>
+                                        <option value="<?php echo $class; ?>" <?php echo $selectedClass === $class ? 'selected' : ''; ?>>
+                                            Class <?php echo $class; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
 
@@ -196,12 +102,15 @@
                             <label for="term" class="form-label">Term</label>
                             <select name="term" id="term" class="form-select" required>
                                 <option value="">Select Term</option>
-                                <?php foreach ($terms as $term): ?>
-                                    <option value="<?php echo $term['value']; ?>"
-                                        <?php echo $selectedTerm === $term['value'] ? 'selected' : ''; ?>>
-                                        <?php echo $term['label']; ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <?php if (empty($terms)): ?>
+                                    <option value="" disabled>No terms available</option>
+                                <?php else: ?>
+                                    <?php foreach ($terms as $term): ?>
+                                        <option value="<?php echo $term['value']; ?>" <?php echo $selectedTerm === $term['value'] ? 'selected' : ''; ?>>
+                                            <?php echo $term['label']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
 
@@ -217,13 +126,34 @@
 
             <!-- Selection Summary -->
             <?php if ($selectedGrade && $selectedClass): ?>
+                <?php
+                // Safely resolve term and exam type labels
+                $termLabel = '-';
+                if (!empty($terms) && $selectedTerm !== '') {
+                    foreach ($terms as $t) {
+                        if (isset($t['value']) && (string)$t['value'] === (string)$selectedTerm) {
+                            $termLabel = $t['label'];
+                            break;
+                        }
+                    }
+                }
+                /*$examTypeLabel = '-';
+                if (!empty($examTypes) && $selectedExamType !== '') {
+                    foreach ($examTypes as $et) {
+                        if (isset($et['value']) && (string)$et['value'] === (string)$selectedExamType) {
+                            $examTypeLabel = $et['label'];
+                            break;
+                        }
+                    }
+                }*/
+                ?>
                 <div class="selection-summary">
                     <div class="summary-badge">
                         <span class="summary-icon">📋</span>
                         <span class="summary-text">
                             Showing: <strong>Grade <?php echo $selectedGrade; ?>-<?php echo $selectedClass; ?></strong> •
-                            <strong><?php echo $terms[intval($selectedTerm) - 1]['label']; ?></strong> •
-                            <strong><?php echo $examTypes[array_search($selectedExamType, array_column($examTypes, 'value'))]['label']; ?></strong>
+                            <strong><?php echo htmlspecialchars($termLabel); ?></strong>
+                            <!--<strong><?php echo htmlspecialchars($examTypeLabel); ?></strong>-->
                         </span>
                     </div>
                 </div>
@@ -262,7 +192,7 @@
 
                 <!-- Marks Entry Table -->
                 <div class="marks-table-container">
-                    <form action="#" method="POST" id="marksForm">
+                    <form action="/markEntry/submit" method="POST" id="marksForm">
                         <input type="hidden" name="grade" value="<?php echo htmlspecialchars($selectedGrade); ?>">
                         <input type="hidden" name="class" value="<?php echo htmlspecialchars($selectedClass); ?>">
                         <input type="hidden" name="term" value="<?php echo htmlspecialchars($selectedTerm); ?>">
@@ -357,10 +287,10 @@
                                 <span class="btn-icon">🗑️</span>
                                 <span class="btn-text">Clear All</span>
                             </button>
-                            <button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                            <!--<button type="button" class="btn btn-secondary" onclick="saveDraft()">
                                 <span class="btn-icon">💾</span>
                                 <span class="btn-text">Save Draft</span>
-                            </button>
+                            </button>-->
                             <button type="submit" class="btn btn-primary">
                                 <span class="btn-icon">✓</span>
                                 <span class="btn-text">Submit Marks</span>
@@ -436,8 +366,6 @@
 
         // Form validation
         document.getElementById('marksForm')?.addEventListener('submit', function(e) {
-            e.preventDefault();
-
             const inputs = document.querySelectorAll('.marks-input');
             let allFilled = true;
 
@@ -449,13 +377,12 @@
 
             if (!allFilled) {
                 if (!confirm('Some marks are still pending. Do you want to submit anyway?')) {
+                    e.preventDefault();
                     return false;
                 }
             }
 
-            // TODO: Implement actual form submission
-            alert('Marks submitted successfully! (This is a demo)');
-            console.log('Form submitted');
+            // Allow normal form submission to the server
         });
 
         // Auto-save functionality (every 2 minutes)
