@@ -117,5 +117,42 @@ class MarkEntryController extends Controller
 			'selectedTerm' => $term
 		]);
 	}
-}
 
+	public function deleteMarks()
+	{
+		// AJAX endpoint: delete marks from database
+		header('Content-Type: application/json');
+
+		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			http_response_code(400);
+			echo json_encode(['error' => 'Invalid request method']);
+			return;
+		}
+
+		$studentId = $_POST['studentId'] ?? null;
+		$grade = $_POST['grade'] ?? null;
+		$class = $_POST['class'] ?? null;
+		$term = $_POST['term'] ?? null;
+
+		if (!$studentId || !$grade || !$class || !$term) {
+			http_response_code(400);
+			echo json_encode(['error' => 'Missing required parameters']);
+			return;
+		}
+
+		$model = $this->model('MarkEntryModel');
+		$teacherInfo = $model->getTeacherInfo($this->session->get('user_id'));
+
+		try {
+			$ok = $model->deleteMarks($studentId, $teacherInfo['subjectID'] ?? null, $term);
+			if ($ok) {
+				echo json_encode(['success' => true, 'message' => 'Marks deleted successfully']);
+			} else {
+				echo json_encode(['success' => false, 'error' => 'Failed to delete marks']);
+			}
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['success' => false, 'error' => $e->getMessage()]);
+		}
+	}
+}

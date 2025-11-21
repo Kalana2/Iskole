@@ -15,13 +15,13 @@
     // Calculate statistics from supplied students if controller didn't
     $totalStudents = $totalStudents ?? count($students);
     $marksEntered = $marksEntered ?? count(array_filter($students, function ($s) {
-        return isset($s['current_marks']) && $s['current_marks'] !== null && $s['current_marks'] !== '';
+        return isset($s['previous_marks']) && $s['previous_marks'] !== null && $s['previous_marks'] !== '';
     }));
     $marksPending = $marksPending ?? ($totalStudents - $marksEntered);
     $completionPercentage = $completionPercentage ?? ($totalStudents > 0 ? round(($marksEntered / $totalStudents) * 100) : 0);
     $classAverage = $classAverage ?? 0;
     if (empty($classAverage)) {
-        $enteredMarks = array_filter(array_column($students, 'current_marks'), function ($m) {
+        $enteredMarks = array_filter(array_column($students, 'previous_marks'), function ($m) {
             return $m !== null && $m !== '';
         });
         $classAverage = !empty($enteredMarks) ? round(array_sum($enteredMarks) / count($enteredMarks), 2) : 0;
@@ -206,6 +206,7 @@
                                         <th class="col-grade">Grade</th>
                                         <th class="col-attendance">Attendance</th>
                                         <th class="col-status">Status</th>
+                                        <th class="col-action">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -271,6 +272,13 @@
                                                     <?php echo $student['current_marks'] !== null ? 'Entered' : 'Pending'; ?>
                                                 </span>
                                             </td>
+                                            <td class="col-action">
+                                                <?php if ($student['previous_marks'] !== null): ?>
+                                                    <button type="button" class="status-badge status-remove" onclick="removeMarks(<?php echo $student['id']; ?>, '<?php echo htmlspecialchars($student['name']); ?>')" title="Remove previous marks">
+                                                        Remove
+                                                    </button>
+                                                <?php endif; ?>
+                                            </td>
                                         </tr>
                                     <?php endforeach; ?>
                                 </tbody>
@@ -299,7 +307,7 @@
                 <div class="empty-state">
                     <div class="empty-icon">📝</div>
                     <h3 class="empty-title">Select Class and Exam</h3>
-                    <p class="empty-description">Please select grade, class, term, and exam type from the filters above to load student list.</p>
+                    <p class="empty-description">Please select grade, class and term from the filters above to load student list.</p>
                 </div>
             <?php endif; ?>
         </div>
@@ -340,6 +348,45 @@
 
             gradeBadge.textContent = grade;
             gradeBadge.className = 'grade-badge ' + gradeClass;
+        }
+
+        // Remove marks from database
+        function removeMarks(studentId, studentName) {
+            if (!confirm('Remove previous marks for ' + studentName + '? This action cannot be undone.')) {
+                return;
+            }
+            
+            const grade = document.querySelector('input[name="grade"]').value;
+            const classVal = document.querySelector('input[name="class"]').value;
+            const term = document.querySelector('input[name="term"]').value;
+            
+            if (!grade || !classVal || !term) {
+                alert('Grade, Class, and Term are required');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('action', 'deleteMarks');
+            formData.append('studentId', studentId);
+            formData.append('grade', grade);
+            formData.append('class', classVal);
+            formData.append('term', term);
+            
+            fetch('/index.php?url=markEntry/deleteMarks', { method: 'POST', body: formData })
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+                    // Remove the mark from the previous marks column and hide button
+                    const row = document.querySelector('button[onclick*="removeMarks('+studentId+'"]').closest('tr');
+                    if (row) {
+                        const prevMarksCell = row.querySelector('.prev-marks');
+                        if (prevMarksCell) prevMarksCell.textContent = '-';
+                        const removeBtn = row.querySelector('.btn-remove');
+                        if (removeBtn) removeBtn.style.display = 'none';
+                    }
+                    alert('Marks removed successfully');
+                })
+                .catch(err => { console.error('Delete error:', err); alert('Delete failed: ' + err.message); });
         }
 
         // Clear all marks
@@ -442,7 +489,7 @@
                     summary.querySelector('.summary-text').innerHTML = 'Showing: <strong>Grade '+escapeHtml(data.selectedGrade)+'-'+escapeHtml(data.selectedClass)+'</strong> • <strong>'+escapeHtml(termLabel)+'</strong>';
                 }
                 // Stats
-                if (data.stats) {
+                /*if (data.stats) {
                     const statValues = document.querySelectorAll('.stat-card .stat-value');
                     if (statValues.length >= 4) {
                         statValues[0].textContent = data.stats.totalStudents;
@@ -450,7 +497,65 @@
                         statValues[2].textContent = data.stats.marksPending;
                         statValues[3].textContent = (data.stats.classAverage || 0) + '%';
                     }
-                }
+                }*/
+
+                // Stats Section
+if (data.stats) {
+    let statsGrid = document.querySelector('.stats-grid');
+
+    // If stats grid is missing (AJAX initial load), create it
+    if (!statsGrid) {
+        const box = document.querySelector('.box');
+        statsGrid = document.createElement('div');
+        statsGrid.className = 'stats-grid';
+
+        statsGrid.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <div class="stat-value" id="totalStudents">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-content">
+                    <div class="stat-value" id="marksEntered">0</div>
+                    <div class="stat-label">Marks Entered</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-content">
+                    <div class="stat-value" id="marksPending">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <div class="stat-value" id="classAverage">0%</div>
+                    <div class="stat-label">Class Average</div>
+                </div>
+            </div>
+        `;
+
+        // Insert stats before the table container
+        const tableContainer = document.querySelector('.marks-table-container');
+        if (tableContainer) {
+            box.insertBefore(statsGrid, tableContainer);
+        } else {
+            box.appendChild(statsGrid);
+        }
+    }
+
+    // Update stats values
+    document.getElementById('totalStudents').textContent = data.stats.totalStudents;
+    document.getElementById('marksEntered').textContent = data.stats.marksEntered;
+    document.getElementById('marksPending').textContent = data.stats.marksPending;
+    document.getElementById('classAverage').textContent = (data.stats.classAverage || 0) + '%';
+}
+
                 // Table container creation if needed
                 let tableContainer = document.querySelector('.marks-table-container');
                 const emptyState = document.querySelector('.empty-state');
@@ -458,7 +563,7 @@
                     if (emptyState) emptyState.remove();
                     tableContainer = document.createElement('div');
                     tableContainer.className = 'marks-table-container';
-                    tableContainer.innerHTML = '<form action="/MarkEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Reg Number</th><th>Student Name</th><th>Previous</th><th>Current Marks</th><th>Grade</th><th>Attendance</th><th>Status</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
+                    tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Reg Number</th><th>Student Name</th><th>Previous</th><th>Current Marks</th><th>Grade</th><th>Attendance</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
                     document.querySelector('.box').appendChild(tableContainer);
                 }
                 const tbody = tableContainer.querySelector('.marks-table tbody');
@@ -480,6 +585,8 @@
                     }
                     const tr = document.createElement('tr');
                     tr.className = 'student-row ' + (cm === null || cm === undefined || cm === '' ? 'pending' : 'completed');
+                    const removeBtn = student.previous_marks !== null && student.previous_marks !== undefined && student.previous_marks !== '' ? 
+                        '<button type="button" class="status-badge status-remove" onclick="removeMarks('+escapeHtml(student.id)+', \''+escapeHtml(student.name)+'\')">Remove</button>' : '';
                     tr.innerHTML = '<td>'+(index+1)+'</td>'+
                         '<td><span class="reg-badge">'+escapeHtml(student.reg_number)+'</span></td>'+
                         '<td><strong>'+escapeHtml(student.name)+'</strong></td>'+
@@ -487,7 +594,8 @@
                         '<td><div class="marks-input-wrapper"><input type="number" name="marks['+escapeHtml(student.id)+']" class="marks-input" min="0" max="100" value="'+(cm !== null && cm !== undefined ? escapeHtml(cm) : '')+'" placeholder="0-100" data-student-id="'+escapeHtml(student.id)+'" onchange="calculateGrade(this)"><span class="marks-total">/ 100</span></div></td>'+
                         '<td><span class="grade-badge '+gradeClass+'" id="grade-'+escapeHtml(student.id)+'">'+(grade||'-')+'</span></td>'+
                         '<td><span class="attendance-badge">'+escapeHtml(student.attendance || '-')+'%</span></td>'+
-                        '<td><span class="status-badge '+(cm !== null && cm !== undefined && cm !== '' ? 'status-entered':'status-pending')+'">'+(cm !== null && cm !== undefined && cm !== '' ? 'Entered':'Pending')+'</span></td>';
+                        '<td><span class="status-badge '+(cm !== null && cm !== undefined && cm !== '' ? 'status-entered':'status-pending')+'">'+(cm !== null && cm !== undefined && cm !== '' ? 'Entered':'Pending')+'</span></td>'+
+                        '<td>'+removeBtn+'</td>';
                     tbody.appendChild(tr);
                 });
                 // Hidden inputs update

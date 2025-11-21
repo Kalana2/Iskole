@@ -96,11 +96,10 @@ class MarkEntryModel
 		$students = $stmt->fetchAll();
 
 		// Prepare mark queries if subjectID/term provided
-		$getCurrent = null;
-		$getPrevious = null;
+		$getPreviousMarks = null;
 		if ($subjectID !== null && $term !== null && $term !== '') {
-			$getCurrent = $this->pdo->prepare("SELECT marks FROM marks WHERE studentID = :sid AND subjectID = :subjectID AND term = :term ORDER BY enteredDate DESC LIMIT 1");
-			$getPrevious = $this->pdo->prepare("SELECT marks FROM marks WHERE studentID = :sid AND subjectID = :subjectID AND term < :term ORDER BY term DESC LIMIT 1");
+			// Get marks from the current term (show in previous column as reference)
+			$getPreviousMarks = $this->pdo->prepare("SELECT marks FROM marks WHERE studentID = :sid AND subjectID = :subjectID AND term = :term ORDER BY enteredDate DESC LIMIT 1");
 		}
 
 		$out = [];
@@ -108,13 +107,9 @@ class MarkEntryModel
 			$sid = $s['studentID'];
 			$current = null;
 			$previous = null;
-			if ($getCurrent) {
-				$getCurrent->execute(['sid' => $sid, 'subjectID' => $subjectID, 'term' => $term]);
-				$r = $getCurrent->fetch();
-				$current = $r ? $r['marks'] : null;
-
-				$getPrevious->execute(['sid' => $sid, 'subjectID' => $subjectID, 'term' => $term]);
-				$pr = $getPrevious->fetch();
+			if ($getPreviousMarks) {
+				$getPreviousMarks->execute(['sid' => $sid, 'subjectID' => $subjectID, 'term' => $term]);
+				$pr = $getPreviousMarks->fetch();
 				$previous = $pr ? $pr['marks'] : null;
 			}
 
@@ -122,8 +117,8 @@ class MarkEntryModel
 				'id' => $sid,
 				'reg_number' => $s['userID'],
 				'name' => trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? '')),
-				'current_marks' => $current,
-				'previous_marks' => $previous,
+				'current_marks' => $current,  // Always null - empty input for new marks
+				'previous_marks' => $previous,  // Previously stored marks for current term
 				'attendance' => null
 			];
 		}
@@ -135,12 +130,12 @@ class MarkEntryModel
 	{
 		$totalStudents = count($students);
 		$marksEntered = count(array_filter($students, function ($s) {
-			return $s['current_marks'] !== null && $s['current_marks'] !== '';
+			return $s['previous_marks'] !== null && $s['previous_marks'] !== '';
 		}));
 		$marksPending = $totalStudents - $marksEntered;
 		$completionPercentage = $totalStudents > 0 ? round(($marksEntered / $totalStudents) * 100) : 0;
 
-		$enteredMarks = array_filter(array_column($students, 'current_marks'), function ($m) {
+		$enteredMarks = array_filter(array_column($students, 'previous_marks'), function ($m) {
 			return $m !== null && $m !== '';
 		});
 		$classAverage = !empty($enteredMarks) ? round(array_sum($enteredMarks) / count($enteredMarks), 2) : 0;
@@ -190,7 +185,7 @@ class MarkEntryModel
 
 			$select = $this->pdo->prepare("SELECT markID FROM marks WHERE studentID = :sid AND subjectID = :subjectID AND term = :term LIMIT 1");
 			$update = $this->pdo->prepare("UPDATE marks SET marks = :marks, gradeLetter = :gradeLetter, updatedDate = NOW(), teacherID = :teacherID WHERE markID = :markID");
-			$insert = $this->pdo->prepare("INSERT INTO marks (studentID, teacherID, subjectID, term, marks, gradeLetter, remarks, enteredDate, updatedDate) VALUES (:studentID, :teacherID, :subjectID, :term, :marks, :gradeLetter, NOW(), NOW())");
+			$insert = $this->pdo->prepare("INSERT INTO marks (studentID, teacherID, subjectID, term, marks, gradeLetter, enteredDate, updatedDate) VALUES (:studentID, :teacherID, :subjectID, :term, :marks, :gradeLetter, NOW(), NOW())");
 
 			foreach ($marks as $studentId => $m) {
 				// Normalize studentId (may be string index)
@@ -228,6 +223,27 @@ class MarkEntryModel
 			return true;
 		} catch (Exception $e) {
 			if ($this->pdo->inTransaction()) $this->pdo->rollBack();
+			throw $e;
+		}
+	}
+
+	public function deleteMarks($studentId, $subjectID = null, $term = null)
+	{
+		// Delete marks for a specific student, subject, and term
+		if ($studentId === null || $subjectID === null || $term === null) {
+			throw new Exception('Missing studentId, subjectID, or term');
+		}
+
+		try {
+			$sql = "DELETE FROM marks WHERE studentID = :studentID AND subjectID = :subjectID AND term = :term";
+			$stmt = $this->pdo->prepare($sql);
+			$stmt->execute([
+				'studentID' => intval($studentId),
+				'subjectID' => $subjectID,
+				'term' => $term
+			]);
+			return $stmt->rowCount() > 0;
+		} catch (Exception $e) {
 			throw $e;
 		}
 	}
