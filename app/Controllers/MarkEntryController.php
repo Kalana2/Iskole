@@ -80,6 +80,9 @@ class MarkEntryController extends Controller
 		];
 
 		$this->view('templates/markEntry', $data);
+
+		//header("Location: ".($_SERVER['HTTP_REFERER'] ?? "/teacher?tab=Mark+Entry"));
+		//exit();
 	}
 
 	public function loadStudents()
