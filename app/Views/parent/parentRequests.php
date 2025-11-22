@@ -20,10 +20,10 @@ $recentRequests = [
         'to_date' => '2025-11-08',
         'reason' => 'Family emergency requiring immediate attention.',
         'submitted_date' => '2025-11-07',
-        'status' => 'approved',
+        'status' => 'acknowledged',
         'duration' => 1,
-        'approved_by' => 'Mrs. Jayawardena',
-        'approved_date' => '2025-11-07'
+        'acknowledged_by' => 'Mrs. Jayawardena',
+        'acknowledged_date' => '2025-11-07'
     ],
     [
         'id' => 3,
@@ -42,11 +42,8 @@ $recentRequests = [
         'to_date' => '2025-11-01',
         'reason' => 'Dental treatment scheduled by orthodontist.',
         'submitted_date' => '2025-10-28',
-        'status' => 'rejected',
-        'duration' => 1,
-        'rejected_by' => 'Mr. Bandara',
-        'rejected_date' => '2025-10-30',
-        'rejection_reason' => 'Important exam scheduled on this date.'
+        'status' => 'not_seen',
+        'duration' => 1
     ],
     [
         'id' => 5,
@@ -55,10 +52,10 @@ $recentRequests = [
         'to_date' => '2025-10-30',
         'reason' => 'Attending regional sports tournament.',
         'submitted_date' => '2025-10-20',
-        'status' => 'approved',
+        'status' => 'acknowledged',
         'duration' => 3,
-        'approved_by' => 'Mrs. Silva',
-        'approved_date' => '2025-10-22'
+        'acknowledged_by' => 'Mrs. Silva',
+        'acknowledged_date' => '2025-10-22'
     ]
 ];
 ?>
@@ -81,11 +78,11 @@ $recentRequests = [
                 <button class="chip" role="tab" aria-selected="false" data-filter="pending">
                     Pending
                 </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="approved">
-                    Approved
+                <button class="chip" role="tab" aria-selected="false" data-filter="acknowledged">
+                    Acknowledgements
                 </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="rejected">
-                    Rejected
+                <button class="chip" role="tab" aria-selected="false" data-filter="not_seen">
+                    Not Seen
                 </button>
             </div>
         </div>
@@ -115,38 +112,35 @@ $recentRequests = [
                                 <?php if ($fromFmt !== $toFmt): ?>
                                     - <?php echo htmlspecialchars($toFmt); ?>
                                 <?php endif; ?>
-                                <span class="duration-badge"><?php echo $duration; ?> day<?php echo $duration > 1 ? 's' : ''; ?></span>
+                                <span class="duration-badge"><?php echo $duration; ?>
+                                    day<?php echo $duration > 1 ? 's' : ''; ?></span>
                             </p>
                             <p class="sub-heading"><?php echo htmlspecialchars($req['reason'] ?? 'No reason provided'); ?></p>
                             <p class="sub-heading meta-info">
                                 <span>Submitted: <?php echo htmlspecialchars($submittedDate); ?></span>
                             </p>
 
-                            <?php if ($status === 'approved' && isset($req['approved_by'])): ?>
-                                <p class="status-note approved">
-                                    ✓ Approved by <?php echo htmlspecialchars($req['approved_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['approved_date'])); ?>
+                            <?php if ($status === 'acknowledged' && isset($req['acknowledged_by'])): ?>
+                                <p class="status-note acknowledged">
+                                    ✓ Acknowledged by <?php echo htmlspecialchars($req['acknowledged_by']); ?>
+                                    on <?php echo date('M j, Y', strtotime($req['acknowledged_date'])); ?>
                                 </p>
                             <?php endif; ?>
 
-                            <?php if ($status === 'rejected' && isset($req['rejected_by'])): ?>
-                                <p class="status-note rejected">
-                                    ✗ Rejected by <?php echo htmlspecialchars($req['rejected_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['rejected_date'])); ?>
-                                    <?php if (isset($req['rejection_reason'])): ?>
-                                        <br><small>Reason: <?php echo htmlspecialchars($req['rejection_reason']); ?></small>
-                                    <?php endif; ?>
+                            <?php if ($status === 'not_seen'): ?>
+                                <p class="status-note not-seen">
+                                    ⊘ Not yet reviewed by teacher
                                 </p>
                             <?php endif; ?>
                         </div>
 
                         <div class="right two-com">
-                            <span class="label <?php echo $status === 'approved' ? 'label-green' : ($status === 'rejected' ? 'label-red' : 'label-warning'); ?>">
-                                <?php echo ucfirst($status); ?>
+                            <span
+                                class="label <?php echo $status === 'acknowledged' ? 'label-green' : ($status === 'not_seen' ? 'label-red' : 'label-warning'); ?>">
+                                <?php echo $status === 'acknowledged' ? 'Acknowledged' : ($status === 'not_seen' ? 'Not Seen' : ucfirst($status)); ?>
                             </span>
                             <?php if ($status === 'pending'): ?>
-                                <button type="button" class="btn btn-primary btn-edit-leave"
-                                    data-id="<?php echo $requestId; ?>"
+                                <button type="button" class="btn btn-primary btn-edit-leave" data-id="<?php echo $requestId; ?>"
                                     data-from="<?php echo htmlspecialchars($fromInput); ?>"
                                     data-to="<?php echo htmlspecialchars($toInput); ?>"
                                     data-reason="<?php echo htmlspecialchars($req['reason'] ?? '', ENT_QUOTES); ?>">
@@ -191,8 +185,8 @@ $recentRequests = [
                 <div class="form-group">
                     <label for="reason">Reason for Absence</label>
                     <textarea id="reason" name="reason" class="textarea-details"
-                        placeholder="Please provide detailed reason for the absence request"
-                        rows="4" required></textarea>
+                        placeholder="Please provide detailed reason for the absence request" rows="4"
+                        required></textarea>
                 </div>
 
                 <button type="submit" class="btn-submit">Submit Request</button>
@@ -237,12 +231,12 @@ $recentRequests = [
 
 <script>
     // Filter functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const chips = document.querySelectorAll('.chip[data-filter]');
         const cards = document.querySelectorAll('.info-box[data-status]');
 
         chips.forEach(chip => {
-            chip.addEventListener('click', function() {
+            chip.addEventListener('click', function () {
                 // Update active state
                 chips.forEach(c => {
                     c.classList.remove('active');
@@ -269,7 +263,7 @@ $recentRequests = [
         const closeButtons = document.querySelectorAll('.modal-close, .modal-cancel');
 
         editButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 const id = this.dataset.id;
                 const fromDate = this.dataset.from;
                 const toDate = this.dataset.to;
@@ -285,13 +279,13 @@ $recentRequests = [
         });
 
         closeButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 modal.style.display = 'none';
             });
         });
 
         // Close modal on backdrop click
-        modal.addEventListener('click', function(e) {
+        modal.addEventListener('click', function (e) {
             if (e.target === modal) {
                 modal.style.display = 'none';
             }

@@ -41,11 +41,11 @@ $absences = [
         'to_date' => '2025-11-07',
         'reason' => 'Attending a regional sports tournament representing the school.',
         'submitted_date' => '2025-11-01',
-        'status' => 'approved',
+        'status' => 'acknowledged',
         'duration' => 2,
         'parent_contact' => '075-5551234',
-        'approved_by' => 'Mrs. Jayawardena',
-        'approved_date' => '2025-11-02'
+        'acknowledged_by' => 'Mrs. Jayawardena',
+        'acknowledged_date' => '2025-11-02'
     ],
     [
         'id' => 4,
@@ -71,12 +71,11 @@ $absences = [
         'to_date' => '2025-11-01',
         'reason' => 'Dental treatment scheduled by orthodontist.',
         'submitted_date' => '2025-10-28',
-        'status' => 'rejected',
+        'status' => 'acknowledged',
         'duration' => 1,
         'parent_contact' => '076-7778899',
-        'rejected_by' => 'Mr. Bandara',
-        'rejected_date' => '2025-10-30',
-        'rejection_reason' => 'Important exam scheduled on this date.'
+        'acknowledged_by' => 'Mr. Bandara',
+        'acknowledged_date' => '2025-10-30'
     ]
 ];
 ?>
@@ -99,11 +98,8 @@ $absences = [
                 <button class="chip" role="tab" aria-selected="false" data-filter="pending">
                     Pending
                 </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="approved">
-                    Approved
-                </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="rejected">
-                    Rejected
+                <button class="chip" role="tab" aria-selected="false" data-filter="acknowledged">
+                    Acknowledgements
                 </button>
             </div>
         </div>
@@ -136,7 +132,8 @@ $absences = [
                                 <?php if ($fromFmt !== $toFmt): ?>
                                     - <?php echo htmlspecialchars($toFmt); ?>
                                 <?php endif; ?>
-                                <span class="duration-badge"><?php echo $duration; ?> day<?php echo $duration > 1 ? 's' : ''; ?></span>
+                                <span class="duration-badge"><?php echo $duration; ?>
+                                    day<?php echo $duration > 1 ? 's' : ''; ?></span>
                             </p>
                             <p class="sub-heading"><?php echo htmlspecialchars($req['reason'] ?? 'No reason provided'); ?></p>
                             <p class="sub-heading meta-info">
@@ -147,35 +144,22 @@ $absences = [
                                 <?php endif; ?>
                             </p>
 
-                            <?php if ($status === 'approved' && isset($req['approved_by'])): ?>
-                                <p class="status-note approved">
-                                    ✓ Approved by <?php echo htmlspecialchars($req['approved_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['approved_date'])); ?>
-                                </p>
-                            <?php endif; ?>
-
-                            <?php if ($status === 'rejected' && isset($req['rejected_by'])): ?>
-                                <p class="status-note rejected">
-                                    ✗ Rejected by <?php echo htmlspecialchars($req['rejected_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['rejected_date'])); ?>
-                                    <?php if (isset($req['rejection_reason'])): ?>
-                                        <br><small>Reason: <?php echo htmlspecialchars($req['rejection_reason']); ?></small>
-                                    <?php endif; ?>
+                            <?php if ($status === 'acknowledged' && isset($req['acknowledged_by'])): ?>
+                                <p class="status-note acknowledged">
+                                    ✓ Acknowledged by <?php echo htmlspecialchars($req['acknowledged_by']); ?>
+                                    on <?php echo date('M j, Y', strtotime($req['acknowledged_date'])); ?>
                                 </p>
                             <?php endif; ?>
                         </div>
 
                         <div class="right two-com">
                             <?php if ($status === 'pending'): ?>
-                                <button class="btn btn-green" onclick="approveRequest(<?php echo $req['id']; ?>)">
-                                    Approve
-                                </button>
-                                <button class="btn btn-red" onclick="rejectRequest(<?php echo $req['id']; ?>)">
-                                    Reject
+                                <button class="btn btn-green" onclick="acknowledgeRequest(<?php echo $req['id']; ?>)">
+                                    Acknowledge
                                 </button>
                             <?php else: ?>
-                                <span class="label <?php echo $status === 'approved' ? 'label-green' : 'label-red'; ?>">
-                                    <?php echo ucfirst($status); ?>
+                                <span class="label label-green">
+                                    Acknowledged
                                 </span>
                             <?php endif; ?>
                         </div>
@@ -195,12 +179,12 @@ $absences = [
 
 <script>
     // Filter functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const chips = document.querySelectorAll('.chip[data-filter]');
         const cards = document.querySelectorAll('.info-box[data-status]');
 
         chips.forEach(chip => {
-            chip.addEventListener('click', function() {
+            chip.addEventListener('click', function () {
                 // Update active state
                 chips.forEach(c => {
                     c.classList.remove('active');
@@ -223,20 +207,11 @@ $absences = [
     });
 
     // Action handlers (to be implemented with backend)
-    function approveRequest(id) {
-        if (confirm('Are you sure you want to approve this absence request?')) {
-            console.log('Approving request:', id);
+    function acknowledgeRequest(id) {
+        if (confirm('Are you sure you want to acknowledge this absence request?')) {
+            console.log('Acknowledging request:', id);
             // TODO: Implement AJAX call to backend
-            alert('Approval functionality to be implemented');
-        }
-    }
-
-    function rejectRequest(id) {
-        const reason = prompt('Please provide a reason for rejection (optional):');
-        if (reason !== null) {
-            console.log('Rejecting request:', id, 'Reason:', reason);
-            // TODO: Implement AJAX call to backend
-            alert('Rejection functionality to be implemented');
+            alert('Acknowledgement functionality to be implemented');
         }
     }
 </script>
