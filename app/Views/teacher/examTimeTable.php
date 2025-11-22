@@ -11,7 +11,7 @@ if (file_exists($metaFile)) {
 
 // Grade selection
 $gradeOptions = ['6' => 'Grade 6', '7' => 'Grade 7', '8' => 'Grade 8', '9' => 'Grade 9'];
-$selectedGrade = isset($_GET['grade']) ? preg_replace('/[^0-9A-Za-z_-]/', '', $_GET['grade']) : '6';
+$selectedGrade = isset($_GET['grade']) ? preg_replace('/[^0-9A-Za-z_-]/', '', $_GET['grade']) : '10';
 if (!isset($gradeOptions[$selectedGrade])) { $selectedGrade = array_key_first($gradeOptions); }
 
 // Read per-grade meta with legacy fallback
@@ -30,10 +30,10 @@ $hidden = isset($entry['hidden']) ? (bool)$entry['hidden'] : false;
   <div class="ann-header">
     <div class="ann-title-wrap">
       <h2 id="exam-tt-title">Exam Time Table</h2>
-      <p class="ann-subtitle">Upload timetable image and control visibility per grade</p>
+      <p class="ann-subtitle">View timetable image</p>
     </div>
     <div class="ann-actions">
-      <form method="get" action="/admin" style="display:flex; align-items:center; gap:.5rem;">
+      <form method="get" action="/teacher" style="display:flex; align-items:center; gap:.5rem;">
         <input type="hidden" name="tab" value="Exam Time Table" />
         <label for="grade" class="ann-subtitle" style="margin:0;">Grade</label>
         <select id="grade" name="grade" onchange="this.form.submit()" class="tab-select" style="padding:.5rem .75rem; border-radius:10px; border:1px solid rgba(0,0,0,.15); background:#fff;">
@@ -54,33 +54,7 @@ $hidden = isset($entry['hidden']) ? (bool)$entry['hidden'] : false;
   <?php endif; ?>
 
   <div class="ann-grid" role="list">
-    <article class="ann-card" role="listitem" aria-label="Upload or toggle timetable">
-      <div class="ann-card-header">
-        <div class="ann-badges">
-          <span class="badge"><?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></span>
-          <?php if ($hidden): ?>
-            <span class="badge" style="background: rgba(251, 146, 60, 0.2); border-color: rgba(251, 146, 60, 0.4); color: #c2410c;">Hidden</span>
-          <?php else: ?>
-            <span class="badge" style="background: rgba(45, 212, 191, 0.2); border-color: rgba(45, 212, 191, 0.4); color: #047857;">Visible</span>
-          <?php endif; ?>
-        </div>
-      </div>
-
-      <h3 class="ann-title-text" style="margin-top:.25rem;">Manage Exam Timetable</h3>
-      <p class="ann-body">Upload or replace the timetable image, and toggle visibility for the selected grade.</p>
-
-      <form class="upload-form" method="post" action="/admin/uploadExamTimeTable" enctype="multipart/form-data" style="display:flex; gap:.6rem; align-items:center; flex-wrap:wrap; margin-top:.5rem;">
-        <input type="hidden" name="grade" value="<?= htmlspecialchars($selectedGrade) ?>" />
-        <input type="file" name="exam_image" accept="image/*" required style="padding:.55rem .75rem; border:1px solid rgba(0,0,0,.15); border-radius:10px; background:#fff;" />
-        <button type="submit" class="btn">Upload</button>
-      </form>
-
-      <form class="toggle-form" method="post" action="/admin/toggleExamTimeTable" style="margin-top:.6rem; display:flex; gap:.5rem;">
-        <input type="hidden" name="grade" value="<?= htmlspecialchars($selectedGrade) ?>" />
-        <input type="hidden" name="hidden" value="<?= $hidden ? '0' : '1' ?>" />
-        <button type="submit" class="btn <?= $hidden ? '' : 'ghost' ?>"><?= $hidden ? 'Show Timetable' : 'Hide Timetable' ?></button>
-      </form>
-    </article>
+    
 
     <article class="ann-card" role="listitem" aria-label="Current timetable preview">
       <div class="ann-card-header">
