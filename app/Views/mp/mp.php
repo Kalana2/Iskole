@@ -22,6 +22,7 @@
     } else if ($active === 'Report') {
         include __DIR__ . '/report.php';
     } else {
+        include __DIR__ . '/../../Controllers/announcement/addAnnouncementController.php';
         include __DIR__ . '/../templates/announcements.php';
         include __DIR__ . '/../templates/createAnnouncement.php';
     }

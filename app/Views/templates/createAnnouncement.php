@@ -1,8 +1,5 @@
-<?php
-// filepath: /home/snake/Projects/Iskole/app/Views/templates/createAnnouncement.php
-?>
-<link rel="stylesheet" href="/css/addNewUser/addNewUser.css">
-
+<link rel="stylesheet" href="/css/createAnnouncement/createAnnouncement.css">
+<?php include __DIR__ . '/../../Controllers/announcement/addAnnouncementController.php'; ?>
 <section class="mp-management" aria-labelledby="mgmt-form-title">
     <header class="mgmt-header">
         <div class="title-wrap">
@@ -15,32 +12,57 @@
         <form action="" method="post" novalidate>
             <div class="form-grid">
                 <div class="field span-2">
-                    <label for="targetAudience">Target Audience</label>
-                    <select name="group" id="targetAudience" required>
-                        <option value="" selected disabled>Select Audience</option>
-                        <option value="all">Management Panel, Teachers &amp; Students</option>
-                        <option value="mp">Management Panel</option>
-                        <option value="teachers">Teachers</option>
-                        <option value="mp_teachers">Management Panel &amp; Teachers</option>
-                        <option value="teachers_students">Teachers &amp; Students</option>
-                        <option value="students">Students</option>
-                    </select>
-                    <small class="hint">Choose who should receive this announcement.</small>
-                </div>
-
-                <div class="field span-2">
                     <label for="announcementTitle">Announcement Title</label>
-                    <input type="text" name="title" id="announcementTitle" placeholder="Enter the announcement title" required maxlength="120">
+                    <input type="text" name="announcementTitle" id="announcementTitle" placeholder="Enter the announcement title" required maxlength="120">
                     <small class="hint"><span id="title-count">0</span>/120</small>
                 </div>
-
                 <div class="field span-2">
                     <label for="announcementMessage">Message</label>
-                    <textarea name="message" id="announcementMessage" rows="8" placeholder="Type your announcement message here" required maxlength="1000"></textarea>
+                    <textarea name="announcementMessage" id="announcementMessage" rows="8" placeholder="Type your announcement message here" required maxlength="1000"></textarea>
                     <small class="hint" id="msg-count">0/1000</small>
                 </div>
             </div>
+            <div class="field span-2">
+                <label for="targetAudience">Target Audience</label>
+                <?php if ($_SESSION['userRole'] == 2): ?>
+                    <label>
+                        <input type="checkbox" name="roles[]" value="parent">
+                        Parent
+                    </label>
 
+                    <label>
+                        <input type="checkbox" name="roles[]" value="student">
+                        Student
+                    </label>
+                <?php else: ?>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="admin">
+                        Admin
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="mp">
+                        Management Panel (MP)
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="teacher">
+                        Teacher
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="parent">
+                        Parent
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="student">
+                        Student
+                    </label>
+                <?php endif; ?>
+                <small class="hint">Choose who should receive this announcement.</small>
+            </div>
             <div class="form-actions">
                 <button class="btn btn-ghost" type="reset">Clear</button>
                 <button class="btn btn-primary" type="submit">Publish Announcement</button>
@@ -50,8 +72,8 @@
 </section>
 
 <script>
-    (function(){
-        const $ = (s, ctx=document) => ctx.querySelector(s);
+    (function() {
+        const $ = (s, ctx = document) => ctx.querySelector(s);
         const formSection = document.currentScript.previousElementSibling; // section.mp-management
         if (!formSection) return;
         const title = $('#announcementTitle', formSection);

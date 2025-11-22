@@ -1,6 +1,3 @@
-<?php
-// filepath: /home/snake/Projects/Iskole/app/Views/templates/announcements.php
-?>
 <link rel="stylesheet" href="/css/announcements/announcements.css">
 
 <section class="mp-announcements theme-light" aria-labelledby="ann-title">
