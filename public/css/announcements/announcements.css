@@ -338,6 +338,35 @@
   flex-shrink: 0;
 }
 
+.btn-delete {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background-color: rgb(255, 41, 41);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-delete:hover {
+  background-color: #ff2b2b;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(255, 41, 41, 0.3);
+}
+
+.btn-delete:active {
+  transform: translateY(0);
+}
+
+.btn-delete svg {
+  flex-shrink: 0;
+}
+
 /* Modal Styles */
 .modal-overlay {
   position: fixed;
