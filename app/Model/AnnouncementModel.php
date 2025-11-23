@@ -28,6 +28,7 @@ class AnnouncementModel
         $query = "SELECT a.*, ur.roleName
                   FROM announcement a
                   JOIN userRoles as ur ON a.role = ur.roleID
+                  WHERE a.deleted != 1 OR a.deleted IS NULL
                   ORDER BY a.created_at DESC";
         $stmt = $this->conn->prepare($query);
         $stmt->execute();
@@ -66,7 +67,16 @@ class AnnouncementModel
 
     public function deleteAnnouncement($announcement_id)
     {
-        $query = "DELETE FROM " . $this->table . " WHERE announcement_id = ?";
+        // First check if the announcement exists and is not already deleted
+        $checkQuery = "SELECT announcement_id FROM " . $this->table . " WHERE announcement_id = ? AND (deleted != 1 OR deleted IS NULL)";
+        $checkStmt = $this->conn->prepare($checkQuery);
+        $checkStmt->execute([$announcement_id]);
+
+        if (!$checkStmt->fetch()) {
+            return false; // Announcement doesn't exist or is already deleted
+        }
+
+        $query = "UPDATE " . $this->table . " SET deleted = 1 WHERE announcement_id = ?";
         $stmt = $this->conn->prepare($query);
         return $stmt->execute([$announcement_id]);
     }
