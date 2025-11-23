@@ -94,8 +94,8 @@ class ExamTimeTableController extends Controller
             }
         }
 
-        // Redirect back with grade parameter
-        header('Location: /index.php?url=Admin/examTimeTable&grade=' . $grade);
+        // Redirect back with grade and tab parameters
+        header('Location: /index.php?url=Admin&tab=Exam Time Table&grade=' . $grade);
         exit;
     }
 }
