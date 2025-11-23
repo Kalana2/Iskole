@@ -2,7 +2,7 @@
 class UserModel
 {
     protected $pdo;
-    private $userTable = 'user';
+    protected $userTable = 'user';
     private $userAddressTable = 'userAddress';
     private $userNameTable = 'userName'; // fName, lName
 

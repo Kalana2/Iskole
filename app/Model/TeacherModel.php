@@ -25,4 +25,19 @@ class TeacherModel extends UserModel
 
         return true;
     }
+    public function getTeacherByClass($grade, $class)
+    {
+        $sql = "SELECT classID FROM $this->teacherTable WHERE grade = :grade AND classID = :class LIMIT 1";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'grade' => $grade,
+                'class' => $class
+            ]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['classID'] : null;
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching teacher class: " . $e->getMessage());
+        }
+    }
 }

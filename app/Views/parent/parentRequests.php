@@ -170,7 +170,7 @@ $recentRequests = [
                 <p class="sub-heding-text">Request absence in advance with proper reason</p>
             </div>
 
-            <form class="leave-request-form" action="../../Controllers/leaveReqController.php" method="POST">
+            <form class="leave-request-form" action="/StudentAbsenceReason/submit" method="POST">
                 <div class="date-row">
                     <div class="form-group">
                         <label for="from-date">From Date</label>

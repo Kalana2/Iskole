@@ -1,6 +1,6 @@
 <?php
 
-class StudentAbsenceReason
+class StudentAbsenceReasonModel
 {
     protected $pdo;
     private $table = "absentReasons";
@@ -29,6 +29,4 @@ class StudentAbsenceReason
             return false;
         }
     }
-
-
 }

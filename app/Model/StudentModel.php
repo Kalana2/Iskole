@@ -27,4 +27,15 @@ class StudentModel extends UserModel
 
         return true;
     }
+    public function getStudentById($studentId)
+    {
+        $sql = "SELECT s.*, u.* FROM {$this->studentTable} s JOIN {$this->userTable} u ON s.userID = u.userID WHERE s.userID = :studentId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['studentId' => $studentId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching student by ID: " . $e->getMessage());
+        }
+    }
 }
