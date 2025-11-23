@@ -7,10 +7,11 @@ class ParentModel extends UserModel
     public function createParent($data)
     {
         $data['role'] = $this->userRoleMap['parent'];
-        $userId = $this->createUser($data);
-
-        $sql = "INSERT INTO $this->parentTable (userID, relationshipType, studentID, nic) VALUES (:userId, :relationshipType, :studentId, :nic)";
+        $this->pdo->beginTransaction();
         try {
+            $userId = $this->createUser($data);
+
+            $sql = "INSERT INTO $this->parentTable (userID, relationshipType, studentID, nic) VALUES (:userId, :relationshipType, :studentId, :nic)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 'userId' => $userId,
@@ -18,11 +19,13 @@ class ParentModel extends UserModel
                 'studentId' => $data['studentId'],
                 'nic' => $data['nic']
             ]);
+            $this->pdo->commit();
+            return true;
         } catch (PDOException $e) {
-
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             throw new Exception("Error Processing Request to parent table: " . $e->getMessage());
         }
-
-        return true;
     }
 }

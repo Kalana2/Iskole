@@ -42,7 +42,7 @@ class UserModel
     public function createUser($data)
     {
         try {
-            $this->pdo->beginTransaction();
+            // Do NOT begin/commit here; outer model should manage transaction
             $sql = "INSERT INTO {$this->userTable} (gender, email, phone, createDate, role, active, dateOfBirth, password, pwdChanged) VALUES (:gender, :email, :phone, :createDate, :role, :active, :dateOfBirth, :password, :pwdChanged)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -57,6 +57,7 @@ class UserModel
                 'pwdChanged' => $data['pwdChanged']
             ]);
             $userId = $this->pdo->lastInsertId();
+
             $sql = "INSERT INTO {$this->userAddressTable} (userID, address_line1, address_line2, address_line3) VALUES (:userId, :address_line1, :address_line2, :address_line3)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -65,6 +66,7 @@ class UserModel
                 'address_line2' => $data['address_line2'],
                 'address_line3' => $data['address_line3']
             ]);
+
             $sql = "INSERT INTO {$this->userNameTable} (userId, firstName, lastName) VALUES (:userId, :firstName, :lastName)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
@@ -72,13 +74,9 @@ class UserModel
                 'firstName' => $data['fName'],
                 'lastName' => $data['lName']
             ]);
-            $this->pdo->commit();
 
             return $userId;
         } catch (PDOException $e) {
-            if ($this->pdo->inTransaction()) {
-                $this->pdo->rollBack();
-            }
             throw new Exception("Error Processing Request: " . $e->getMessage());
         }
     }

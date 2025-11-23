@@ -7,10 +7,11 @@ class TeacherModel extends UserModel
     public function createTeacher($data)
     {
         $data['role'] = $this->userRoleMap['teacher'];
-        $userId = $this->createUser($data);
-
-        $sql = "INSERT INTO $this->teacherTable (userID, subjectID, nic, classID, grade) VALUES (:userId, :subject, :nic, :classId, :grade)";
+        $this->pdo->beginTransaction();
         try {
+            $userId = $this->createUser($data);
+
+            $sql = "INSERT INTO $this->teacherTable (userID, subjectID, nic, classID, grade) VALUES (:userId, :subject, :nic, :classId, :grade)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 'userId' => $userId,
@@ -19,10 +20,14 @@ class TeacherModel extends UserModel
                 'classId' => $data['classId'],
                 'grade' => $data['grade']
             ]);
+
+            $this->pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             throw new Exception("Error Processing Request to teacher table: " . $e->getMessage());
         }
-
-        return true;
     }
 }
