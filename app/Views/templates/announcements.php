@@ -1,5 +1,5 @@
 <link rel="stylesheet" href="/css/announcements/announcements.css">
-
+<?php include __DIR__ . '/../../Controllers/announcement/readAnnouncementController.php'; ?>
 <section class="mp-announcements theme-light" aria-labelledby="ann-title">
     <div class="ann-header">
         <div class="ann-title-wrap">
@@ -16,40 +16,13 @@
 
     <div class="ann-grid" role="list">
         <?php
-        // Expecting: $announcements = [ [ 'title' => '', 'body' => '', 'author' => '', 'author_id' => '', 'date' => '' ], ... ]
-        // $currentUserId should be set by the controller
-        $now = date('Y-m-d');
-        $sample = [
-            [
-                'id' => '1',
-                'title' => 'System Maintenance Window',
-                'body' => 'Scheduled maintenance will occur on Friday from 10:00 PM to 12:00 AM. During this period, access to certain features may be limited. We appreciate your understanding.',
-                'author' => 'Admin',
-                'author_id' => '1',
-                'date' => $now,
-                'audience' => 'all',
-            ],
-            [
-                'id' => '2',
-                'title' => 'Midterm Exam Schedule Released',
-                'body' => 'The midterm exam timetable is now available. Please review the schedule carefully and contact your subject teacher for any discrepancies.',
-                'author' => 'Management Panel',
-                'author_id' => '2',
-                'date' => $now,
-                'audience' => 'students',
-            ],
-            [
-                'id' => '3',
-                'title' => 'Staff Meeting Reminder',
-                'body' => 'A reminder that the monthly staff meeting will be held on Wednesday at 2:00 PM in the conference hall.',
-                'author' => 'Management Panel',
-                'author_id' => '1',
-                'date' => $now,
-                'audience' => 'teachers',
-            ],
-        ];
-        $list = isset($announcements) && is_array($announcements) ? $announcements : $sample;
-        $currentUserId = $currentUserId ?? '1'; // Should be set by controller
+        // Use announcements from controller, fallback to empty array if not set
+        $list = isset($announcements) && is_array($announcements) ? $announcements : [];
+        $currentUserId = $_SESSION['user_id'] ?? null;
+
+        if (empty($list)) {
+            echo '<div class="no-announcements-wrapper"><p class="no-announcements">No announcements available at this time.</p></div>';
+        }
         ?>
 
         <?php foreach ($list as $i => $a): ?>
@@ -235,7 +208,7 @@
             submitBtn.textContent = 'Saving...';
 
             // Send update request to server
-            fetch('/mp/announcements/update', {
+            fetch(window.location.pathname + '?action=update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
