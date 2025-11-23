@@ -1,13 +1,9 @@
 <?php
 // Exam timetable upload & display template
+require_once __DIR__ . '/../../Model/ExamTimeTableModel.php';
+
 $msg = $_SESSION['exam_tt_msg'] ?? null;
 unset($_SESSION['exam_tt_msg']);
-$metaFile = __DIR__ . '/../../../public/assets/exam_timetable.json';
-$meta = [];
-if (file_exists($metaFile)) {
-  $raw = file_get_contents($metaFile);
-  $meta = json_decode($raw, true) ?: [];
-}
 
 // Grade selection
 $gradeOptions = ['6' => 'Grade 6', '7' => 'Grade 7', '8' => 'Grade 8', '9' => 'Grade 9'];
@@ -16,22 +12,15 @@ if (!isset($gradeOptions[$selectedGrade])) {
   $selectedGrade = array_key_first($gradeOptions);
 }
 
-// Read per-grade meta with legacy fallback
-$entry = null;
-if (isset($meta['file'])) {
-  // legacy flat format
-  $entry = $meta;
-} elseif (isset($meta[$selectedGrade])) {
-  $entry = $meta[$selectedGrade];
-}
+// Read from database
+$model = new ExamTimeTableModel();
+$entry = $model->getByGrade($selectedGrade);
 $imagePath = $entry['file'] ?? null;
-$hidden = isset($entry['hidden']) ? (bool)$entry['hidden'] : false;
+$hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // visibility: 1=visible, 0=hidden
 ?>
 <link rel="stylesheet" href="/css/announcements/announcements.css">
 
-<form method="POST" action="/../../Controllers/ExamTimeTableController.php" enctype="multipart/form-data">
-  
-
+<form method="POST" action="/index.php?url=ExamTimeTable/upload" enctype="multipart/form-data">
   <section class="mp-announcements theme-light" aria-labelledby="exam-tt-title">
     <div class="ann-header">
       <div class="ann-title-wrap">
