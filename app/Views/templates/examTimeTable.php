@@ -29,7 +29,7 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
     <div class="ann-actions">
       <div style="display:flex; align-items:center; gap:.5rem;">
         <label for="grade" class="ann-subtitle" style="margin:0;">Grade</label>
-        <select id="grade" name="grade" onchange="window.location.href='?tab=Exam Time Table&grade=' + this.value" class="tab-select" style="padding:.5rem .75rem; border-radius:10px; border:1px solid rgba(0,0,0,.15); background:#fff;">
+        <select id="grade" name="grade" onchange="window.location.href='/index.php?url=Admin&tab=Exam Time Table&grade=' + this.value" class="tab-select" style="padding:.5rem .75rem; border-radius:10px; border:1px solid rgba(0,0,0,.15); background:#fff;">
           <?php foreach ($gradeOptions as $value => $label): ?>
             <option value="<?= htmlspecialchars($value) ?>" <?= $value == $selectedGrade ? 'selected' : '' ?>><?= htmlspecialchars($label) ?></option>
           <?php endforeach; ?>
