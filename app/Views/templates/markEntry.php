@@ -143,7 +143,7 @@
                     }
                 }*/
                 ?>
-                <div class="selection-summary">
+                <div class="selection-summary" id="selectionSummary">
                     <div class="summary-badge">
                         <span class="summary-icon">📋</span>
                         <span class="summary-text">
@@ -155,7 +155,7 @@
                 </div>
 
                 <!-- Statistics Grid -->
-                <div class="stats-grid">
+                <div class="stats-grid" id="statsGrid">
                     <div class="stat-card">
                         <div class="stat-icon">👥</div>
                         <div class="stat-content">
@@ -187,8 +187,8 @@
                 </div>
 
                 <!-- Marks Entry Table -->
-                <div class="marks-table-container">
-                    <form action="/MarkEntry" method="POST" id="marksForm">
+                <div class="marks-table-container" id="marksTableContainer">
+                    <form action="/index.php?url=markEntry" method="POST" id="marksForm">
                         <input type="hidden" name="grade" value="<?php echo htmlspecialchars($selectedGrade); ?>">
                         <input type="hidden" name="class" value="<?php echo htmlspecialchars($selectedClass); ?>">
                         <input type="hidden" name="term" value="<?php echo htmlspecialchars($selectedTerm); ?>">
@@ -304,7 +304,7 @@
                 </div>
             <?php else: ?>
                 <!-- Empty State -->
-                <div class="empty-state">
+                <div class="empty-state" id="emptyState">
                     <div class="empty-icon">📝</div>
                     <h3 class="empty-title">Select Class and Exam</h3>
                     <p class="empty-description">Please select grade, class and term from the filters above to load student list.</p>
@@ -314,6 +314,22 @@
     </section>
 
     <script>
+        // Utility: show a temporary flash message at top of box
+        function showFlashMessage(text, timeout = 3500) {
+            let flash = document.querySelector('.flash-message');
+            if (!flash) {
+                const box = document.querySelector('.box');
+                flash = document.createElement('div');
+                flash.className = 'flash-message';
+                if (box) box.insertBefore(flash, box.firstChild);
+            }
+            flash.textContent = text;
+            flash.style.display = 'block';
+            setTimeout(() => {
+                try { flash.style.display = 'none'; } catch (e) {}
+            }, timeout);
+        }
+
         // Calculate grade based on marks
         function calculateGrade(input) {
             const marks = parseInt(input.value);
@@ -407,29 +423,43 @@
             alert('Draft saved successfully! (This is a demo)');
         }
 
-        // Form validation
-        var _marksForm = document.getElementById('marksForm');
-        if (_marksForm) {
-            _marksForm.addEventListener('submit', function(e) {
-            const inputs = document.querySelectorAll('.marks-input');
+        // Form submission handled via AJAX (delegated) so page does not reload
+        document.addEventListener('submit', function(e) {
+            const form = e.target;
+            if (!form || form.id !== 'marksForm') return;
+            e.preventDefault();
+
+            // Validate pending marks
+            const inputs = form.querySelectorAll('.marks-input');
             let allFilled = true;
-
             inputs.forEach(input => {
-                if (!input.value || input.value === '') {
-                    allFilled = false;
-                }
+                if (!input.value || input.value === '') allFilled = false;
             });
-
             if (!allFilled) {
                 if (!confirm('Some marks are still pending. Do you want to submit anyway?')) {
-                    e.preventDefault();
                     return false;
                 }
             }
 
-            // Allow normal form submission to the server
+            // Collect form data and submit via fetch
+            const formData = new FormData(form);
+            // ensure grade/class/term fields exist on form (hidden inputs populated by updateStudentTable)
+            fetch('/index.php?url=markEntry/submitMarks', { method: 'POST', body: formData })
+                .then(r => {
+                    const ct = r.headers.get('Content-Type') || '';
+                    if (!ct.includes('application/json')) return r.text().then(t => { throw new Error('Unexpected response: ' + t.substring(0,120)); });
+                    return r.json();
+                })
+                .then(data => {
+                    if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
+                    // Update UI with returned students + stats
+                    if (typeof updateStudentTable === 'function') {
+                        updateStudentTable(data);
+                    }
+                    showFlashMessage(data.message || 'Marks saved successfully.');
+                })
+                .catch(err => { console.error('Submit error:', err); alert('Save failed: ' + err.message); });
         });
-        }
 
         // Auto-save functionality (every 2 minutes)
         setInterval(function() {
@@ -453,7 +483,7 @@
                 formData.append('grade', grade);
                 formData.append('class', classVal);
                 formData.append('term', term);
-                fetch('/MarkEntry/loadStudents', { method: 'POST', body: formData })
+                fetch('/index.php?url=markEntry/loadStudents', { method: 'POST', body: formData })
                     .then(r => {
                         const ct = r.headers.get('Content-Type') || '';
                         if (!ct.includes('application/json')) return r.text().then(t => { throw new Error('Unexpected response: ' + t.substring(0,120)); });
@@ -549,11 +579,22 @@ if (data.stats) {
         }
     }
 
-    // Update stats values
-    document.getElementById('totalStudents').textContent = data.stats.totalStudents;
-    document.getElementById('marksEntered').textContent = data.stats.marksEntered;
-    document.getElementById('marksPending').textContent = data.stats.marksPending;
-    document.getElementById('classAverage').textContent = (data.stats.classAverage || 0) + '%';
+    // Update stats values (support both dynamically-created ids and server-rendered stat-value elements)
+    const elTotal = document.getElementById('totalStudents');
+    if (elTotal) {
+        document.getElementById('totalStudents').textContent = data.stats.totalStudents;
+        document.getElementById('marksEntered').textContent = data.stats.marksEntered;
+        document.getElementById('marksPending').textContent = data.stats.marksPending;
+        document.getElementById('classAverage').textContent = (data.stats.classAverage || 0) + '%';
+    } else {
+        const statValues = statsGrid.querySelectorAll('.stat-card .stat-value');
+        if (statValues.length >= 4) {
+            statValues[0].textContent = data.stats.totalStudents;
+            statValues[1].textContent = data.stats.marksEntered;
+            statValues[2].textContent = data.stats.marksPending;
+            statValues[3].textContent = (data.stats.classAverage || 0) + '%';
+        }
+    }
 }
 
                 // Table container creation if needed
@@ -563,6 +604,7 @@ if (data.stats) {
                     if (emptyState) emptyState.remove();
                     tableContainer = document.createElement('div');
                     tableContainer.className = 'marks-table-container';
+                    tableContainer.id = 'marksTableContainer';
                     tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Reg Number</th><th>Student Name</th><th>Previous</th><th>Current Marks</th><th>Grade</th><th>Attendance</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
                     document.querySelector('.box').appendChild(tableContainer);
                 }

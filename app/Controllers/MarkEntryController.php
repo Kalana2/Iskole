@@ -121,6 +121,67 @@ class MarkEntryController extends Controller
 		]);
 	}
 
+	public function submitMarks()
+	{
+		// AJAX endpoint: accept marks and return updated students + stats
+		header('Content-Type: application/json');
+
+		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+			return;
+		}
+
+		if (!isset($_POST['marks']) || !is_array($_POST['marks'])) {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'error' => 'Missing marks data']);
+			return;
+		}
+
+		$marks = $_POST['marks'];
+		$grade = $_POST['grade'] ?? null;
+		$class = $_POST['class'] ?? null;
+		$term = $_POST['term'] ?? null;
+
+		$model = $this->model('MarkEntryModel');
+		$teacherInfo = $model->getTeacherInfo($this->session->get('user_id'));
+
+		$meta = [
+			'grade' => $grade,
+			'class' => $class,
+			'term' => $term,
+			'teacherUserId' => $this->session->get('user_id'),
+			'teacherID' => $teacherInfo['teacher_id'] ?? null,
+			'subjectID' => $teacherInfo['subjectID'] ?? null
+		];
+
+		try {
+			$ok = $model->saveMarks($marks, $meta);
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['success' => false, 'error' => 'Error saving marks: ' . $e->getMessage()]);
+			return;
+		}
+
+		// Fetch updated list + stats and return to client for UI update
+		$students = [];
+		if ($grade && $class) {
+			$students = $model->getStudents($grade, $class, $teacherInfo['subjectID'] ?? null, $term ?: null);
+		}
+
+		$stats = $model->calculateStatistics($students);
+
+		echo json_encode([
+			'success' => true,
+			'message' => $ok ? 'Marks saved successfully.' : 'Failed to save marks.',
+			'students' => $students,
+			'stats' => $stats,
+			'selectedGrade' => $grade,
+			'selectedClass' => $class,
+			'selectedTerm' => $term
+		]);
+	}
+
 	public function deleteMarks()
 	{
 		// AJAX endpoint: delete marks from database
