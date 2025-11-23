@@ -40,18 +40,15 @@ class AnnouncementModel
         $query = "UPDATE " . $this->table . " SET title = ?, content = ?, admin = ?, mp = ?, teacher = ?, parent = ?, student = ? WHERE announcement_id = ?";
         $stmt = $this->conn->prepare($query);
 
-        // Convert audience to role flags
-        $audiences = explode(',', $data['audience']);
+        // Convert audience to role flags - handle empty audience safely
+        $audience = isset($data['audience']) ? $data['audience'] : '';
+        $audiences = !empty($audience) ? explode(',', $audience) : [];
+
         $admin = in_array('admin', $audiences) ? 1 : 0;
         $mp = in_array('mp', $audiences) ? 1 : 0;
         $teacher = in_array('teacher', $audiences) ? 1 : 0;
         $parent = in_array('parent', $audiences) ? 1 : 0;
         $student = in_array('student', $audiences) ? 1 : 0;
-
-        // If audience is 'all', set all flags to 1
-        if ($data['audience'] === 'all') {
-            $admin = $mp = $teacher = $parent = $student = 1;
-        }
 
         return $stmt->execute([
             $data['title'],

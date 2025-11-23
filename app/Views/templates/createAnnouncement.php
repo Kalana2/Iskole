@@ -23,6 +23,7 @@
                 </div>
             </div>
             <div class="field span-2">
+                <br>
                 <label for="targetAudience">Target Audience</label>
                 <?php if ($_SESSION['userRole'] == 2): ?>
                     <label>

@@ -21,9 +21,9 @@ if ($result) {
             $shouldShow = true;
         } elseif ($currentUserRole == 2 && $announcement['teacher'] == 1) { // Teacher
             $shouldShow = true;
-        } elseif ($currentUserRole == 3 && $announcement['parent'] == 1) { // Parent
+        } elseif ($currentUserRole == 4 && $announcement['parent'] == 1) { // Parent
             $shouldShow = true;
-        } elseif ($currentUserRole == 4 && $announcement['student'] == 1) { // Student
+        } elseif ($currentUserRole == 3 && $announcement['student'] == 1) { // Student
             $shouldShow = true;
         } elseif ($currentUserId == $announcement['published_by']) {
             // Always show announcements published by the current user

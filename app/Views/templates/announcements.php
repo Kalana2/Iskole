@@ -55,7 +55,8 @@
                         <button class="btn-edit" type="button"
                             data-id="<?php echo htmlspecialchars($a['id'] ?? $i); ?>"
                             data-title="<?php echo htmlspecialchars($a['title'] ?? '', ENT_QUOTES); ?>"
-                            data-body="<?php echo htmlspecialchars($a['body'] ?? '', ENT_QUOTES); ?>">
+                            data-body="<?php echo htmlspecialchars($a['body'] ?? '', ENT_QUOTES); ?>"
+                            data-audience="<?php echo htmlspecialchars($a['audience'] ?? '', ENT_QUOTES); ?>">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M11.333 2.00004C11.5081 1.82494 11.716 1.68605 11.9447 1.59129C12.1735 1.49653 12.4187 1.44775 12.6663 1.44775C12.914 1.44775 13.1592 1.49653 13.3879 1.59129C13.6167 1.68605 13.8246 1.82494 13.9997 2.00004C14.1748 2.17513 14.3137 2.383 14.4084 2.61178C14.5032 2.84055 14.552 3.08575 14.552 3.33337C14.552 3.58099 14.5032 3.82619 14.4084 4.05497C14.3137 4.28374 14.1748 4.49161 13.9997 4.66671L5.33301 13.3334L1.99967 14L2.66634 10.6667L11.333 2.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
@@ -195,10 +196,28 @@
                 const id = btn.getAttribute('data-id');
                 const title = btn.getAttribute('data-title');
                 const body = btn.getAttribute('data-body');
+                const audience = btn.getAttribute('data-audience');
 
                 document.getElementById('edit_announcement_id').value = id;
                 document.getElementById('edit_title').value = title;
                 document.getElementById('edit_body').value = body;
+
+                // Reset all checkboxes first
+                const checkboxes = form.querySelectorAll('input[name="roles[]"]');
+                checkboxes.forEach(cb => cb.checked = false);
+
+                // Populate audience checkboxes based on current audience
+                if (audience && audience !== 'all') {
+                    const audiences = audience.split(',');
+                    audiences.forEach(aud => {
+                        const checkbox = form.querySelector(`input[name="roles[]"][value="${aud.trim()}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                } else if (audience === 'all') {
+                    checkboxes.forEach(cb => cb.checked = true);
+                }
 
                 modal.style.display = 'flex';
             }
@@ -212,13 +231,28 @@
             const data = {
                 announcement_id: formData.get('announcement_id'),
                 title: formData.get('title'),
-                body: formData.get('body')
+                body: formData.get('body'),
+                audience: formData.getAll('roles[]')
             };
+
+            // Validate data before sending
+            if (!data.announcement_id || !data.title || !data.body) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Check if at least one audience is selected
+            if (!data.audience || data.audience.length === 0) {
+                alert('Please select at least one target audience.');
+                return;
+            }
 
             // Disable submit button during request
             const submitBtn = form.querySelector('.btn-save');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
+
+            console.log('Sending data:', data); // Debug log
 
             // Send update request to server
             fetch(window.location.pathname + '?action=update', {
@@ -228,22 +262,41 @@
                     },
                     body: JSON.stringify(data)
                 })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        alert('Announcement updated successfully!');
-                        closeModal();
-                        // Reload the page to show updated data
-                        location.reload();
-                    } else {
-                        alert('Error updating announcement: ' + (result.message || 'Unknown error'));
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug log
+                    console.log('Response headers:', response.headers.get('content-type')); // Debug log
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    return response.text(); // Get as text first to debug
+                })
+                .then(text => {
+                    console.log('Raw response:', text); // Debug log
+
+                    try {
+                        const result = JSON.parse(text);
+                        if (result.success) {
+                            alert('Announcement updated successfully!');
+                            closeModal();
+                            location.reload();
+                        } else {
+                            alert('Error updating announcement: ' + (result.error || result.message || 'Unknown error'));
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Save Changes';
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        console.error('Response text that failed to parse:', text);
+                        alert('Server returned invalid response. Please check the console for details.');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Save Changes';
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to update announcement. Please try again.');
+                    console.error('Fetch error:', error);
+                    alert('Failed to update announcement. Please try again. Check console for details.');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Save Changes';
                 });
