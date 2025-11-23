@@ -90,13 +90,14 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
       </div>
 
       <?php if ($imagePath): ?>
-        <?php if ($hidden): ?>
-          <p class="ann-body" style="margin-top:.25rem;">Timetable is currently hidden for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.</p>
-        <?php else: ?>
-          <div style="margin-top:.5rem;">
-            <img src="<?= htmlspecialchars($imagePath) ?>" alt="Exam Timetable - <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>" style="max-width:100%; height:auto; border-radius:12px; border:1px solid rgba(0,0,0,.08);" />
-          </div>
-        <?php endif; ?>
+        <div style="margin-top:.5rem;">
+          <?php if ($hidden): ?>
+            <p class="ann-body" style="margin-bottom:.5rem; padding:.5rem; background:rgba(251, 146, 60, 0.1); border-radius:8px; color:#c2410c;">
+              ⚠️ This timetable is currently hidden from students
+            </p>
+          <?php endif; ?>
+          <img src="<?= htmlspecialchars($imagePath) ?>" alt="Exam Timetable - <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>" style="max-width:100%; height:auto; border-radius:12px; border:1px solid rgba(0,0,0,.08);" />
+        </div>
       <?php else: ?>
         <p class="ann-body" style="margin-top:.25rem;">No exam timetable uploaded yet for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.</p>
       <?php endif; ?>
