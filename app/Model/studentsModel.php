@@ -34,7 +34,7 @@ class StudentsModel
         //                                 JOIN class c ON s.classID = c.classID
         //                                 WHERE ps.parentUserID = :parentUserID
         //                                 LIMIT 1");
-        
+
         // For now, return null - implement based on your database structure
         return $this->getGradeByUserID($parentUserID);
     }
