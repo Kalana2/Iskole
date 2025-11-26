@@ -165,7 +165,6 @@ class StudentAbsenceReasonController extends Controller
                 : null;
 
             $user = $this->model('UserModel')->getUserById($row['acknowledgedBy']);
-            var_dump($user);
             $row['acknowledgedBy'] = $user ? ($user['firstName'] . ' ' . $user['lastName']) : null;
         }
         unset($row);

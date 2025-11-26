@@ -31,25 +31,38 @@ class StudentAbsenceReasonModel
     public function deleteAbsenceReason($reasonId)
     {
         try {
+            // Only allow deletion of non-acknowledged requests
             $stmt = $this->pdo->prepare(
-                "DELETE FROM " . $this->table . " WHERE reasonID = :reasonId"
+                "DELETE FROM " . $this->table . " 
+                 WHERE reasonID = :reasonId 
+                 AND acknowledgedBy IS NULL"
             );
             $result = $stmt->execute([
                 'reasonId' => $reasonId,
             ]);
-            return $result;
+
+            // Check if any rows were actually deleted
+            if ($result && $stmt->rowCount() > 0) {
+                return true;
+            }
+
+            error_log('No rows deleted for reasonId: ' . $reasonId . '. Possibly already acknowledged or invalid ID.');
+            return false;
         } catch (PDOException $e) {
             error_log('Failed to delete absence reason: ' . $e->getMessage());
+            var_dump('Delete error: ' . $e->getMessage());
             return false;
         }
     }
     public function updateAbsenceReason($data)
     {
         try {
+            // Allow updates only for non-acknowledged requests
             $stmt = $this->pdo->prepare(
                 "UPDATE " . $this->table . " 
                  SET reason = :reason, fromDate = :fromDate, toDate = :toDate
-                 WHERE reasonID = :reasonId AND status = 'pending'"
+                 WHERE reasonID = :reasonId 
+                 AND acknowledgedBy IS NULL"
             );
             $result = $stmt->execute([
                 'reasonId' => $data['reasonId'],
@@ -57,9 +70,18 @@ class StudentAbsenceReasonModel
                 'fromDate' => $data['fromDate'],
                 'toDate' => $data['toDate'],
             ]);
-            return $result;
+
+            // Check if any rows were actually updated
+            if ($result && $stmt->rowCount() > 0) {
+                return true;
+            }
+
+            // If no rows were updated, log and return false
+            error_log('No rows updated for reasonId: ' . $data['reasonId'] . '. Possibly already acknowledged or invalid ID.');
+            return false;
         } catch (PDOException $e) {
             error_log('Failed to update absence reason: ' . $e->getMessage());
+            var_dump('Update error: ' . $e->getMessage());
             return false;
         }
     }
@@ -83,23 +105,8 @@ class StudentAbsenceReasonModel
 
 
             $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-            foreach ($data as &$row) {
-                $today = (new DateTime())->setTime(0, 0, 0);
-                $fromDate = !empty($row['fromDate']) ? (new DateTime($row['fromDate']))->setTime(0, 0, 0) : null;
-
-                if (!empty($row['acknowledgedBy']) || !empty($row['acknowledgedDate'])) {
-                    $row['Status'] = 'acknowledged';
-                } else {
-                    $row['Status'] = 'pending';
-                }
-                $toDate = !empty($row['toDate']) ? (new DateTime($row['toDate']))->setTime(0, 0, 0) : null;
-                $diff = $fromDate->diff($toDate);
-                // days difference (inclusive)
-                $row['duration'] = (int) $diff->format('%a') + 1;
-            }
-            unset($row);
-
             return $data;
+
         } catch (PDOException $e) {
             var_dump("Failed to fetch absence reasons" . $e->getMessage());
             error_log('Failed to fetch absence reasons: ' . $e->getMessage());

@@ -113,7 +113,7 @@ $recentRequests = $absenceRequests ?? [
                     $submittedDate = isset($req['submittedDate']) && $req['submittedDate'] !== ''
                         ? date('M j, Y', strtotime($req['submittedDate']))
                         : 'N/A';
-                    $requestId = isset($req['absenceID']) ? (int) $req['absenceID'] : 0;
+                    $requestId = isset($req['reasonID']) ? (int) $req['reasonID'] : (isset($req['absenceID']) ? (int) $req['absenceID'] : 0);
                     $fromInput = $fromTs ? date('Y-m-d', $fromTs) : '';
                     $toInput = $toTs ? date('Y-m-d', $toTs) : '';
                     ?>
@@ -151,7 +151,7 @@ $recentRequests = $absenceRequests ?? [
                                 class="label <?php echo $status === 'acknowledged' ? 'label-green' : ($status === 'not_seen' ? 'label-red' : 'label-warning'); ?>">
                                 <?php echo $status === 'acknowledged' ? 'Acknowledged' : ($status === 'not_seen' ? 'Not Seen' : ucfirst($status)); ?>
                             </span>
-                            <?php if ($status === 'pending'): ?>
+                            <?php if ($status === 'pending' || $status === 'not_seen'): ?>
                                 <button type="button" class="btn btn-primary btn-edit-leave" data-id="<?php echo $requestId; ?>"
                                     data-from="<?php echo htmlspecialchars($fromInput); ?>"
                                     data-to="<?php echo htmlspecialchars($toInput); ?>"
@@ -311,12 +311,12 @@ $recentRequests = $absenceRequests ?? [
             form.method = 'POST';
             form.action = '/studentAbsenceReason/delete';
 
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'reasonId';
-            input.value = id;
+            const reasonIdInput = document.createElement('input');
+            reasonIdInput.type = 'hidden';
+            reasonIdInput.name = 'reasonId';
+            reasonIdInput.value = id;
 
-            form.appendChild(input);
+            form.appendChild(reasonIdInput);
             document.body.appendChild(form);
             form.submit();
         }
