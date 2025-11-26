@@ -79,6 +79,7 @@ class StudentAbsenceReasonModel
             // If no rows were updated, log and return false
             error_log('No rows updated for reasonId: ' . $data['reasonId'] . '. Possibly already acknowledged or invalid ID.');
             return false;
+
         } catch (PDOException $e) {
             error_log('Failed to update absence reason: ' . $e->getMessage());
             var_dump('Update error: ' . $e->getMessage());
