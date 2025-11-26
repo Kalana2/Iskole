@@ -1,8 +1,15 @@
 <?php
-// filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\parent\parentrequests.php
 
-// Sample data for parent absence requests
-$recentRequests = [
+require_once __DIR__ . "/../../Controllers/StudentAbsenceReasonController.php";
+$studentAbsence = new StudentAbsenceReasonController();
+$absenceRequests = $studentAbsence->viewAbsencesByUserId($_SESSION['user_id']);
+
+echo "<pre>";
+var_dump("Debugging absence requests:");
+var_dump($absenceRequests);
+echo "</pre>";
+
+$recentRequests = $absenceRequests ?? [
     [
         'id' => 1,
         'request_id' => 1,
@@ -63,6 +70,16 @@ $recentRequests = [
 
 <section class="parent-requests-section theme-light" aria-labelledby="requests-title">
     <div class="box">
+        <?php if (isset($_SESSION['mgmt_msg'])): ?>
+            <div class="alert alert-info"
+                style="padding: 15px; margin-bottom: 20px; background: #e8f4f8; border-left: 4px solid #2196F3; border-radius: 4px;">
+                <?php
+                echo htmlspecialchars($_SESSION['mgmt_msg']);
+                unset($_SESSION['mgmt_msg']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <!-- Header Section -->
         <div class="heading-section">
             <h1 class="heading-text" id="requests-title">Absence Request Status</h1>
@@ -170,7 +187,7 @@ $recentRequests = [
                 <p class="sub-heding-text">Request absence in advance with proper reason</p>
             </div>
 
-            <form class="leave-request-form" action="/StudentAbsenceReason/submit" method="POST">
+            <form class="leave-request-form" action="/studentAbsenceReason/submit" method="POST">
                 <div class="date-row">
                     <div class="form-group">
                         <label for="from-date">From Date</label>
@@ -202,8 +219,8 @@ $recentRequests = [
             <h3>Edit Absence Request</h3>
             <button class="modal-close" type="button" aria-label="Close">×</button>
         </div>
-        <form id="editLeaveForm" method="POST" action="../../Controllers/leaveReqController.php">
-            <input type="hidden" name="edit_request_id" id="edit-request-id" value="">
+        <form id="editLeaveForm" method="POST" action="/studentAbsenceReason/edit">
+            <input type="hidden" name="reasonId" id="edit-request-id" value="">
             <div class="modal-body">
                 <div class="date-row">
                     <div class="form-group">
@@ -297,11 +314,11 @@ $recentRequests = [
         if (confirm('Are you sure you want to delete this absence request?')) {
             const form = document.createElement('form');
             form.method = 'POST';
-            form.action = '../../Controllers/leaveReqController.php';
+            form.action = '/studentAbsenceReason/delete';
 
             const input = document.createElement('input');
             input.type = 'hidden';
-            input.name = 'delete_request_id';
+            input.name = 'reasonId';
             input.value = id;
 
             form.appendChild(input);
