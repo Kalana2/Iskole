@@ -144,12 +144,32 @@ class StudentAbsenceReasonController extends Controller
     {
         $parentModel = $this->model('ParentModel');
         $parent = $parentModel->getParentByUserId($userId);
-        var_dump("inside controller");
-        var_dump($parent);
 
         $absences = $this->model->getAbsenceReasonsByParentId($parent['parentID']);
-        var_dump("inside controller");
-        var_dump($absences);
+        foreach ($absences as &$row) {
+            $today = (new DateTime())->setTime(0, 0, 0);
+            $fromDate = !empty($row['fromDate']) ? (new DateTime($row['fromDate']))->setTime(0, 0, 0) : null;
+
+            if (!empty($row['acknowledgedBy']) || !empty($row['acknowledgedDate'])) {
+                $row['Status'] = 'acknowledged';
+            } else {
+                $row['Status'] = 'pending';
+            }
+            $toDate = !empty($row['toDate']) ? (new DateTime($row['toDate']))->setTime(0, 0, 0) : null;
+            $diff = $fromDate->diff($toDate);
+            // days difference (inclusive)
+            $row['duration'] = (int) $diff->format('%a') + 1;
+
+            $row['submittedDate'] = !empty($row['submittedAt'])
+                ? (new DateTime($row['submittedAt']))->format('Y-m-d H:i:s')
+                : null;
+
+            $user = $this->model('UserModel')->getUserById($row['acknowledgedBy']);
+            var_dump($user);
+            $row['acknowledgedBy'] = $user ? ($user['firstName'] . ' ' . $user['lastName']) : null;
+        }
+        unset($row);
+
         return $absences;
     }
 }

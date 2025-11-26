@@ -12,10 +12,9 @@ class StudentAbsenceReasonModel
     public function submitAbsenceReason($data)
     {
         try {
-            $stmt = $this->pdo->prepare(
-                "INSERT INTO " . $this->table . " (parentID, reason, fromDate, toDate, submittedDate, status) 
-                 VALUES (:parentId, :reason, :fromDate, :toDate, NOW(), 'pending')"
-            );
+            $sql = "INSERT INTO " . $this->table . " (parentID, reason, fromDate, toDate)
+                    VALUES (:parentId, :reason, :fromDate, :toDate)";
+            $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute([
                 'parentId' => $data['parentId'],
                 'reason' => $data['reason'],
@@ -24,6 +23,7 @@ class StudentAbsenceReasonModel
             ]);
             return $result;
         } catch (PDOException $e) {
+            var_dump($e->errorInfo);
             error_log('Failed to submit absence reason: ' . $e->getMessage());
             return false;
         }
@@ -115,6 +115,7 @@ class StudentAbsenceReasonModel
             $stmt->execute();
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            var_dump("Failed to fetch all absence reasons: " . $e->getMessage());
             error_log('Failed to fetch all absence reasons: ' . $e->getMessage());
             return [];
         }
@@ -136,6 +137,7 @@ class StudentAbsenceReasonModel
             ]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
+            var_dump("Failed to fetch absence reasons by class: " . $e->getMessage());
             error_log('Failed to fetch absence reasons by class: ' . $e->getMessage());
             return [];
         }

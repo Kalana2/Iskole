@@ -11,58 +11,53 @@ echo "</pre>";
 
 $recentRequests = $absenceRequests ?? [
     [
-        'id' => 1,
-        'request_id' => 1,
-        'from_date' => '2025-11-10',
-        'to_date' => '2025-11-12',
+        'absenceID' => 1,
+        'fromDate' => '2025-11-10',
+        'toDate' => '2025-11-12',
         'reason' => 'Medical appointment and recovery period. Will provide medical certificate upon return.',
-        'submitted_date' => '2025-11-05',
-        'status' => 'pending',
+        'submittedDate' => '2025-11-05',
+        'Status' => 'pending',
         'duration' => 3
     ],
     [
-        'id' => 2,
-        'request_id' => 2,
-        'from_date' => '2025-11-08',
-        'to_date' => '2025-11-08',
+        'absenceID' => 2,
+        'fromDate' => '2025-11-08',
+        'toDate' => '2025-11-08',
         'reason' => 'Family emergency requiring immediate attention.',
-        'submitted_date' => '2025-11-07',
-        'status' => 'acknowledged',
+        'submittedDate' => '2025-11-07',
+        'Status' => 'acknowledged',
         'duration' => 1,
-        'acknowledged_by' => 'Mrs. Jayawardena',
-        'acknowledged_date' => '2025-11-07'
+        'acknowledgedBy' => 'Mrs. Jayawardena',
+        'acknowledgedDate' => '2025-11-07'
     ],
     [
-        'id' => 3,
-        'request_id' => 3,
-        'from_date' => '2025-11-15',
-        'to_date' => '2025-11-17',
+        'absenceID' => 3,
+        'fromDate' => '2025-11-15',
+        'toDate' => '2025-11-17',
         'reason' => 'Attending a cultural event as school representative.',
-        'submitted_date' => '2025-11-04',
-        'status' => 'pending',
+        'submittedDate' => '2025-11-04',
+        'Status' => 'pending',
         'duration' => 3
     ],
     [
-        'id' => 4,
-        'request_id' => 4,
-        'from_date' => '2025-11-01',
-        'to_date' => '2025-11-01',
+        'absenceID' => 4,
+        'fromDate' => '2025-11-01',
+        'toDate' => '2025-11-01',
         'reason' => 'Dental treatment scheduled by orthodontist.',
-        'submitted_date' => '2025-10-28',
-        'status' => 'not_seen',
+        'submittedDate' => '2025-10-28',
+        'Status' => 'not_seen',
         'duration' => 1
     ],
     [
-        'id' => 5,
-        'request_id' => 5,
-        'from_date' => '2025-10-28',
-        'to_date' => '2025-10-30',
+        'absenceID' => 5,
+        'fromDate' => '2025-10-28',
+        'toDate' => '2025-10-30',
         'reason' => 'Attending regional sports tournament.',
-        'submitted_date' => '2025-10-20',
-        'status' => 'acknowledged',
+        'submittedDate' => '2025-10-20',
+        'Status' => 'acknowledged',
         'duration' => 3,
-        'acknowledged_by' => 'Mrs. Silva',
-        'acknowledged_date' => '2025-10-22'
+        'acknowledgedBy' => 'Mrs. Silva',
+        'acknowledgedDate' => '2025-10-22'
     ]
 ];
 ?>
@@ -109,16 +104,16 @@ $recentRequests = $absenceRequests ?? [
             <?php if (!empty($recentRequests)): ?>
                 <?php foreach ($recentRequests as $req): ?>
                     <?php
-                    $fromTs = isset($req['from_date']) && $req['from_date'] !== '' ? strtotime($req['from_date']) : false;
-                    $toTs = isset($req['to_date']) && $req['to_date'] !== '' ? strtotime($req['to_date']) : false;
+                    $fromTs = isset($req['fromDate']) && $req['fromDate'] !== '' ? strtotime($req['fromDate']) : false;
+                    $toTs = isset($req['toDate']) && $req['toDate'] !== '' ? strtotime($req['toDate']) : false;
                     $fromFmt = $fromTs ? date('F j, Y', $fromTs) : 'N/A';
                     $toFmt = $toTs ? date('F j, Y', $toTs) : 'N/A';
-                    $status = $req['status'] ?? 'pending';
+                    $status = $req['Status'] ?? 'pending';
                     $duration = $req['duration'] ?? 1;
-                    $submittedDate = isset($req['submitted_date']) && $req['submitted_date'] !== ''
-                        ? date('M j, Y', strtotime($req['submitted_date']))
+                    $submittedDate = isset($req['submittedDate']) && $req['submittedDate'] !== ''
+                        ? date('M j, Y', strtotime($req['submittedDate']))
                         : 'N/A';
-                    $requestId = isset($req['request_id']) ? (int) $req['request_id'] : (isset($req['id']) ? (int) $req['id'] : 0);
+                    $requestId = isset($req['absenceID']) ? (int) $req['absenceID'] : 0;
                     $fromInput = $fromTs ? date('Y-m-d', $fromTs) : '';
                     $toInput = $toTs ? date('Y-m-d', $toTs) : '';
                     ?>
@@ -137,10 +132,10 @@ $recentRequests = $absenceRequests ?? [
                                 <span>Submitted: <?php echo htmlspecialchars($submittedDate); ?></span>
                             </p>
 
-                            <?php if ($status === 'acknowledged' && isset($req['acknowledged_by'])): ?>
+                            <?php if ($status === 'acknowledged' && isset($req['acknowledgedBy'])): ?>
                                 <p class="status-note acknowledged">
-                                    ✓ Acknowledged by <?php echo htmlspecialchars($req['acknowledged_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['acknowledged_date'])); ?>
+                                    ✓ Acknowledged by <?php echo htmlspecialchars($req['acknowledgedBy']); ?>
+                                    on <?php echo date('M j, Y', strtotime($req['acknowledgedDate'])); ?>
                                 </p>
                             <?php endif; ?>
 
