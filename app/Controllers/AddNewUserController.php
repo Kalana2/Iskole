@@ -3,21 +3,15 @@
 class AddNewUserController extends Controller
 {
     protected $userRoleMap = ['admin' => 0, 'mp' => 1, 'teacher' => 2, 'student' => 3, 'parent' => 4];
-    private function markLoaded($context = '')
-    {
-        $_SESSION['addNewUser_loaded'] = 'AddNewUserController loaded' . ($context ? ' (' . $context . ')' : '') . ' @ ' . date('H:i:s');
-    }
 
     public function index()
     {
-        $this->markLoaded('index');
         header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/admin?tab=Management'));
         exit;
     }
 
     public function submit()
     {
-        $this->markLoaded('submit');
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             $_SESSION['mgmt_msg'] = 'AddNewUserController reached (non-POST).';
             header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/admin?tab=Management'));

@@ -43,4 +43,19 @@ class StudentModel extends UserModel
             throw new Exception("Error fetching student grade: " . $e->getMessage());
         }
     }
+
+    public function getStudentById($studentId)
+    {
+        $sql = "SELECT s.*, u.*, un.* FROM {$this->studentTable} s
+            JOIN {$this->userTable} u ON s.userID = u.userID
+            LEFT JOIN {$this->userNameTable} un ON u.userID = un.userID
+            WHERE s.studentID = :studentId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['studentId' => $studentId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching student by ID: " . $e->getMessage());
+        }
+    }
 }

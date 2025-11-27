@@ -2,9 +2,9 @@
 class UserModel
 {
     protected $pdo;
-    private $userTable = 'user';
-    private $userAddressTable = 'userAddress';
-    private $userNameTable = 'userName'; // fName, lName
+    protected $userTable = 'user';
+    protected $userAddressTable = 'userAddress';
+    protected $userNameTable = 'userName'; // fName, lName
 
     protected $userRoleMap = ['admin' => 0, 'mp' => 1, 'teacher' => 2, 'student' => 3, 'parent' => 4];
 
@@ -34,9 +34,15 @@ class UserModel
 
     public function getUserById($userId)
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM {$this->userTable} WHERE userID = :userId");
+        $sql = "SELECT {$this->userTable}.*, {$this->userNameTable}.firstName, {$this->userNameTable}.lastName 
+                FROM {$this->userTable} 
+                LEFT JOIN {$this->userNameTable} 
+                ON {$this->userTable}.userID = {$this->userNameTable}.userID   
+                WHERE {$this->userTable}.userID = :userId";
+
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['userId' => $userId]);
-        return $stmt->fetch();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
     // gender, email, phone, createDate, role, active, dateOfBirth, password, pwdChanged
     public function createUser($data)
