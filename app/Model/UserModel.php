@@ -3,8 +3,8 @@ class UserModel
 {
     protected $pdo;
     protected $userTable = 'user';
-    private $userAddressTable = 'userAddress';
-    private $userNameTable = 'userName'; // fName, lName
+    protected $userAddressTable = 'userAddress';
+    protected $userNameTable = 'userName'; // fName, lName
 
     protected $userRoleMap = ['admin' => 0, 'mp' => 1, 'teacher' => 2, 'student' => 3, 'parent' => 4];
 

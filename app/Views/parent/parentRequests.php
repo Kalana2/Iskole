@@ -2,12 +2,12 @@
 
 require_once __DIR__ . "/../../Controllers/StudentAbsenceReasonController.php";
 $studentAbsence = new StudentAbsenceReasonController();
-$absenceRequests = $studentAbsence->viewAbsencesByUserId($_SESSION['user_id']);
+$absenceRequests = $studentAbsence->viewAbsencesByParentUserId($_SESSION['user_id']);
 
-echo "<pre>";
-var_dump("Debugging absence requests:");
-var_dump($absenceRequests);
-echo "</pre>";
+// echo "<pre>";
+// var_dump("Debugging absence requests:");
+// var_dump($absenceRequests);
+// echo "</pre>";
 
 $recentRequests = $absenceRequests ?? [
     [

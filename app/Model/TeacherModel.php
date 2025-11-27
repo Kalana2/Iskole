@@ -40,4 +40,16 @@ class TeacherModel extends UserModel
             throw new Exception("Error fetching teacher class: " . $e->getMessage());
         }
     }
+
+    public function getTeacherByUserId($userId)
+    {
+        $sql = "SELECT t.*, u.* FROM `{$this->teacherTable}` t JOIN `{$this->userTable}` u ON t.`userID` = u.`userID` WHERE t.`userID` = :userId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching teacher by user ID: " . $e->getMessage());
+        }
+    }
 }

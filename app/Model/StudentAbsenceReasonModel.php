@@ -133,11 +133,17 @@ class StudentAbsenceReasonModel
     {
         try {
             $stmt = $this->pdo->prepare(
-                "SELECT ar.* FROM " . $this->table . " ar
+                "SELECT ar.*, 
+                        parent_u.phone as parent_contact,
+                        s.gradeID as grade,
+                        s.classID as class,
+                        s.studentID
+                 FROM " . $this->table . " ar
                  JOIN parents p ON ar.parentID = p.parentID
                  JOIN students s ON p.studentID = s.studentID
+                 JOIN user parent_u ON p.userID = parent_u.userID
                  WHERE s.gradeID = :grade AND s.classID = :classId
-                 ORDER BY ar.submittedDate DESC, ar.reasonID DESC"
+                 ORDER BY ar.submittedAt DESC, ar.reasonID DESC"
             );
             $stmt->execute([
                 'grade' => $grade,
@@ -148,6 +154,34 @@ class StudentAbsenceReasonModel
             var_dump("Failed to fetch absence reasons by class: " . $e->getMessage());
             error_log('Failed to fetch absence reasons by class: ' . $e->getMessage());
             return [];
+        }
+    }
+
+    public function acknowledgeAbsenceReason($reasonId, $acknowledgedBy)
+    {
+        try {
+            $stmt = $this->pdo->prepare(
+                "UPDATE " . $this->table . " 
+                 SET acknowledgedBy = :acknowledgedBy, 
+                     acknowledgedDate = NOW()
+                 WHERE reasonID = :reasonId 
+                 AND acknowledgedBy IS NULL"
+            );
+            $result = $stmt->execute([
+                'reasonId' => $reasonId,
+                'acknowledgedBy' => $acknowledgedBy
+            ]);
+
+            // Check if any rows were actually updated
+            if ($result && $stmt->rowCount() > 0) {
+                return true;
+            }
+
+            error_log('No rows updated for reasonId: ' . $reasonId . '. Possibly already acknowledged.');
+            return false;
+        } catch (PDOException $e) {
+            error_log('Failed to acknowledge absence reason: ' . $e->getMessage());
+            return false;
         }
     }
 }
