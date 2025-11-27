@@ -147,7 +147,7 @@ if (!isset($materials) || empty($materials)) {
                     <?php else: ?>
                         <button type="button" class="btn" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" onclick="unhide(this)">Show</button>
                     <?php endif; ?>
-                    <button type="button" class="btn ghost" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" style="color: #dc2626; border-color: rgba(220, 38, 38, 0.3);" onclick="if(confirm('Are you sure you want to delete this material?')) alert('Delete feature will be implemented with backend')">Delete</button>
+                    <button type="button" id="deletebtn" class="btn ghost" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" style="color: #dc2626; border-color: rgba(220, 38, 38, 0.3);" onclick="deleteMaterial(this)">Delete</button>
                 </div>
             </article>
         <?php endforeach; ?>
@@ -363,6 +363,38 @@ if (!isset($materials) || empty($materials)) {
                     location.reload();
                 } else {
                     alert('Error showing material: ' + data.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }).catch(error => {
+                alert('Network error: ' + error.message);
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+    }
+
+    function deleteMaterial(button) {
+        const materialID = button.getAttribute('data-id');
+        console.log(materialID)
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = 'Deleting...';
+
+        fetch('/teacher/materials?action=delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    materialID: materialID
+                })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Material Deleted successfully.');
+                    location.reload();
+                } else {
+                    alert('Error deleting material: ' + data.message);
                     button.disabled = false;
                     button.textContent = originalText;
                 }

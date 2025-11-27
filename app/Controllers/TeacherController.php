@@ -36,6 +36,11 @@ class TeacherController extends Controller
             return;
         }
 
+        if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+            include_once __DIR__ . '/material/deleteMaterialController.php';
+            return;
+        }
+
         $this->view('teacher/materials');
     }
 
