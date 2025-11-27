@@ -100,10 +100,17 @@ class Material extends TeacherModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function editMaterial($materialID, $grade, $class, $subjectID, $title, $description, $file, $teacherID)
+    public function editMaterial($materialID, $grade, $class, $subjectID, $title, $description, $file)
     {
         $query = "UPDATE material SET grade = ?, class = ?, subjectID = ?, title = ?, description = ?, file = ? WHERE materialID = ? AND teacherID = ?";
         $stmt = $this->pdo->prepare($query);
-        return $stmt->execute([$grade, $class, $subjectID, $title, $description, $file, $materialID, $teacherID]);
+        return $stmt->execute([$grade, $class, $subjectID, $title, $description, $file, $materialID, $this->teacherID]);
+    }
+
+    public function editMaterialWithoutFile($materialID, $grade, $class, $subjectID, $title, $description)
+    {
+        $query = "UPDATE material SET grade = ?, class = ?, subjectID = ?, title = ?, description = ? WHERE materialID = ? AND teacherID = ?";
+        $stmt = $this->pdo->prepare($query);
+        return $stmt->execute([$grade, $class, $subjectID, $title, $description, $materialID, $this->teacherID]);
     }
 }

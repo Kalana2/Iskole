@@ -41,6 +41,13 @@ class TeacherController extends Controller
             return;
         }
 
+        if (isset($_GET['action']) && $_GET['action'] === 'update') {
+            require_once __DIR__ . '/material/materialController.php';
+            $materialController = new MaterialController();
+            $materialController->update();
+            return;
+        }
+
         $this->view('teacher/materials');
     }
 

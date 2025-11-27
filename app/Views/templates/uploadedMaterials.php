@@ -411,8 +411,40 @@ if (!isset($materials) || empty($materials)) {
 
     function handleFormSubmit(event) {
         event.preventDefault();
-        alert('Material update will be implemented with backend');
-        closeEditModal();
+        const formEl = document.getElementById('editMaterialForm');
+        const formData = new FormData(formEl);
+
+        const submitButton = formEl.querySelector('button[type="submit"]');
+        submitButton.disabled = true;
+        submitButton.textContent = 'Updating...';
+
+        fetch('/teacher/materials?action=update', {
+            method: 'POST',
+            body: formData // sends form data directly without jsonification
+        }).then(response => {
+            console.log('Response status:', response.status);
+            console.log('Response headers:', response.headers);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        }).then(result => {
+            if (result.success) {
+                alert(result.message || 'Material updated successfully!');
+                formEl.reset();
+                closeEditModal();
+                location.reload();
+            } else {
+                alert(result.message || 'Failed to update material. Please try again.');
+            }
+        }).catch(error => {
+            console.error('Update error:', error);
+            alert('An error occurred while updating. Please check the console for details.');
+        }).finally(() => {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Update Material';
+        });
+
     }
 
     // Close modal when clicking outside of it
