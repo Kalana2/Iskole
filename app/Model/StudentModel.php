@@ -27,4 +27,20 @@ class StudentModel extends UserModel
 
         return true;
     }
+
+    public function getStudentGradeClass($userId)
+    {
+        $sql = "SELECT c.grade, c.class
+                FROM students AS st
+                JOIN class AS c ON c.classID = st.classID
+                WHERE st.userID = :userId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ?: null;
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching student grade: " . $e->getMessage());
+        }
+    }
 }

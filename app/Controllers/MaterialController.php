@@ -126,4 +126,88 @@ class MaterialController extends Controller
             exit;
         }
     }
+
+    public function download()
+    {
+        // Ensure session is started
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        error_log("Download method called. Method: " . $_SERVER['REQUEST_METHOD']);
+        error_log("POST data: " . print_r($_POST, true));
+
+        // Check if user is logged in
+        if (!isset($_SESSION['user_id'])) {
+            error_log("Download failed: No user session");
+            http_response_code(403);
+            echo 'Access denied. Please log in.';
+            exit;
+        }
+
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['materialID'])) {
+            try {
+                $materialID = $_POST['materialID'];
+                error_log("Attempting to download material ID: " . $materialID);
+
+                $model = new Material();
+
+                // Get the file path from the database
+                $fileData = $model->fetchFileName($materialID);
+                error_log("File data from database: " . print_r($fileData, true));
+
+                if (!$fileData || !isset($fileData['file'])) {
+                    error_log("File not found in database for material ID: " . $materialID);
+                    http_response_code(404);
+                    echo 'File not found in database.';
+                    exit;
+                }
+
+                $filePath = $fileData['file'];
+                $fullPath = __DIR__ . '/../../public' . $filePath;
+                error_log("Full file path: " . $fullPath);
+
+                // Check if file exists
+                if (!file_exists($fullPath)) {
+                    error_log("File not found on server: " . $fullPath);
+                    http_response_code(404);
+                    echo 'File not found on server: ' . $fullPath;
+                    exit;
+                }
+
+                // Get file info
+                $fileName = basename($fullPath);
+                $fileSize = filesize($fullPath);
+                $mimeType = mime_content_type($fullPath) ?: 'application/octet-stream';
+
+                error_log("File info - Name: $fileName, Size: $fileSize, MIME: $mimeType");
+
+                // Clear any output buffering
+                if (ob_get_level()) {
+                    ob_end_clean();
+                }
+
+                // Set headers for download
+                header('Content-Type: ' . $mimeType);
+                header('Content-Disposition: attachment; filename="' . $fileName . '"');
+                header('Content-Length: ' . $fileSize);
+                header('Cache-Control: no-cache, must-revalidate');
+                header('Pragma: public');
+
+                // Output file
+                readfile($fullPath);
+                exit;
+            } catch (Exception $e) {
+                error_log('Material download error: ' . $e->getMessage());
+                http_response_code(500);
+                echo 'Server error: ' . $e->getMessage();
+                exit;
+            }
+        } else {
+            error_log("Invalid request. Method: " . $_SERVER['REQUEST_METHOD'] . ", MaterialID present: " . (isset($_POST['materialID']) ? 'yes' : 'no'));
+            http_response_code(400);
+            echo 'Invalid request. Missing material ID.';
+            exit;
+        }
+    }
 }

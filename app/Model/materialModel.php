@@ -16,17 +16,21 @@ class Material extends TeacherModel
                 throw new Exception("Database connection failed");
             }
 
-            if (!isset($_SESSION['user_id'])) {
-                throw new Exception("No user session found");
-            }
-
-            $this->teacherID = $this->getTeacherIDByUserID($_SESSION['user_id']);
-            if (!$this->teacherID) {
-                throw new Exception("Teacher ID not found for user");
+            // Only check for teacher ID if user is logged in and is a teacher
+            if (isset($_SESSION['user_id']) && isset($_SESSION['userRole']) && $_SESSION['userRole'] === 2) {
+                $this->teacherID = $this->getTeacherIDByUserID($_SESSION['user_id']);
+                if (!$this->teacherID) {
+                    error_log("Teacher ID not found for user ID: " . $_SESSION['user_id']);
+                    // Don't throw exception for students, just set teacherID to null
+                }
+            } else {
+                // For non-teacher users or when session is not available, set teacherID to null
+                $this->teacherID = null;
             }
         } catch (Exception $e) {
             error_log("Material model initialization error: " . $e->getMessage());
-            throw $e;
+            // Don't rethrow the exception to allow students to use the model
+            $this->teacherID = null;
         }
     }
 
@@ -85,8 +89,8 @@ class Material extends TeacherModel
     {
         $stmt = $this->pdo->prepare("SELECT * FROM material 
         JOIN subject ON material.subjectID = subject.subjectID
-        JOIN teacher ON material.teacherID = teacher.teacherID
-        JOIN user ON teacher.userID = user.userID
+        JOIN teachers ON material.teacherID = teachers.teacherID
+        JOIN userName ON teachers.userID = userName.userID
          WHERE material.grade = ? AND material.class = ? AND material.visibility = 1 AND material.deleted = 0
          ORDER BY date DESC");
         $stmt->execute([$grade, $class]);
