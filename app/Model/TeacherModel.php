@@ -25,4 +25,17 @@ class TeacherModel extends UserModel
 
         return true;
     }
+
+    public function getTeacherIDByUserID($userID)
+    {
+        $sql = "SELECT teacherID FROM $this->teacherTable WHERE userID = :userID";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userID' => $userID]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['teacherID'] : null;
+        } catch (PDOException $e) {
+            throw new Exception("Error Fetching Teacher ID: " . $e->getMessage());
+        }
+    }
 }

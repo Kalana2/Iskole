@@ -14,6 +14,19 @@ class TeacherController extends Controller
         $this->view('teacher/index');
     }
 
+    public function materials()
+    {
+        // Handle material upload actions
+        if (isset($_GET['action']) && $_GET['action'] === 'create') {
+            require_once __DIR__ . '/MaterialController.php';
+            $materialController = new MaterialController();
+            $materialController->create();
+            return;
+        }
+
+        $this->view('teacher/materials');
+    }
+
     private function handleAnnouncementAction($action)
     {
         switch ($action) {
