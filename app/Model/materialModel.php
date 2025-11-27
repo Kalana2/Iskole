@@ -58,7 +58,7 @@ class Material extends TeacherModel
 
     public function showMaterials()
     {
-        $stmt = $this->pdo->prepare("SELECT * FROM material LEFT JOIN subject ON material.subjectID = subject.subjectID LEFT JOIN teacher ON material.teacherID = teacher.teacherID JOIN user ON teacher.userID = user.userID WHERE material.teacherID = ? AND material.deleted = 0 ORDER BY date DESC");
+        $stmt = $this->pdo->prepare("SELECT material.*,subject.subjectName FROM material LEFT JOIN subject ON material.subjectID = subject.subjectID LEFT JOIN teachers ON material.teacherID = teachers.teacherID JOIN user ON teachers.userID = user.userID WHERE material.teacherID = ? AND material.deleted = 0 ORDER BY date DESC");
         $stmt->execute([$this->teacherID]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

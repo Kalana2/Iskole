@@ -1,6 +1,6 @@
 <?php
 // filepath: /d:/Semester 4/SCS2202 - Group Project/Iskole/app/Views/teacher/uploadedMaterials.php
-
+include_once __DIR__ . '/../../Controllers/material/readMaterialController.php';
 // Sample data for demonstration (remove when backend is implemented)
 $sampleMaterials = [
     [
@@ -143,11 +143,11 @@ if (!isset($materials) || empty($materials)) {
                     <button class="btn ghost" type="button" onclick="openEditModal(<?= htmlspecialchars(json_encode($material)) ?>)">Edit</button>
                     <div class="spacer"></div>
                     <?php if ($material['visibility'] == 1): ?>
-                        <button type="button" class="btn ghost" onclick="alert('Hide feature will be implemented with backend')">Hide</button>
+                        <button type="button" class="btn ghost" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" onclick="hide(this)">Hide</button>
                     <?php else: ?>
-                        <button type="button" class="btn" onclick="alert('Show feature will be implemented with backend')">Show</button>
+                        <button type="button" class="btn" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" onclick="unhide(this)">Show</button>
                     <?php endif; ?>
-                    <button type="button" class="btn ghost" style="color: #dc2626; border-color: rgba(220, 38, 38, 0.3);" onclick="if(confirm('Are you sure you want to delete this material?')) alert('Delete feature will be implemented with backend')">Delete</button>
+                    <button type="button" class="btn ghost" data-id="<?php echo htmlspecialchars($material['materialID']); ?>" style="color: #dc2626; border-color: rgba(220, 38, 38, 0.3);" onclick="if(confirm('Are you sure you want to delete this material?')) alert('Delete feature will be implemented with backend')">Delete</button>
                 </div>
             </article>
         <?php endforeach; ?>
@@ -308,6 +308,69 @@ if (!isset($materials) || empty($materials)) {
         } else {
             document.getElementById('current-file-name').textContent = '';
         }
+    }
+
+    function hide(button) {
+        const materialID = button.getAttribute('data-id');
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = 'Hiding...';
+
+        fetch('/teacher/materials?action=hide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    materialID: materialID
+                })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Material hidden successfully.');
+                    location.reload();
+                } else {
+                    alert('Error hiding material: ' + data.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }).catch(error => {
+                alert('Network error: ' + error.message);
+                button.disabled = false;
+                button.textContent = originalText;
+            });
+    }
+
+
+    function unhide(button) {
+        const materialID = button.getAttribute('data-id');
+        button.disabled = true;
+        const originalText = button.textContent;
+        button.textContent = 'Showing...';
+
+        fetch('/teacher/materials?action=unhide', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    materialID: materialID
+                })
+            }).then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Material shown successfully.');
+                    location.reload();
+                } else {
+                    alert('Error showing material: ' + data.message);
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }).catch(error => {
+                alert('Network error: ' + error.message);
+                button.disabled = false;
+                button.textContent = originalText;
+            });
     }
 
     function closeEditModal() {

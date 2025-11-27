@@ -24,6 +24,18 @@ class TeacherController extends Controller
             return;
         }
 
+        // Handle material hide action
+        if (isset($_GET['action']) && $_GET['action'] === 'hide') {
+            include_once __DIR__ . '/material/hideMaterialController.php';
+            return;
+        }
+
+        // Handle material unhide action
+        if (isset($_GET['action']) && $_GET['action'] === 'unhide') {
+            include_once __DIR__ . '/material/unhideMaterialController.php';
+            return;
+        }
+
         $this->view('teacher/materials');
     }
 
