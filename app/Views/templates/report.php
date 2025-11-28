@@ -127,7 +127,7 @@ $behaviorReports = [
           <div class="behavior-form-wrapper">
             <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
-              <form action="" id="behaviorForm">
+              <form action="/app/Controllers/behaviorController.php" method="POST" id="behaviorForm">
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
                   <select id="report_type" name="report_type" required>
@@ -138,7 +138,7 @@ $behaviorReports = [
                 </div>
                 <div class="form-row">
                   <label for="category">Category</label>
-                  <input type="text" id="category" name="category" placeholder="e.g. Academic Excellence" />
+                  <input type="text" id="category" name="category" placeholder="e.g. Academic Excellence" required />
                 </div>
                 <div class="form-row">
                   <label for="title">Title</label>
@@ -207,6 +207,7 @@ $behaviorReports = [
               </div>
             <?php endif; ?>
           </div>
+          <!-- ........ -->
         </div>
       </div>
     </div>
