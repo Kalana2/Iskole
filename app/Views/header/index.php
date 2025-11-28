@@ -20,8 +20,8 @@
                 </div>
                 <div class="user-details">
                     <span class="user-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></span>
-                    <span
-                        class="user-email"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'user@example.com'); ?></span>
+                    <a class="user-email" href="/profile"
+                        title="View profile"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'user@example.com'); ?></a>
                 </div>
             </div>
 
