@@ -24,17 +24,34 @@
 }
 
 .profile-header {
-    text-align: center;
-    margin-bottom: 60px;
-    position: relative;
-    padding: 1.5rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
     border-radius: var(--radius);
-    /* base solid gradient matching navigation */
-    background: linear-gradient(135deg, #0b2bb8 0%, #653991 100%);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255,255,255,0.06);
+    background: linear-gradient(135deg, rgba(26,31,58,0.92), rgba(45,27,78,0.92));
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255,255,255,0.06);
     border: 1px solid rgba(255, 255, 255, 0.14);
     overflow: hidden;
     animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.profile-header .header-content {
+    margin: 0;
+}
+
+.profile-header .header-content h1 {
+    margin: 0;
+    font-size: 1.35rem;
+    color: #cdd3ea; /* light text similar to announcements header */
+    letter-spacing: 0.3px;
+}
+
+.profile-header .header-content .subtitle {
+    margin: 0.15rem 0 0;
+    color: #8790b0; /* muted subtitle color to match announcements */
+    font-size: 0.9rem;
 }
 
 /* animated colorful overlay used on main header (copied from header styles) */
