@@ -1,21 +1,16 @@
 <!-- filepath: /home/snake/Projects/Iskole/app/Views/templates/report.php -->
 <?php
+// Controller එකෙන් එන data
 $behaviorReports = $behaviorReports ?? [];
-$error   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
-$success = isset($_GET['success']);
+$flash = $flash ?? null;
 ?>
 
-<?php if ($error): ?>
+<?php if ($flash): ?>
   <div style="margin:10px 0;padding:12px;border-radius:6px;
-              border:1px solid red;color:red;">
-    <strong>❌ Error:</strong> <?= $error ?>
-  </div>
-<?php endif; ?>
-
-<?php if ($success): ?>
-  <div style="margin:10px 0;padding:12px;border-radius:6px;
-              border:1px solid green;color:green;">
-    <strong>✅ Success!</strong> Report added successfully.
+              border:1px solid <?= $flash['type'] === 'error' ? 'red' : 'green' ?>;
+              color:<?= $flash['type'] === 'error' ? 'red' : 'green' ?>;">
+    <strong><?= $flash['type'] === 'error' ? '❌ Error:' : '✅ Success:' ?></strong>
+    <?= htmlspecialchars($flash['text']) ?>
   </div>
 <?php endif; ?>
 
