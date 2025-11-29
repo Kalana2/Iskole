@@ -127,7 +127,7 @@ $behaviorReports = [
           <div class="behavior-form-wrapper">
             <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
-              <form action="/app/Controllers/behaviorController.php" method="POST" id="behaviorForm">
+              <form action="/index.php?url=report" method="POST" id="behaviorForm">
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
                   <select id="report_type" name="report_type" required>

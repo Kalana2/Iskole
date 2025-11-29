@@ -25,7 +25,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
         $pdo = Database::getInstance();
         error_log("Database connected successfully");
         
-        $stmt = $pdo->prepare("INSERT INTO behaviorReports (report_type, category, title, description, report_date) VALUES (?, ?, ?, ?, NOW())");
+        $stmt = $pdo->prepare("INSERT INTO report (report_type, category, title, description, report_date) VALUES (?, ?, ?, ?, NOW())");
         
         error_log("Statement prepared successfully");
         
