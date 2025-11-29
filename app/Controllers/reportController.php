@@ -1,6 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../Core/Database.php';
+require_once __DIR__ . '/../Core/Controller.php';
 
 // Error logging setup
 ini_set('display_errors', 1);
