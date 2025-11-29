@@ -1,29 +1,27 @@
 <!-- filepath: /home/snake/Projects/Iskole/app/Views/templates/report.php -->
 <?php
-// Sample behavior reports (replace later with DB fetch)
-$behaviorReports = [
-  [
-    'id' => 1,
-    'teacher_name' => 'Mr. John Silva',
-    'teacher_subject' => 'Mathematics',
-    'report_date' => '2025-11-01',
-    'report_type' => 'positive',
-    'title' => 'Excellent Leadership in Group Work',
-    'description' => 'Showed exceptional leadership during group activities. Actively helped struggling classmates understand complex algebra concepts. Demonstrated patience and clear communication skills while explaining solutions.',
-    'category' => 'Academic Excellence'
-  ],
-  [
-    'id' => 2,
-    'teacher_name' => 'Mrs. Sarah Perera',
-    'teacher_subject' => 'Science',
-    'report_date' => '2025-10-30',
-    'report_type' => 'positive',
-    'title' => 'Outstanding Lab Safety and Participation',
-    'description' => 'Displayed outstanding participation in today\'s chemistry lab experiment. Followed all safety protocols perfectly and assisted team members in setting up equipment correctly. Shows great attention to detail.',
-    'category' => 'Safety & Conduct'
-  ],
-];
+$behaviorReports = $behaviorReports ?? [];
+$error   = isset($_GET['error']) ? htmlspecialchars($_GET['error']) : null;
+$success = isset($_GET['success']);
 ?>
+
+<?php if ($error): ?>
+  <div style="margin:10px 0;padding:12px;border-radius:6px;
+              border:1px solid red;color:red;">
+    <strong>❌ Error:</strong> <?= $error ?>
+  </div>
+<?php endif; ?>
+
+<?php if ($success): ?>
+  <div style="margin:10px 0;padding:12px;border-radius:6px;
+              border:1px solid green;color:green;">
+    <strong>✅ Success!</strong> Report added successfully.
+  </div>
+<?php endif; ?>
+
+
+
+
 <section class="reports-entry tab-panel mp-management">
   <div class="reports-section">
     <header class="mgmt-header">

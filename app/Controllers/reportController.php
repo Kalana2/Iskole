@@ -1,46 +1,59 @@
 <?php
-
 require_once __DIR__ . '/../Core/Database.php';
 require_once __DIR__ . '/../Core/Controller.php';
 
-// Error logging setup
-ini_set('display_errors', 1);
-error_reporting(E_ALL);
-
-if($_SERVER['REQUEST_METHOD'] == 'POST'){
-    $reportType = $_POST['report_type'] ?? null;
-    $category = $_POST['category'] ?? null;
-    $title = $_POST['title'] ?? null;
-    $description = $_POST['description'] ?? null;
-
-    // Debug: පෙන්වන්න යැයි කුමන data එක ගිහින් ඇතිදැයි
-    error_log("POST Data - Type: $reportType, Category: $category, Title: $title, Desc: $description");
-
-    if(!$reportType || !$category || !$title || !$description) {
-        error_log("Validation failed - Missing field(s)");
-        header("Location: /report?error=missing_fields");
-        exit();
-    }
-
-    try {
+class ReportController extends Controller
+{
+    public function index()
+    {
         $pdo = Database::getInstance();
-        error_log("Database connected successfully");
-        
-        $stmt = $pdo->prepare("INSERT INTO report (report_type, category, title, description, report_date) VALUES (?, ?, ?, ?, NOW())");
-        
-        error_log("Statement prepared successfully");
-        
-        $result = $stmt->execute([$reportType, $category, $title, $description]);
-        
-        error_log("Insert executed - Result: " . ($result ? 'Success' : 'Failed'));
-        
-        header("Location: /report?success=1");
-        exit();
-    } catch (Exception $e) {
-        error_log("Exception caught - Error: " . $e->getMessage());
-        error_log("Stack trace: " . $e->getTraceAsString());
-        header("Location: /report?error=" . urlencode($e->getMessage()));
-        exit();
+
+        // 1) POST: insert new report
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+
+            die('ReportController POST reached: ' . print_r($_POST, true));
+
+            $reportType  = $_POST['report_type'] ?? null;
+            $category    = trim($_POST['category'] ?? '');
+            $title       = trim($_POST['title'] ?? '');
+            $description = trim($_POST['description'] ?? '');
+
+            // 🔍 DEBUG: check if POST even comes here (uncomment once):
+            // die('ReportController POST reached: ' . print_r($_POST, true));
+
+            if (!$reportType || !$category || !$title || !$description) {
+                header('Location: /index.php?url=report&error=' . urlencode('Missing required fields'));
+                exit;
+            }
+
+            try {
+                $stmt = $pdo->prepare(
+                    "INSERT INTO report (report_type, category, title, description, report_date)
+                     VALUES (:type, :category, :title, :description, NOW())"
+                );
+
+                $stmt->execute([
+                    ':type'        => $reportType,
+                    ':category'    => $category,
+                    ':title'       => $title,
+                    ':description' => $description,
+                ]);
+
+                header('Location: /index.php?url=report&success=1');
+                exit;
+            } catch (Exception $e) {
+                header('Location: /index.php?url=report&error=' . urlencode($e->getMessage()));
+                exit;
+            }
+        }
+
+        // 2) GET: load reports to show in view
+        $stmt = $pdo->query("SELECT * FROM report ORDER BY report_date DESC");
+        $behaviorReports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $this->view('templates/report', [
+            'behaviorReports' => $behaviorReports,
+        ]);
     }
 }
-?>
