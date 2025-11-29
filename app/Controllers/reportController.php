@@ -2,14 +2,13 @@
 
 class ReportController extends Controller
 {
-    // GET /report  -> show page + list
+    // Show page + list
     public function index()
     {
-        $pdo = Database::getInstance();
+        /** @var ReportModel $model */
+        $model = $this->model('ReportModel'); // same helper as in AddNewUserController
 
-        // DB එකෙන් behavior reports ගන්න
-        $stmt = $pdo->query("SELECT * FROM report ORDER BY report_date DESC");
-        $behaviorReports = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $behaviorReports = $model->getAllReports();
 
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
@@ -20,11 +19,11 @@ class ReportController extends Controller
         ]);
     }
 
-    // POST /report/submit  -> insert new behavior report
+    // Handle form submit
     public function submit()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /report');
+            header('Location: /index.php?url=report');
             exit;
         }
 
@@ -38,23 +37,20 @@ class ReportController extends Controller
                 'type' => 'error',
                 'text' => 'Missing required fields.',
             ];
-            header('Location: /report');
+            header('Location: /index.php?url=report');
             exit;
         }
 
         try {
-            $pdo = Database::getInstance();
+            /** @var ReportModel $model */
+            $model = $this->model('ReportModel');
 
-            $stmt = $pdo->prepare(
-                "INSERT INTO report (report_type, category, title, description, report_date)
-                 VALUES (:type, :category, :title, :description, NOW())"
-            );
-
-            $stmt->execute([
-                ':type'        => $reportType,
-                ':category'    => $category,
-                ':title'       => $title,
-                ':description' => $description,
+            $model->createReport([
+                'report_type' => $reportType,
+                'category'    => $category,
+                'title'       => $title,
+                'description' => $description,
+                // 'report_date' => null, // optional – DB will use NOW()
             ]);
 
             $_SESSION['report_msg'] = [
@@ -68,7 +64,7 @@ class ReportController extends Controller
             ];
         }
 
-        header('Location: /report');
+        header('Location: /index.php?url=report');
         exit;
     }
 }
