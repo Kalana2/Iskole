@@ -57,7 +57,7 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--white);
   letter-spacing: 0.3px;
 }
 
@@ -90,7 +90,7 @@
 
 .info-value {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--white);
   font-weight: 700;
 }
 
@@ -174,7 +174,7 @@
 }
 
 .timetable-scroll::-webkit-scrollbar-track {
-  background: #f3f4f6;
+  background: var(--bg-gray-2);
 }
 
 .timetable-scroll::-webkit-scrollbar-thumb {
@@ -269,7 +269,7 @@
 }
 
 .timetable-table tbody tr:hover:not(.interval-row) {
-  background: #f9fafb;
+  background: var(--bg-gray);
 }
 
 .timetable-table tbody tr.current-period {
@@ -675,11 +675,11 @@
   }
 
   .today-cell {
-    background: #f3f4f6;
+    background: var(--bg-gray-2);
   }
 
   .interval-row {
-    background: #f9fafb;
+    background: var(--bg-gray);
   }
 
   .timetable-legend {

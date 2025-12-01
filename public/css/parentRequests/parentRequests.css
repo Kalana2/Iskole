@@ -20,7 +20,7 @@
   padding: 1rem 1.5rem;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
-  color: #fff;
+  color: var(--white);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   margin-bottom: 1.5rem;
 }
@@ -29,7 +29,7 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--white);
   letter-spacing: 0.3px;
 }
 
@@ -106,12 +106,12 @@
 }
 
 .info-box[data-status="pending"] {
-  border-left-color: #f59e0b;
+  border-left-color: var(--warning);
   background: linear-gradient(to right, #fffbeb 0%, white 10%);
 }
 
 .info-box[data-status="approved"] {
-  border-left-color: #10b981;
+  border-left-color: var(--success);
   background: linear-gradient(to right, #ecfdf5 0%, white 10%);
 }
 
@@ -129,7 +129,7 @@
 .sub-heading-bolt {
   font-size: 1.125rem;
   font-weight: 600;
-  color: #1f2937;
+  color: var(--text-gray);
   margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
@@ -150,14 +150,14 @@
 
 .sub-heading {
   font-size: 0.95rem;
-  color: #4b5563;
+  color: var(--text-medium);
   line-height: 1.6;
   margin-bottom: 0.75rem;
 }
 
 .meta-info {
   font-size: 0.875rem;
-  color: #9ca3af;
+  color: var(--text-light);
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -273,13 +273,13 @@
 }
 
 .btn-secondary {
-  background: #f3f4f6;
-  color: #4b5563;
+  background: var(--bg-gray-2);
+  color: var(--text-medium);
   border: 1px solid #d1d5db;
 }
 
 .btn-secondary:hover {
-  background: #e5e7eb;
+  background: var(--bg-border);
 }
 
 /* Empty State */
@@ -287,7 +287,7 @@
   justify-content: center;
   padding: 3rem;
   border: 2px dashed #d1d5db;
-  background: #f9fafb;
+  background: var(--bg-gray);
 }
 
 .empty-state .heading-name {
@@ -297,7 +297,7 @@
 }
 
 .empty-state .sub-heading {
-  color: #9ca3af;
+  color: var(--text-light);
 }
 
 /* Form Section */
@@ -308,7 +308,7 @@
 }
 
 .leave-request-form {
-  background: #f9fafb;
+  background: var(--bg-gray);
   padding: 2rem;
   border-radius: 12px;
   border: 1px solid #e5e7eb;
@@ -423,7 +423,7 @@
 .modal-header h3 {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #1f2937;
+  color: var(--text-gray);
   margin: 0;
 }
 
@@ -460,7 +460,7 @@
   display: flex;
   gap: 1rem;
   justify-content: flex-end;
-  background: #f9fafb;
+  background: var(--bg-gray);
   border-radius: 0 0 16px 16px;
 }
 

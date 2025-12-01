@@ -57,7 +57,7 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--white);
   letter-spacing: 0.3px;
   display: flex;
   align-items: center;
@@ -95,7 +95,7 @@
 
 .badge-value {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--white);
   font-weight: 700;
 }
 
@@ -382,7 +382,7 @@
 }
 
 .attendance-table tbody tr:hover {
-  background: #f9fafb;
+  background: var(--bg-gray);
 }
 
 .attendance-table tbody tr:last-child {

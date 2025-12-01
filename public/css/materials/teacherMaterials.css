@@ -51,7 +51,7 @@
 
 .close:hover,
 .close:focus {
-  color: #1f2937;
+  color: var(--text-gray);
 }
 
 .upload-section {
@@ -66,7 +66,7 @@
 
 .upload-section .heading h1 {
   margin: 0 0 0.5rem 0;
-  color: #1f2937;
+  color: var(--text-gray);
   font-size: 1.75rem;
 }
 
@@ -97,7 +97,7 @@
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   background: white;
-  color: #1f2937;
+  color: var(--text-gray);
   font-size: 0.95rem;
   transition: all 0.2s ease;
 }
@@ -129,7 +129,7 @@
   border: 1px solid rgba(0, 0, 0, 0.15);
   border-radius: 10px;
   background: white;
-  color: #1f2937;
+  color: var(--text-gray);
   font-size: 0.95rem;
   font-family: inherit;
   transition: all 0.2s ease;

@@ -17,7 +17,7 @@
   padding: 1rem 1.5rem;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
-  color: #fff;
+  color: var(--white);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
 }
 .mgmt-header .title-wrap h2 {
@@ -60,7 +60,7 @@
   border-radius: 12px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   background: var(--card);
-  color: #111827;
+  color: var(--text-dark);
   font-size: 0.95rem;
   outline: none;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
@@ -84,7 +84,7 @@
   transform: translateY(1px);
 }
 .btn-primary {
-  color: #fff;
+  color: var(--white);
   background: linear-gradient(135deg, var(--primary), var(--primary-2));
   box-shadow: 0 10px 24px rgba(102, 126, 234, 0.35);
 }
@@ -92,12 +92,12 @@
   box-shadow: 0 14px 30px rgba(102, 126, 234, 0.45);
 }
 .btn-ghost {
-  background: #f3f4f6;
-  color: #1f2937;
+  background: var(--bg-gray-2);
+  color: var(--text-gray);
   border: 1px solid rgba(17, 24, 39, 0.12);
 }
 .btn-ghost:hover {
-  background: #e5e7eb;
+  background: var(--bg-border);
 }
 .btn-ghost:disabled {
   opacity: 0.6;
@@ -105,7 +105,7 @@
 }
 .btn-red {
   background: #ef4444;
-  color: #fff;
+  color: var(--white);
 }
 .btn-red:hover {
   background: #dc2626;
@@ -140,7 +140,7 @@
 }
 .table-data {
   padding: 0.7rem 0.9rem;
-  color: #111827;
+  color: var(--text-dark);
   border-bottom: 1px solid rgba(17, 24, 39, 0.08);
   font-size: 0.95rem;
 }
@@ -229,7 +229,7 @@
 }
 
 .modal-close:hover {
-  background: #f3f4f6;
+  background: var(--bg-gray-2);
   color: var(--text);
 }
 
@@ -263,7 +263,7 @@
   border-radius: 12px;
   border: 1px solid rgba(17, 24, 39, 0.14);
   background: var(--card);
-  color: #111827;
+  color: var(--text-dark);
   font-size: 0.95rem;
   outline: none;
   transition: box-shadow 0.2s ease, border-color 0.2s ease;

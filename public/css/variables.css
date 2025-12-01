@@ -9,10 +9,19 @@
   --primary-2: #764ba2; /* Deep purple */
   --text-color: #333;
   --text: #1f2543; /* Dark blue text */
+  --text-dark: #111827; /* Very dark gray */
+  --text-gray: #1f2937; /* Dark gray */
+  --text-medium: #4b5563; /* Medium gray */
+  --text-light: #9ca3af; /* Light gray */
+  --text-lighter: #9aa0ae; /* Lighter gray */
   --muted: #6b7280; /* Gray muted text */
+  --white: #ffffff; /* Pure white */
   --card-bg: #fff;
   --card: #ffffff;
   --bg-color: #f4f7f6; /* Light gray background */
+  --bg-gray: #f9fafb; /* Very light gray */
+  --bg-gray-2: #f3f4f6; /* Light gray 2 */
+  --bg-border: #e5e7eb; /* Border gray */
   --blur-bg: rgba(255, 255, 255, 0.7);
   
   /* ========== BORDER & SHADOWS ========== */
@@ -60,6 +69,19 @@
   --interval-bg: #cce4fe;
   --today-bg: #ede9fe;
   --today-border: #a78bfa;
+  
+  /* ========== GRADIENTS & SPECIAL BACKGROUNDS ========== */
+  --gradient-blue-light-start: #eff6ff;
+  --gradient-blue-light-end: #dbeafe;
+  --gradient-blue-medium-start: #dbeafe;
+  --gradient-blue-medium-end: #bfdbfe;
+  --gradient-green-light-start: #ecfdf5;
+  --gradient-green-light-end: #d1fae5;
+  --gradient-green-medium-start: #d1fae5;
+  --gradient-green-medium-end: #a7f3d0;
+  --gradient-yellow-start: #ffffff;
+  --gradient-yellow-end: #fffbeb;
+  --gradient-orange: #d97706;
   
   /* ========== HEADER SECTION ========== */
   --header-gradient-start: #0b2bb8;

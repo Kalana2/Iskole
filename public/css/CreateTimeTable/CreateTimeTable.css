@@ -11,17 +11,17 @@
 .admin-timetable-builder .btn {
   padding: 10px 14px;
   border-radius: 8px;
-  background: #e5e7eb;
+  background: var(--bg-border);
   border: none;
   cursor: pointer;
 }
 .admin-timetable-builder .btn.primary {
   background: #3b82f6;
-  color: #fff;
+  color: var(--white);
 }
 .admin-timetable-builder .btn.success {
   background: #10b981;
-  color: #fff;
+  color: var(--white);
 }
 
 .admin-timetable-builder .class-card {
@@ -85,6 +85,6 @@
   .info-item
   select.info-value
   option {
-  color: #111827; /* dark text */
+  color: var(--text-dark); /* dark text */
   background: var(--card); /* white background */
 }

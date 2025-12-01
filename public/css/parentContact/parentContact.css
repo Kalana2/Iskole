@@ -8,7 +8,7 @@
 .parent-contact-section {
   min-height: 100vh;
   padding: 1.5rem;
-  background: linear-gradient(to bottom right, #f9fafb, #f3f4f6);
+  background: linear-gradient(to bottom right, var(--bg-gray), var(--bg-gray-2));
 }
 
 .contact-container {
@@ -57,7 +57,7 @@
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #ffffff;
+  color: var(--white);
   letter-spacing: 0.3px;
   display: flex;
   align-items: center;
@@ -97,7 +97,7 @@
 
 .info-value {
   font-size: 0.95rem;
-  color: #ffffff;
+  color: var(--white);
   font-weight: 700;
 }
 
@@ -219,7 +219,7 @@
 
 .class-teacher-card {
   border: 2px solid var(--warning);
-  background: linear-gradient(135deg, #ffffff 0%, #fffbeb 100%);
+  background: linear-gradient(135deg, var(--gradient-yellow-start) 0%, var(--gradient-yellow-end) 100%);
 }
 
 .class-teacher-card:hover {
@@ -231,7 +231,7 @@
   position: absolute;
   top: 1rem;
   right: 1rem;
-  background: linear-gradient(135deg, var(--warning), #d97706);
+  background: linear-gradient(135deg, var(--warning), var(--gradient-orange));
   color: white;
   padding: 0.4rem 0.875rem;
   border-radius: 20px;
@@ -321,7 +321,7 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background: #f9fafb;
+  background: var(--bg-gray);
   border-radius: 12px;
 }
 
@@ -374,21 +374,21 @@
 }
 
 .email-method {
-  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  background: linear-gradient(135deg, var(--gradient-blue-light-start) 0%, var(--gradient-blue-light-end) 100%);
   color: var(--info);
 }
 
 .email-method:hover {
-  background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+  background: linear-gradient(135deg, var(--gradient-blue-medium-start) 0%, var(--gradient-blue-medium-end) 100%);
 }
 
 .phone-method {
-  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  background: linear-gradient(135deg, var(--gradient-green-light-start) 0%, var(--gradient-green-light-end) 100%);
   color: var(--success);
 }
 
 .phone-method:hover {
-  background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+  background: linear-gradient(135deg, var(--gradient-green-medium-start) 0%, var(--gradient-green-medium-end) 100%);
 }
 
 .contact-method i {
@@ -439,13 +439,13 @@
 }
 
 .secondary-btn {
-  background: #f3f4f6;
+  background: var(--bg-gray-2);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
 .secondary-btn:hover {
-  background: #e5e7eb;
+  background: var(--bg-border);
   transform: translateY(-2px);
 }
 
