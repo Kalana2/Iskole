@@ -23,7 +23,7 @@
   --bg-gray-2: #f3f4f6; /* Light gray 2 */
   --bg-border: #e5e7eb; /* Border gray */
   --blur-bg: rgba(255, 255, 255, 0.7);
-  
+
   /* ========== BORDER & SHADOWS ========== */
   --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
@@ -32,44 +32,44 @@
   --border-radius: 12px;
   --border: rgba(17, 24, 39, 0.08);
   --ring: rgba(102, 126, 234, 0.45);
-  
+
   /* ========== STATUS COLORS ========== */
   /* Success */
   --success: #10b981;
   --success-light: #10b981;
   --success-dark: #059669;
   --ok: #2dd4bf; /* Teal success */
-  
+
   /* Danger/Error */
   --danger: #ef4444;
   --danger-light: #ef4444;
   --danger-dark: #dc2626;
-  
+
   /* Warning */
   --warning: #f59e0b;
-  
+
   /* Info */
   --info: #3b82f6;
   --info-light: #3b82f6;
   --info-dark: #2563eb;
-  
+
   /* ========== ANNOUNCEMENTS SECTION ========== */
   --ann-text: #cdd3ea;
   --ann-muted: #8790b0;
   --ann-ok: #2dd4bf;
   --ann-pin: #f472b6;
-  
+
   /* ========== ACADEMIC OVERVIEW SECTION ========== */
   --ao-muted: rgba(51, 51, 51, 0.58);
   --ao-success: #16a34a;
   --ao-danger: #ef4444;
   --ao-shadow: var(--shadow-light);
-  
+
   /* ========== TIMETABLE SECTION ========== */
   --interval-bg: #cce4fe;
   --today-bg: #ede9fe;
   --today-border: #a78bfa;
-  
+
   /* ========== GRADIENTS & SPECIAL BACKGROUNDS ========== */
   --gradient-blue-light-start: #eff6ff;
   --gradient-blue-light-end: #dbeafe;
@@ -82,17 +82,17 @@
   --gradient-yellow-start: #ffffff;
   --gradient-yellow-end: #fffbeb;
   --gradient-orange: #d97706;
-  
+
   /* ========== HEADER SECTION ========== */
   --header-gradient-start: #0b2bb8;
   --header-gradient-end: #653991;
   --header-bg-gradient-start: #f5f7fa;
   --header-bg-gradient-end: #c3cfe2;
-  
+
   /* ========== NAVIGATION SECTION ========== */
   --nav-gradient-start: #1a1f3a;
   --nav-gradient-end: #2d1b4e;
-  
+
   /* ========== MANAGEMENT/ADMIN SECTION ========== */
   --mgmt-gradient-start: #1a1f3a;
   --mgmt-gradient-end: #2d1b4e;

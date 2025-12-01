@@ -8,7 +8,11 @@
 .parent-contact-section {
   min-height: 100vh;
   padding: 1.5rem;
-  background: linear-gradient(to bottom right, var(--bg-gray), var(--bg-gray-2));
+  background: linear-gradient(
+    to bottom right,
+    var(--bg-gray),
+    var(--bg-gray-2)
+  );
 }
 
 .contact-container {
@@ -18,7 +22,11 @@
 
 /* Header Section */
 .contact-header {
-  background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--mgmt-gradient-start) 0%,
+    var(--mgmt-gradient-end) 100%
+  );
   border-radius: 16px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;
@@ -219,7 +227,11 @@
 
 .class-teacher-card {
   border: 2px solid var(--warning);
-  background: linear-gradient(135deg, var(--gradient-yellow-start) 0%, var(--gradient-yellow-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-yellow-start) 0%,
+    var(--gradient-yellow-end) 100%
+  );
 }
 
 .class-teacher-card:hover {
@@ -374,21 +386,37 @@
 }
 
 .email-method {
-  background: linear-gradient(135deg, var(--gradient-blue-light-start) 0%, var(--gradient-blue-light-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-blue-light-start) 0%,
+    var(--gradient-blue-light-end) 100%
+  );
   color: var(--info);
 }
 
 .email-method:hover {
-  background: linear-gradient(135deg, var(--gradient-blue-medium-start) 0%, var(--gradient-blue-medium-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-blue-medium-start) 0%,
+    var(--gradient-blue-medium-end) 100%
+  );
 }
 
 .phone-method {
-  background: linear-gradient(135deg, var(--gradient-green-light-start) 0%, var(--gradient-green-light-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-green-light-start) 0%,
+    var(--gradient-green-light-end) 100%
+  );
   color: var(--success);
 }
 
 .phone-method:hover {
-  background: linear-gradient(135deg, var(--gradient-green-medium-start) 0%, var(--gradient-green-medium-end) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--gradient-green-medium-start) 0%,
+    var(--gradient-green-medium-end) 100%
+  );
 }
 
 .contact-method i {

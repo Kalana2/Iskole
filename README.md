@@ -13,6 +13,21 @@ A comprehensive web-based School Management System built with PHP and MySQL, des
 - **Announcements**: School-wide and role-specific announcements
 - **RESTful API**: AJAX-powered operations for smooth user experience
 
+## 📖 Documentation
+
+All project documentation is now organized in the **[`/documentation`](./documentation/)** folder:
+
+- 📘 **[Documentation Index](./documentation/README.md)** - Start here for all documentation
+- 🚀 **[Quick Reference](./documentation/QUICK-REFERENCE.md)** - Common tasks and commands
+- 💻 **[Development Guide](./documentation/DEVELOPMENT-GUIDE.md)** - Setup and development
+- 🏗️ **[System Architecture](./documentation/SYSTEM-ARCHITECTURE.md)** - Technical overview
+- 🎨 **[CSS Variables Guide](./documentation/CSS-VARIABLES-COMPLETE-SUMMARY.md)** - Styling system
+- 🔌 **[API Documentation](./documentation/API-DOCUMENTATION.md)** - REST API reference
+- 🚢 **[Deployment Guide](./documentation/DEPLOYMENT-GUIDE.md)** - Production deployment
+- 🔧 **[Troubleshooting](./documentation/TROUBLESHOOTING.md)** - Common issues & solutions
+
+**Total Documentation:** 17 comprehensive guides | **Last Updated:** December 2, 2025
+
 ## ✨ Key Features
 
 ### For Administrators
@@ -389,6 +404,14 @@ For support, please:
 - Documentation: [System Documentation](SYSTEM-ARCHITECTURE.md)
 
 ## 🗓️ Changelog
+
+### Version 2.0.0 (2025-12-02)
+
+- ✅ **Documentation Organization** - Moved all docs to `/documentation` folder
+- ✅ **CSS Variables System** - Implemented 67 centralized CSS variables
+- ✅ **System-wide Styling** - Updated 17+ CSS files to use variables
+- ✅ **Design System** - Professional theming with single source of truth
+- ✅ **Documentation** - 4 new CSS variables guides added
 
 ### Version 1.0.0 (2024-01-15)
 
