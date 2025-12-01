@@ -65,7 +65,7 @@
 
 /* Relief Management layout alignment */
 .mp-relief { max-width:1400px; margin:1.25rem auto; padding:0.5rem 1rem 2rem; }
-.relief-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin: 0 auto 1rem; max-width:1400px; padding:1rem 1.5rem; border-radius:16px; background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%); color:#fff; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
+.relief-header { display:flex; align-items:center; justify-content:space-between; gap:1rem; margin: 0 auto 1rem; max-width:1400px; padding:1rem 1.5rem; border-radius:16px; background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%); color:#fff; box-shadow: 0 10px 28px rgba(0,0,0,.35); }
 /* Header reuses .mgmt-header styles from userDirectory.css */
 .relief-stats { display:flex; gap:.6rem; align-items:center; }
 .relief-stat { display:flex; flex-direction:column; gap:.1rem; padding:.5rem .75rem; background: rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15); border-radius:10px; }

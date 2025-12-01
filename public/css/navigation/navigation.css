@@ -1,7 +1,7 @@
 /* Deprecated: Navigation styles have been moved to /css/mp/navigation.css */
 .mp-nav {
   width: 100%;
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  background: linear-gradient(135deg, var(--nav-gradient-start) 0%, var(--nav-gradient-end) 100%);
   backdrop-filter: blur(12px) saturate(150%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);

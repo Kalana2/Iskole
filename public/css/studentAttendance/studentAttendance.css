@@ -1,18 +1,4 @@
-:root {
-  --text: #1f2543;
-  --muted: #6b7280;
-  --primary: #667eea;
-  --primary-2: #764ba2;
-  --card: #ffffff;
-  --border: rgba(17, 24, 39, 0.08);
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.15);
-}
+/* Uses global variables from /css/variables.css */
 
 * {
   box-sizing: border-box;
@@ -32,7 +18,7 @@
 
 /* Header Section */
 .attendance-header {
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
   border-radius: 16px;
   padding: 1rem 1.5rem;
   margin-bottom: 1.5rem;

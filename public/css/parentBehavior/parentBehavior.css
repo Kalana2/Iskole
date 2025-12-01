@@ -19,7 +19,7 @@
   gap: 0.3rem;
   padding: 1rem 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
   color: #fff;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   margin-bottom: 1.5rem;
@@ -58,14 +58,14 @@
   border-radius: 24px;
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
   cursor: pointer;
   transition: all 0.3s ease;
 }
 
 .chip:hover {
-  border-color: #667eea;
-  color: #667eea;
+  border-color: var(--primary);
+  color: var(--primary);
   transform: translateY(-2px);
 }
 
@@ -122,7 +122,7 @@
 }
 
 .behavior-report.neutral {
-  border-left-color: #6b7280;
+  border-left-color: var(--muted);
   background: linear-gradient(to right, #f9fafb 0%, white 15%);
 }
 
@@ -188,7 +188,7 @@
 
 .repo-date {
   font-size: 0.875rem;
-  color: #6b7280;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 0.25rem;
@@ -284,7 +284,7 @@
 .empty-state h3 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: #6b7280;
+  color: var(--muted);
   margin-bottom: 0.5rem;
 }
 
@@ -329,7 +329,7 @@
 }
 
 .stat-card.neutral {
-  border-color: #6b7280;
+  border-color: var(--muted);
   background: linear-gradient(135deg, #f9fafb 0%, white 50%);
 }
 
@@ -366,7 +366,7 @@
 .stat-label {
   font-size: 0.875rem;
   font-weight: 500;
-  color: #6b7280;
+  color: var(--muted);
 }
 
 /* Animations */

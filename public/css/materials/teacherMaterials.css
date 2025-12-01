@@ -40,7 +40,7 @@
 }
 
 .close {
-  color: #6b7280;
+  color: var(--muted);
   float: right;
   font-size: 32px;
   font-weight: bold;
@@ -72,7 +72,7 @@
 
 .upload-section .heading p {
   margin: 0;
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.95rem;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .material-content {
-  color: #6b7280;
+  color: var(--muted);
   font-size: 0.85rem;
 }
 

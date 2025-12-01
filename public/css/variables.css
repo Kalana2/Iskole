@@ -1,8 +1,77 @@
+/* ============================================
+   Global CSS Variables for Iskole Application
+   ============================================ */
+
 :root {
-    --primary-color: #4a90e2; /* A modern blue */
-    --text-color: #333;
-    --card-bg: #fff;
-    --bg-color: #f4f7f6; /* Light gray background */
-    --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
-    --border-radius: 12px;
+  /* ========== BASE COLORS ========== */
+  --primary-color: #4a90e2; /* Modern blue */
+  --primary: #667eea; /* Purple-blue */
+  --primary-2: #764ba2; /* Deep purple */
+  --text-color: #333;
+  --text: #1f2543; /* Dark blue text */
+  --muted: #6b7280; /* Gray muted text */
+  --card-bg: #fff;
+  --card: #ffffff;
+  --bg-color: #f4f7f6; /* Light gray background */
+  --blur-bg: rgba(255, 255, 255, 0.7);
+  
+  /* ========== BORDER & SHADOWS ========== */
+  --shadow-light: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 28px rgba(0, 0, 0, 0.15);
+  --border-radius: 12px;
+  --border: rgba(17, 24, 39, 0.08);
+  --ring: rgba(102, 126, 234, 0.45);
+  
+  /* ========== STATUS COLORS ========== */
+  /* Success */
+  --success: #10b981;
+  --success-light: #10b981;
+  --success-dark: #059669;
+  --ok: #2dd4bf; /* Teal success */
+  
+  /* Danger/Error */
+  --danger: #ef4444;
+  --danger-light: #ef4444;
+  --danger-dark: #dc2626;
+  
+  /* Warning */
+  --warning: #f59e0b;
+  
+  /* Info */
+  --info: #3b82f6;
+  --info-light: #3b82f6;
+  --info-dark: #2563eb;
+  
+  /* ========== ANNOUNCEMENTS SECTION ========== */
+  --ann-text: #cdd3ea;
+  --ann-muted: #8790b0;
+  --ann-ok: #2dd4bf;
+  --ann-pin: #f472b6;
+  
+  /* ========== ACADEMIC OVERVIEW SECTION ========== */
+  --ao-muted: rgba(51, 51, 51, 0.58);
+  --ao-success: #16a34a;
+  --ao-danger: #ef4444;
+  --ao-shadow: var(--shadow-light);
+  
+  /* ========== TIMETABLE SECTION ========== */
+  --interval-bg: #cce4fe;
+  --today-bg: #ede9fe;
+  --today-border: #a78bfa;
+  
+  /* ========== HEADER SECTION ========== */
+  --header-gradient-start: #0b2bb8;
+  --header-gradient-end: #653991;
+  --header-bg-gradient-start: #f5f7fa;
+  --header-bg-gradient-end: #c3cfe2;
+  
+  /* ========== NAVIGATION SECTION ========== */
+  --nav-gradient-start: #1a1f3a;
+  --nav-gradient-end: #2d1b4e;
+  
+  /* ========== MANAGEMENT/ADMIN SECTION ========== */
+  --mgmt-gradient-start: #1a1f3a;
+  --mgmt-gradient-end: #2d1b4e;
 }

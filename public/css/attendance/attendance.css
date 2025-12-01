@@ -1,19 +1,4 @@
-:root {
-  --blur-bg: rgba(255, 255, 255, 0.7);
-  --text: #1f2543;
-  --muted: #6b7280;
-  --primary: #667eea;
-  --primary-2: #764ba2;
-  --ring: rgba(102, 126, 234, 0.45);
-  --card: #ffffff;
-  --border: rgba(17, 24, 39, 0.08);
-  --success-light: #10b981;
-  --success-dark: #059669;
-  --danger-light: #ef4444;
-  --danger-dark: #dc2626;
-  --warning: #f59e0b;
-  --info: #3b82f6;
-}
+/* Uses global variables from /css/variables.css */
 
 * {
   box-sizing: border-box;
@@ -35,7 +20,7 @@
 .heading-section {
   padding: 1rem 1.5rem;
   border-radius: 16px;
-  background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
+  background: linear-gradient(135deg, var(--mgmt-gradient-start) 0%, var(--mgmt-gradient-end) 100%);
   color: #fff;
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
   margin-bottom: 1.5rem;

@@ -2,7 +2,7 @@
 body {
     margin: 0;
     padding: 0;
-    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    background: linear-gradient(135deg, var(--header-bg-gradient-start) 0%, var(--header-bg-gradient-end) 100%);
     font-family: 'Inter', 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -11,7 +11,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: linear-gradient(135deg, #0b2bb8 0%, #653991 100%);
+    background: linear-gradient(135deg, var(--header-gradient-start) 0%, var(--header-gradient-end) 100%);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid rgba(255, 255, 255, 0.18);
