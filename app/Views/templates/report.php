@@ -120,7 +120,7 @@ $flash = $flash ?? null;
           <div class="behavior-form-wrapper">
             <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
-              <form action="/index.php?url=report/submit" method="POST" id="behaviorForm">
+              <form action="/index.php?url=report/submit" method="POST" >
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
                   <select id="report_type" name="report_type" required>

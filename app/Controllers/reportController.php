@@ -2,12 +2,10 @@
 
 class ReportController extends Controller
 {
-    // Show page + list
     public function index()
     {
         /** @var ReportModel $model */
-        $model = $this->model('ReportModel'); // same helper as in AddNewUserController
-
+        $model = $this->model('ReportModel');
         $behaviorReports = $model->getAllReports();
 
         $flash = $_SESSION['report_msg'] ?? null;
@@ -19,11 +17,14 @@ class ReportController extends Controller
         ]);
     }
 
-    // Handle form submit
+    // POST /index.php?url=report/submit
     public function submit()
     {
+        // 🔴 DEBUG line REMOVE now (use only if needed)
+        // die('✅ submit reached. METHOD = ' . $_SERVER['REQUEST_METHOD'] .
+        //    ' POST = ' . print_r($_POST, true));
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?url=report');
+            header('Location: /teacher?tab=Reports');
             exit;
         }
 
@@ -37,7 +38,7 @@ class ReportController extends Controller
                 'type' => 'error',
                 'text' => 'Missing required fields.',
             ];
-            header('Location: /index.php?url=report');
+            header('Location: /teacher?tab=Reports');
             exit;
         }
 
@@ -50,7 +51,6 @@ class ReportController extends Controller
                 'category'    => $category,
                 'title'       => $title,
                 'description' => $description,
-                // 'report_date' => null, // optional – DB will use NOW()
             ]);
 
             $_SESSION['report_msg'] = [
@@ -64,7 +64,8 @@ class ReportController extends Controller
             ];
         }
 
-        header('Location: /index.php?url=report');
+        // ✅ always go back to the styled teacher page
+        header('Location: /teacher?tab=Reports');
         exit;
     }
 }
