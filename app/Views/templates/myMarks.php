@@ -2,6 +2,7 @@
 // filepath: /home/snake/Projects/Iskole/app/Views/templates/myMarks.php
 ?>
 <section class="reports-entry tab-panel mp-management">
+  <input type="hidden" id="studentId" value="<?= $this->session->get('user_id') ?>">
   <div class="reports-section">
     <header class="mgmt-header">
       <div class="title-wrap">

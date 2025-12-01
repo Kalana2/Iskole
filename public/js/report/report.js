@@ -1,25 +1,32 @@
 // Student data
-const studentData = {
-  subjects: [
-    { name: "Religion", score: 89, grade: "A" },
-    { name: "Sinhala", score: 77, grade: "A" },
-    { name: "Mathematics", score: 92, grade: "A" },
-    { name: "Science", score: 88, grade: "A" },
-    { name: "English", score: 85, grade: "A" },
-    { name: "History", score: 60, grade: "C" },
-    { name: "Geography", score: 73, grade: "B" },
-    { name: "Health & PE", score: 74, grade: "B" },
-    { name: "Tamil", score: 99, grade: "A" },
-    { name: "Aesthetics", score: 55, grade: "C" },
-    { name: "Citizenship", score: 30, grade: "W" },
-    { name: "Practical Skills", score: 45, grade: "S" },
-  ],
-  terms: {
-    term1: [85, 70, 88, 82, 80, 55, 68, 70, 95, 50, 25, 40],
-    term2: [87, 74, 90, 85, 83, 58, 70, 72, 97, 53, 28, 42],
-    term3: [89, 77, 92, 88, 85, 60, 73, 74, 99, 55, 30, 45],
-  },
+let studentData = {
+  subjects: [],
+  terms: { term1: [], term2: [], term3: [] },
 };
+
+async function loadStudentData(studentId) {
+  try {
+    const response = await fetch(`/Report/getStudentMarks/${studentId}`);
+    const data = await response.json();
+
+    // Extract subjects from the model (these become chart labels)
+    studentData.subjects = data.subjects.map((s) => s.name);
+
+    // Convert PHP structure into term arrays
+    studentData.terms = { term1: [], term2: [], term3: [] };
+
+    for (const subjectName in data.terms) {
+      const marks = data.terms[subjectName]; // [t1, t2, t3]
+      studentData.terms.term1.push(marks[0] ?? null);
+      studentData.terms.term2.push(marks[1] ?? null);
+      studentData.terms.term3.push(marks[2] ?? null);
+    }
+
+    initChart(); // Draw chart with new data
+  } catch (error) {
+    console.error("Error loading student data:", error);
+  }
+}
 
 // Chart.js configuration
 let performanceChart = null;
@@ -38,177 +45,50 @@ const colorScheme = {
 
 // Initialize chart
 function initChart() {
-  const ctx = document.getElementById("performanceChart");
-  if (!ctx) return;
+  const ctx = document.getElementById("performanceChart").getContext("2d");
 
-  // Destroy existing chart if it exists
-  if (performanceChart) {
-    performanceChart.destroy();
+  if (chartInstance) {
+    chartInstance.destroy();
   }
 
-  const labels = studentData.subjects.map((s) => s.name);
-
-  // Define datasets for all three terms
-  const termDatasets = [
-    {
-      key: "term1",
-      label: "Term 1",
-      data: studentData.terms.term1,
-      borderColor: "rgba(239, 68, 68, 0.8)",
-      backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(239, 68, 68, 0.15)"
-          : "rgba(239, 68, 68, 0.1)",
-    },
-    {
-      key: "term2",
-      label: "Term 2",
-      data: studentData.terms.term2,
-      borderColor: "rgba(245, 158, 11, 0.8)",
-      backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(245, 158, 11, 0.15)"
-          : "rgba(245, 158, 11, 0.1)",
-    },
-    {
-      key: "term3",
-      label: "Term 3",
-      data: studentData.terms.term3,
-      borderColor: "rgba(16, 185, 129, 0.8)",
-      backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(16, 185, 129, 0.15)"
-          : "rgba(16, 185, 129, 0.1)",
-    },
-  ];
-
-  // Apply highlighting based on selected term
-  const datasets = termDatasets.map((dataset) => {
-    const isSelected = dataset.key === currentTerm;
-    return {
-      label: dataset.label,
-      data: dataset.data,
-      borderColor: isSelected
-        ? dataset.borderColor
-        : dataset.borderColor.replace("0.8", "0.3"),
-      backgroundColor: isSelected
-        ? dataset.backgroundColor
-        : dataset.backgroundColor.replace(/0\.1\d?/, "0.05"),
-      borderWidth: isSelected ? 3 : 1,
-      pointBackgroundColor: isSelected
-        ? dataset.borderColor
-        : dataset.borderColor.replace("0.8", "0.3"),
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: dataset.borderColor,
-      pointRadius: isSelected ? 4 : 3,
-      tension: 0.4,
-      fill: currentChartType === "line",
-    };
-  });
-
-  const config = {
-    type: currentChartType,
+  chartInstance = new Chart(ctx, {
+    type: currentChartType === "radar" ? "radar" : "line",
     data: {
-      labels: labels,
-      datasets: datasets,
+      labels: studentData.subjects, // <-- SUBJECT NAMES HERE
+      datasets: [
+        {
+          label: "Term 1",
+          data: studentData.terms.term1,
+          borderWidth: 2,
+          fill: false,
+        },
+        {
+          label: "Term 2",
+          data: studentData.terms.term2,
+          borderWidth: 2,
+          fill: false,
+        },
+        {
+          label: "Term 3",
+          data: studentData.terms.term3,
+          borderWidth: 2,
+          fill: false,
+        },
+      ],
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
-      aspectRatio: 2,
-      plugins: {
-        legend: {
-          display: true,
-          position: "top",
-          labels: {
-            usePointStyle: true,
-            padding: 15,
-            font: {
-              size: 12,
-              weight: "600",
-            },
-          },
-        },
-        tooltip: {
-          backgroundColor: "rgba(0, 0, 0, 0.8)",
-          padding: 12,
-          cornerRadius: 8,
-          titleFont: {
-            size: 14,
-            weight: "bold",
-          },
-          bodyFont: {
-            size: 13,
-          },
-          callbacks: {
-            label: function (context) {
-              const score = context.parsed.y || context.parsed.r;
-              const subject = studentData.subjects[context.dataIndex];
-              return `${context.dataset.label}: ${score}/100 (Grade: ${subject.grade})`;
-            },
-          },
-        },
-      },
       scales:
         currentChartType === "radar"
-          ? {
-              r: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                  stepSize: 20,
-                  font: {
-                    size: 11,
-                  },
-                },
-                pointLabels: {
-                  font: {
-                    size: 11,
-                    weight: "600",
-                  },
-                },
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-              },
-            }
-          : currentChartType === "line"
-          ? {
-              x: {
-                grid: {
-                  display: false,
-                },
-                ticks: {
-                  font: {
-                    size: 11,
-                    weight: "600",
-                  },
-                  maxRotation: 45,
-                  minRotation: 45,
-                },
-              },
+          ? {}
+          : {
               y: {
                 beginAtZero: true,
-                max: 100,
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-                ticks: {
-                  font: {
-                    size: 11,
-                  },
-                  callback: function (value) {
-                    return value + "%";
-                  },
-                },
+                suggestedMax: 100,
               },
-            }
-          : {},
+            },
     },
-  };
-
-  performanceChart = new Chart(ctx, config);
+  });
 }
 
 // Chart toggle functionality
@@ -407,17 +287,16 @@ function animateProgressBars() {
 
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
-  // Check if Chart.js is loaded
-  if (typeof Chart !== "undefined") {
-    initChart();
-    setupChartToggle();
-    setupTermSelector();
+  const studentId = document.getElementById("studentId")?.value;
+
+  if (studentId) {
+    loadStudentData(studentId); // This will call initChart() internally
   } else {
-    console.error(
-      "Chart.js is not loaded. Please include Chart.js in your HTML."
-    );
+    console.error("Student ID not found in DOM");
   }
 
+  setupChartToggle();
+  setupTermSelector();
   setupSearch();
   setupBehaviorForm();
   animateProgressBars();
