@@ -10,6 +10,8 @@ class ReportModel
         $this->pdo = Database::getInstance();
     }
 
+
+
     public function createReport(array $data)
     {
         try {
@@ -39,7 +41,7 @@ class ReportModel
 
     public function getAllReports()
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY report_date DESC, id DESC";
+        $sql = "SELECT * FROM {$this->table} ORDER BY report_date DESC, id DESC LIMIT 3";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);

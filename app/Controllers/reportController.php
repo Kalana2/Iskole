@@ -4,14 +4,20 @@ class ReportController extends Controller
 {
     public function index()
     {
-        /** @var ReportModel $model */
-        $model = $this->model('ReportModel');
-        $behaviorReports = $model->getAllReports();
+        $tab = $_GET['tab'] ?? 'Dashboard';
 
+        $behaviorReports = [];
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
 
-        $this->view('templates/report', [
+        if ($tab === 'Reports') {
+            /** @var ReportModel $reportModel */
+            $reportModel = $this->model('ReportModel');
+            $behaviorReports = $reportModel->getAllReports(); // later filter by student/teacher
+        }
+
+        $this->view('teacher/index', [
+            'tab'             => $tab,
             'behaviorReports' => $behaviorReports,
             'flash'           => $flash,
         ]);

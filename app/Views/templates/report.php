@@ -123,7 +123,7 @@ $flash = $flash ?? null;
               <form action="/index.php?url=report/submit" method="POST" >
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
-                  <select id="report_type" name="report_type" required>
+                  <select id="report_type" name="report_type" required id="behaviorForm">
                     <option value="positive" selected>Positive</option>
                     <option value="neutral">Neutral</option>
                     <option value="concern">Concern</option>

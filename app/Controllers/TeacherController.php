@@ -11,7 +11,30 @@ class TeacherController extends Controller
             return;
         }
 
-        $this->view('teacher/index');
+
+
+        // 2) Flash message (ReportController::submit එකෙන් ආ message)
+        $flash = $_SESSION['report_msg'] ?? null;
+        unset($_SESSION['report_msg']);
+
+        // 3) Default value
+        $behaviorReports = [];
+
+        // 4) මේ page එක Reports tab එකෙන් විවෘත කරද්දි විතරක් DB එකෙන් reports ගන්න
+        if (isset($_GET['tab']) && $_GET['tab'] === 'Reports') {
+            /** @var ReportModel $reportModel */
+            $reportModel = $this->model('ReportModel');
+
+            // දැන්ට නම් DB එකෙන් සියලු reports ගන්නවා
+            // (පස්සේ student/teacher අනුව filter කරන්න පුළුවන්)
+            $behaviorReports = $reportModel->getAllReports();
+        }
+
+        // 5) data එක්ක view එක load කරන්න
+        $this->view('teacher/index', [
+            'behaviorReports' => $behaviorReports,
+            'flash'           => $flash,
+        ]);
     }
 
     public function materials()
