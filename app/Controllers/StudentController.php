@@ -14,7 +14,6 @@ class StudentController extends Controller
 
         $this->view('student/index');
     }
-
     private function handleAnnouncementAction($action)
     {
         switch ($action) {

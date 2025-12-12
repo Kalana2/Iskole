@@ -14,6 +14,43 @@ class TeacherController extends Controller
         $this->view('teacher/index');
     }
 
+    public function materials()
+    {
+        // Handle material upload actions
+        if (isset($_GET['action']) && $_GET['action'] === 'create') {
+            require_once __DIR__ . '/MaterialController.php';
+            $materialController = new MaterialController();
+            $materialController->create();
+            return;
+        }
+
+        // Handle material hide action
+        if (isset($_GET['action']) && $_GET['action'] === 'hide') {
+            include_once __DIR__ . '/material/hideMaterialController.php';
+            return;
+        }
+
+        // Handle material unhide action
+        if (isset($_GET['action']) && $_GET['action'] === 'unhide') {
+            include_once __DIR__ . '/material/unhideMaterialController.php';
+            return;
+        }
+
+        if (isset($_GET['action']) && $_GET['action'] === 'delete') {
+            include_once __DIR__ . '/material/deleteMaterialController.php';
+            return;
+        }
+
+        if (isset($_GET['action']) && $_GET['action'] === 'update') {
+            require_once __DIR__ . '/material/materialController.php';
+            $materialController = new MaterialController();
+            $materialController->update();
+            return;
+        }
+
+        $this->view('teacher/materials');
+    }
+
     private function handleAnnouncementAction($action)
     {
         switch ($action) {

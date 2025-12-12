@@ -12,6 +12,9 @@ class Database
 
     private function __construct()
     {
+        // Load .env file
+        $this->loadEnv();
+
         // Load database credentials from .env file
         $this->host = getenv('MYSQL_HOST') ?: 'localhost';
         $this->port = getenv('MYSQL_PORT') ?: '3306';
@@ -41,5 +44,24 @@ class Database
             self::$instance = new Database();
         }
         return self::$instance->pdo;
+    }
+
+    private function loadEnv()
+    {
+        $envFile = __DIR__ . '/../../.env';
+        if (file_exists($envFile)) {
+            $lines = file($envFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            foreach ($lines as $line) {
+                if (strpos(trim($line), '#') === 0) {
+                    continue;
+                }
+                list($name, $value) = explode('=', $line, 2);
+                $name = trim($name);
+                $value = trim($value);
+                if (!getenv($name)) {
+                    putenv(sprintf('%s=%s', $name, $value));
+                }
+            }
+        }
     }
 }

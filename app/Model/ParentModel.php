@@ -28,4 +28,16 @@ class ParentModel extends UserModel
             throw new Exception("Error Processing Request to parent table: " . $e->getMessage());
         }
     }
+
+    public function getParentByUserId($userId)
+    {
+        $sql = "SELECT p.*, u.* FROM {$this->parentTable} p JOIN {$this->userTable} u ON p.userID = u.userID WHERE p.userID = :userId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching parent by user ID: " . $e->getMessage());
+        }
+    }
 }
