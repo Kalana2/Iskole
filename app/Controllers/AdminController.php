@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../Core/Controller.php';
+
 class AdminController extends Controller
 {
     public function index()
@@ -9,7 +11,36 @@ class AdminController extends Controller
     // timetable management page
     public function timeTable()
     {
-        $this->view('admin/timeTable');
+        $grades = [];
+        $classes = [];
+        $subjects = [];
+        $teachersMapping = [];
+        
+        try {
+            // Use the TimeTableModel to provide grades/classes/subjects/teachers mapping
+            $model = $this->model('TimeTableModel');
+            $grades = $model->getGrades();
+            $classes = $model->getClasses();
+            $subjects = $model->getSubjects();
+            $teachersMapping = $model->getTeachersMapping();
+        } catch (Throwable $e) {
+            // DB not available or connection error; leave arrays empty
+            $grades = [];
+            $classes = [];
+            $subjects = [];
+            $teachersMapping = [];
+        }
+
+        $selectedGrade = '';
+        $selectedClass = '';
+        $this->view('admin/timeTable', [
+            'grades' => $grades, 
+            'classes' => $classes, 
+            'subjects' => $subjects,
+            'teachersMapping' => $teachersMapping,
+            'selectedGrade' => $selectedGrade, 
+            'selectedClass' => $selectedClass
+        ]);
     }
 
     // Upload exam timetable image

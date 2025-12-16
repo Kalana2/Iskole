@@ -1,5 +1,11 @@
 <?php
 // Admin timetable create/edit form and preview
+$grades = $grades ?? [];
+$classes = $classes ?? [];
+$subjects = $subjects ?? [];
+$teachersMapping = $teachersMapping ?? [];
+$timetable = $timetable ?? [];
+
 $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 $periods = [
     ['time' => '07:50 - 08:30', 'label' => '1'],
@@ -25,23 +31,37 @@ $periods = [
           <p class="header-subtitle">Manage class schedule. Preview matches student timetable.</p>
         </div>
         <div class="student-info-badge">
-          <div class="info-item">
-            <span class="info-label">Grade</span>
-            <select id="gradeSelect" class="info-value">
-              <option value="10">Grade 10</option>
-              <option value="11">Grade 11</option>
-              <option value="12">Grade 12</option>
+            <div class = "info-item">
+            <label for="grade" class="info-label">Grade</label>
+            <select name="grade" id="grade" class="info-value" required>
+                <option value="">Select Grade</option>
+                <?php if (empty($grades)): ?>
+                    <option value="" disabled>No grades available</option>
+                <?php else: ?>
+                    <?php foreach ($grades as $grade): ?>
+                        <option value="<?php echo $grade['value']; ?>" <?php echo ($selectedGrade ?? '') === $grade['value'] ? 'selected' : ''; ?>>
+                            Grade <?php echo $grade['label']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </select>
-          </div>
-          <div class="info-item">
-            <span class="info-label">Class</span>
-            <select id="sectionSelect" class="info-value">
-              <option value="A">A</option>
-              <option value="B">B</option>
-              <option value="C">C</option>
-            </select>
-          </div>
-          <!-- Removed previous combined grade select and week input -->
+            </div>
+
+            <div class = "info-item">
+            <label for="class" class="info-label">Class</label>
+              <select name="class" id="class" class="info-value" required>
+                  <option value="">Select Class</option>
+                  <?php if (empty($classes)): ?>
+                      <option value="" disabled>No classes available</option>
+                  <?php else: ?>
+                      <?php foreach ($classes as $class): ?>
+                          <option value="<?php echo $class; ?>" <?php echo ($selectedClass ?? '') === $class ? 'selected' : ''; ?>>
+                              Class <?php echo $class; ?>
+                          </option>
+                      <?php endforeach; ?>
+                  <?php endif; ?>
+              </select>
+            </div>
         </div>
       </div>
     </div>
@@ -49,7 +69,6 @@ $periods = [
     <form id="timetableForm" method="post" action="/admin/timetable/save">
       <input type="hidden" name="class" id="classInput" />
       <input type="hidden" name="grade" id="gradeInput" />
-      <input type="hidden" name="section" id="sectionInput" />
 
       <div class="builder-grid">
         <table class="timetable-table">
@@ -79,16 +98,56 @@ $periods = [
                   <?php foreach ($days as $colIndex => $d): ?>
                     <td class="class-cell">
                       <div class="class-card">
-                        <div class="subject-name">
-                          <input name="cells[<?= $d ?>][<?= $rowIndex ?>][subject]" placeholder="Subject" />
+                        <!--<div class="subject-name">
+                          <select name="cells[<?= $d ?>][<?= $rowIndex ?>][subject]" class="subject-select" required>
+                              <option value="">Subject</option>
+                              <?php if (!empty($subjects)): ?>
+                                  <?php foreach ($subjects as $subject): ?>
+                                      <option value="<?php echo $subject['subjectID']; ?>">
+                                          <?php echo $subject['subjectName']; ?>
+                                      </option>
+                                  <?php endforeach; ?>
+                              <?php endif; ?>
+                          </select>
                         </div>
                         <div class="class-details">
                           <span class="teacher-name">
                             <i class="fas fa-user-tie"></i>
-                            <input name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" placeholder="Teacher" />
+                            <select name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" class="teacher-select" required>
+                                <option value="">Teacher</option>
+                            </select>
                           </span>
-                          <!-- Room input removed -->
+                        </div>-->
+                        <div class="subject-name">
+                          <select name="subject" id="subject" class="form-select" required>
+                            <option value="">Subject</option>
+                            <?php if (empty($subjects)): ?>
+                                <option value="" disabled>No subjects available</option>
+                            <?php else: ?>
+                                <?php foreach ($subjects as $subject): ?>
+                                  <option value="<?php echo $subject['value']; ?>" <?php echo $selectedSubject === $subject['value'] ? 'selected' : ''; ?>>
+                                      <?php echo $subject['label']; ?>
+                                  </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                          </select>
                         </div>
+
+                        <div class="teacher-name">
+                          <select name="teacher" id="teacher" class="form-select" required>
+                            <option value="">Teacher</option>
+                            <?php if (empty($teachers)): ?>
+                                <option value="" disabled>No teachers available</option>
+                            <?php else: ?>
+                                <?php foreach ($subjects as $subject): ?>
+                                  <option value="<?php echo $subject['value']; ?>" <?php echo $selectedSubject === $subject['value'] ? 'selected' : ''; ?>>
+                                      <?php echo $subject['label']; ?>
+                                  </option>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                          </select>
+                        </div>
+
                       </div>
                     </td>
                   <?php endforeach; ?>
@@ -136,10 +195,9 @@ $periods = [
                   <?php foreach ($days as $colIndex => $d): ?>
                     <td class="class-cell">
                       <div class="class-card">
-                        <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></div>
+                        <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" style="font-weight: bold; min-height: 20px;"></div>
                         <div class="class-details">
-                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></span></span>
-                          <!-- Room preview removed -->
+                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" style="margin-left: 5px;"></span></span>
                         </div>
                       </div>
                     </td>
@@ -158,7 +216,6 @@ $periods = [
         <div class="legend-item"><div class="legend-color today-indicator"></div><span>Today's Classes</span></div>
         <div class="legend-item"><div class="legend-color interval-indicator"></div><span>Break Time</span></div>
         <div class="legend-item"><i class="fas fa-user-tie"></i><span>Teacher Name</span></div>
-        <div class="legend-item"><i class="fas fa-door-open"></i><span>Room Number</span></div>
       </div>
     </div>
   </div>
@@ -166,39 +223,136 @@ $periods = [
 
 <script>
 (function(){
-  const gradeSel = document.getElementById('gradeSelect');
-  const sectionSel = document.getElementById('sectionSelect');
+  // Teachers mapping injected from server as JSON (safe-escaped)
+  const teachersMapping = <?php 
+    $tm = $teachersMapping ?? [];
+    echo json_encode($tm, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_SLASHES);
+  ?>;
+  const subjectsData = <?php 
+    $sd = $subjects ?? [];
+    echo json_encode($sd, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_SLASHES);
+  ?>;
+
+  const gradeSelect = document.getElementById('grade');
+  const classSelect = document.getElementById('class');
   const classInput = document.getElementById('classInput');
   const gradeInput = document.getElementById('gradeInput');
-  const sectionInput = document.getElementById('sectionInput');
   const previewBtn = document.getElementById('previewBtn');
   const previewSection = document.getElementById('previewSection');
+  const timetableForm = document.getElementById('timetableForm');
 
+  // Update hidden inputs when grade/class change
   function syncMeta(){
-    const g = gradeSel?.value || '';
-    const s = sectionSel?.value || '';
-    if(classInput) classInput.value = g && s ? (g + '-' + s) : '';
+    const g = gradeSelect?.value || '';
+    const c = classSelect?.value || '';
     if(gradeInput) gradeInput.value = g;
-    if(sectionInput) sectionInput.value = s;
+    if(classInput) classInput.value = c;
   }
-  gradeSel?.addEventListener('change', syncMeta);
-  sectionSel?.addEventListener('change', syncMeta);
+  gradeSelect?.addEventListener('change', syncMeta);
+  classSelect?.addEventListener('change', syncMeta);
   syncMeta();
 
+  // When a subject is selected, populate the corresponding teacher select
+  timetableForm.addEventListener('change', function(e) {
+    const subjectSelect = e.target.closest('.subject-select');
+    if (!subjectSelect) return;
+
+    const subjectId = subjectSelect.value;
+    const cellCard = subjectSelect.closest('.class-card');
+    const teacherSelect = cellCard.querySelector('.teacher-select');
+
+    if (!teacherSelect) return;
+
+    // Clear existing options except the placeholder
+    while (teacherSelect.options.length > 1) {
+      teacherSelect.remove(1);
+    }
+
+    // If no subject selected, leave empty
+    if (!subjectId) {
+      return;
+    }
+
+    // Populate teacher options for this subject
+    const teachersForSubject = teachersMapping[subjectId] || [];
+    if (teachersForSubject.length === 0) {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'No teachers available';
+      opt.disabled = true;
+      teacherSelect.appendChild(opt);
+      return;
+    }
+
+    teachersForSubject.forEach(function(teacher) {
+      const opt = document.createElement('option');
+      opt.value = teacher.teacherID;
+      opt.textContent = teacher.name;
+      teacherSelect.appendChild(opt);
+    });
+  });
+
+  // Fill preview table from form selections
   function fillPreview(){
     const preview = document.getElementById('previewTable');
     const inputs = document.querySelectorAll('[name^="cells["]');
     preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
 
+    // Create a map of selected values for lookup
+    const selectedMap = {};
     inputs.forEach(inp => {
-      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/); // room removed
+      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/);
       if(!m) return;
       const day = m[1];
       const row = m[2];
       const field = m[3];
-      const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
+      const key = `${day}_${row}`;
+      if(!selectedMap[key]) selectedMap[key] = {};
+      selectedMap[key][field] = inp.value;
+    });
+
+    // Map subject IDs to subject names for preview
+    const subjectMap = {};
+    subjectsData.forEach(s => {
+      subjectMap[s.subjectID] = s.subjectName;
+    });
+
+    // Update preview elements
+    inputs.forEach(inp => {
+      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/);
+      if(!m) return;
+      const day = m[1];
+      const row = m[2];
+      const field = m[3];
+      const val = inp.value;
+      
+      // Escape day for querySelector - handle special chars
+      const escapedDay = day.replace(/[\"\\]/g, '\\$&');
+      const sel = `[data-prev="${field}"][data-day="${escapedDay}"][data-row="${row}"]`;
       const target = preview.querySelector(sel);
-      if(target) target.textContent = inp.value;
+      
+      if(target) {
+        if (field === 'subject') {
+          // Show subject name instead of ID
+          target.textContent = val ? (subjectMap[val] || val) : '';
+        } else if (field === 'teacher') {
+          // Find and show teacher name
+          if (!val) {
+            target.textContent = '';
+            return;
+          }
+          let teacherName = val;
+          for (const subId in teachersMapping) {
+            if (!teachersMapping[subId]) continue;
+            const found = teachersMapping[subId].find(t => String(t.teacherID) === String(val));
+            if (found) {
+              teacherName = found.name;
+              break;
+            }
+          }
+          target.textContent = teacherName;
+        }
+      }
     });
   }
 
@@ -209,5 +363,8 @@ $periods = [
       previewSection.scrollIntoView({behavior:'smooth'});
     }
   });
+
+  // Optional: auto-fill preview on form changes
+  timetableForm.addEventListener('change', fillPreview);
 })();
 </script>
