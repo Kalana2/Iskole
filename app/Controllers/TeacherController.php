@@ -13,26 +13,44 @@ class TeacherController extends Controller
 
 
 
-        // 2) Flash message (ReportController::submit එකෙන් ආ message)
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
 
-        // 3) Default value
         $behaviorReports = [];
+        $student = null;                // ✅ NEW
+        $tab = $_GET['tab'] ?? 'Dashboard'; // ✅ NEW (keep tab)
 
-        // 4) මේ page එක Reports tab එකෙන් විවෘත කරද්දි විතරක් DB එකෙන් reports ගන්න
-        if (isset($_GET['tab']) && $_GET['tab'] === 'Reports') {
+        if ($tab === 'Reports') {
+
+
+            error_log("Teacher session classID = " . print_r($_SESSION['classID'] ?? null, true));
+            error_log("Search q = " . print_r($_GET['q'] ?? null, true));
+
+
             /** @var ReportModel $reportModel */
             $reportModel = $this->model('ReportModel');
 
-            // දැන්ට නම් DB එකෙන් සියලු reports ගන්නවා
-            // (පස්සේ student/teacher අනුව filter කරන්න පුළුවන්)
             $behaviorReports = $reportModel->getAllReports();
+
+            // ✅ NEW: search query
+            $q = trim($_GET['q'] ?? '');
+
+            // ✅ NEW: teacher class id from session (change key if your project uses different name)
+            $teacherClassId = $_SESSION['classID'] ?? null;
+
+            if ($teacherClassId && $q !== '') {
+                $student = $reportModel->findStudentInClass((int)$teacherClassId, $q);
+
+                if (!$student) {
+                    $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
+                }
+            }
         }
 
-        // 5) data එක්ක view එක load කරන්න
         $this->view('teacher/index', [
+            'tab'             => $tab,            // ✅ NEW
             'behaviorReports' => $behaviorReports,
+            'student'         => $student,        // ✅ NEW
             'flash'           => $flash,
         ]);
     }

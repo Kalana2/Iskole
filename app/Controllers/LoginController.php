@@ -31,6 +31,17 @@ class LoginController extends Controller
 
         $user = $userModel->getUserByEmail($email);
 
+
+
+        if (($user['role'] ?? null) == 2) { // 2 = teacher (ඔයාගේ system එකේ teacher role id එක)
+            $teacherExtra = $userModel->getUserByEmailWithClassID($email);
+            $_SESSION['classID'] = $teacherExtra['classID'] ?? '';
+        } else {
+            $_SESSION['classID'] = '';
+        }
+
+        error_log("LOGIN teacher classID=" . ($_SESSION['classID'] ?? 'NULL'));
+
         if (!$user || !password_verify($password, $user['password'])) {
             $this->view('login/index', [
                 'error' => 'Invalid credentials.',
@@ -62,6 +73,9 @@ class LoginController extends Controller
         $_SESSION['userEmail'] = $userEmail;
         $_SESSION['user_role'] = $userRole;
         $_SESSION['userRole'] = $userRole;
+        $_SESSION['classID'] = $user['classID'] ?? '';
+        error_log("LOGIN teacher classID=" . ($_SESSION['classID'] ?? 'NULL'));
+
 
 
         $this->roleRedirect($user['role']);

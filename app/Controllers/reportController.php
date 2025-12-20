@@ -7,18 +7,38 @@ class ReportController extends Controller
         $tab = $_GET['tab'] ?? 'Dashboard';
 
         $behaviorReports = [];
+        $student = null; // ✅ NEW
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
+
+        // ✅ NEW: read search query
+        $q = trim($_GET['q'] ?? '');
 
         if ($tab === 'Reports') {
             /** @var ReportModel $reportModel */
             $reportModel = $this->model('ReportModel');
-            $behaviorReports = $reportModel->getAllReports(); // later filter by student/teacher
+
+            // your existing reports list
+            $behaviorReports = $reportModel->getAllReports();
+
+            // ✅ NEW: teacher class id from session (change key if yours differs)
+            $teacherClassId = $_SESSION['classID'] ?? null;
+
+            // ✅ NEW: if user searched, load student details
+            if ($teacherClassId && $q !== '') {
+                $student = $reportModel->findStudentInClass($teacherClassId, $q);
+
+                // optional: flash if not found
+                if (!$student) {
+                    $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
+                }
+            }
         }
 
         $this->view('teacher/index', [
             'tab'             => $tab,
             'behaviorReports' => $behaviorReports,
+            'student'         => $student, // ✅ NEW: pass to view
             'flash'           => $flash,
         ]);
     }
@@ -30,7 +50,7 @@ class ReportController extends Controller
         // die('✅ submit reached. METHOD = ' . $_SERVER['REQUEST_METHOD'] .
         //    ' POST = ' . print_r($_POST, true));
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /teacher?tab=Reports');
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
@@ -44,7 +64,7 @@ class ReportController extends Controller
                 'type' => 'error',
                 'text' => 'Missing required fields.',
             ];
-            header('Location: /teacher?tab=Reports');
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
@@ -71,7 +91,7 @@ class ReportController extends Controller
         }
 
         // ✅ always go back to the styled teacher page
-        header('Location: /teacher?tab=Reports');
+        header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
 }

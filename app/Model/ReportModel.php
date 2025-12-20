@@ -46,4 +46,44 @@ class ReportModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    public function findStudentInClass(int $classId, string $q): ?array
+    {
+        $sql = "
+        SELECT
+            s.studentID,
+            s.classID,
+            s.gradeID,
+            u.email,
+            u.phone,
+            u.dateOfBirth,
+            un.firstName,
+            un.lastName
+        FROM students s
+        INNER JOIN user u ON u.userID = s.userID
+        LEFT JOIN userName un ON un.userID = s.userID
+        WHERE s.classID = :class_id
+          AND (
+                s.studentID = :exact
+             OR u.email LIKE :like
+             OR u.phone LIKE :like
+             OR CONCAT(IFNULL(un.firstName,''),' ',IFNULL(un.lastName,'')) LIKE :like
+             OR un.firstName LIKE :like
+             OR un.lastName LIKE :like
+          )
+        LIMIT 1
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([
+            ':class_id' => $classId,
+            ':exact'    => $q,
+            ':like'     => "%$q%",
+        ]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
 }

@@ -3,6 +3,7 @@
 // Controller එකෙන් එන data
 $behaviorReports = $behaviorReports ?? [];
 $flash = $flash ?? null;
+$student = $student ?? null;
 ?>
 
 <?php if ($flash): ?>
@@ -27,54 +28,90 @@ $flash = $flash ?? null;
     </header>
 
     <div class="center-container card">
+
+
+
       <div class="search-container">
-        <input type="text" placeholder="Search student..." id="searchInput">
-        <button type="submit" class="search-btn">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-          Search
-        </button>
+        <form method="GET" action="/index.php" style="display: contents;">
+          <input type="hidden" name="url" value="teacher">
+          <input type="hidden" name="tab" value="Reports">
+
+          <input
+            type="text"
+            placeholder="Search student..."
+            id="searchInput"
+            name="q"
+            value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+
+          <button type="submit" class="search-btn">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM18 18l-4.35-4.35"
+                stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            Search
+          </button>
+        </form>
       </div>
+
+
+
+
+
+
+
 
       <div class="student-container">
         <!-- Student Details Card -->
-        <div class="student-info-card">
-          <div class="student-avatar">
-            <div class="avatar-circle">
-              <span>SS</span>
-            </div>
-          </div>
-          <div class="details">
-            <h2 class="student-name">Seniru Senaweera</h2>
-            <div class="info-grid">
-              <div class="info-item">
-                <span class="label">Grade:</span>
-                <span class="value">06</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Class:</span>
-                <span class="value">A</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Student ID:</span>
-                <span class="value">101</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Email:</span>
-                <span class="value">seniru@gmail.com</span>
-              </div>
-              <div class="info-item">
-                <span class="label">Phone:</span>
-                <span class="value">+94702222676</span>
-              </div>
-              <div class="info-item">
-                <span class="label">DOB:</span>
-                <span class="value">2013-06-01</span>
+        <?php if (!empty($student)): ?>
+          <div class="student-info-card">
+            <div class="student-avatar">
+              <div class="avatar-circle">
+                <?php
+                $fn = $student['firstName'] ?? '';
+                $ln = $student['lastName'] ?? '';
+                $initials = strtoupper(mb_substr($fn, 0, 1) . mb_substr($ln, 0, 1));
+                if ($initials === '') $initials = 'S';
+                ?>
+                <span><?= htmlspecialchars($initials) ?></span>
               </div>
             </div>
+
+            <div class="details">
+              <!-- ✅ REPLACE your <h2> with this line -->
+              <h2 class="student-name">
+                <?= htmlspecialchars(trim(($student['firstName'] ?? '') . ' ' . ($student['lastName'] ?? '')) ?: 'N/A') ?>
+              </h2>
+
+              <div class="info-grid">
+                <div class="info-item"><span class="label">Grade:</span>
+                  <span class="value"><?= htmlspecialchars($student['gradeID'] ?? 'N/A') ?></span>
+                </div>
+                <div class="info-item"><span class="label">Class:</span>
+                  <span class="value"><?= htmlspecialchars($student['classID'] ?? 'N/A') ?></span>
+                </div>
+                <div class="info-item"><span class="label">Student ID:</span>
+                  <span class="value"><?= htmlspecialchars($student['studentID'] ?? 'N/A') ?></span>
+                </div>
+                <div class="info-item"><span class="label">Email:</span>
+                  <span class="value"><?= htmlspecialchars($student['email'] ?? 'N/A') ?></span>
+                </div>
+                <div class="info-item"><span class="label">Phone:</span>
+                  <span class="value"><?= htmlspecialchars($student['phone'] ?? 'N/A') ?></span>
+                </div>
+                <div class="info-item"><span class="label">DOB:</span>
+                  <span class="value"><?= htmlspecialchars($student['dateOfBirth'] ?? 'N/A') ?></span>
+                </div>
+              </div>
+            </div>
           </div>
-        </div>
+
+        <?php elseif (!empty($_GET['q'])): ?>
+          <div class="empty-state">
+            <div class="empty-icon">🔎</div>
+            <h3>No Student Found</h3>
+            <p>This student is not in your class.</p>
+          </div>
+        <?php endif; ?>
 
         <!-- Performance Overview Cards -->
         <div class="stats-overview">
@@ -120,7 +157,7 @@ $flash = $flash ?? null;
           <div class="behavior-form-wrapper">
             <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
-              <form action="/index.php?url=report/submit" method="POST" >
+              <form action="/index.php?url=report/submit" method="POST">
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
                   <select id="report_type" name="report_type" required id="behaviorForm">
@@ -156,12 +193,12 @@ $flash = $flash ?? null;
             <?php if (!empty($behaviorReports)): ?>
               <?php foreach ($behaviorReports as $report): ?>
                 <?php
-                  $reportDate = isset($report['report_date']) && $report['report_date'] !== '' ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
-                  $reportType = $report['report_type'] ?? 'neutral';
-                  $teacherName = $report['teacher_name'] ?? 'Unknown Teacher';
-                  $teacherSubject = $report['teacher_subject'] ?? '';
-                  $category = $report['category'] ?? 'General';
-                  $typeIcons = [ 'positive' => '✓', 'neutral' => '◉', 'concern' => '⚠' ];
+                $reportDate = isset($report['report_date']) && $report['report_date'] !== '' ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
+                $reportType = $report['report_type'] ?? 'neutral';
+                $teacherName = $report['teacher_name'] ?? 'Unknown Teacher';
+                $teacherSubject = $report['teacher_subject'] ?? '';
+                $category = $report['category'] ?? 'General';
+                $typeIcons = ['positive' => '✓', 'neutral' => '◉', 'concern' => '⚠'];
                 ?>
                 <div class="behavior-report <?php echo htmlspecialchars($reportType); ?>" data-type="<?php echo htmlspecialchars($reportType); ?>">
                   <div class="report-header">
