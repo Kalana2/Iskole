@@ -162,4 +162,53 @@ class ApiController extends Controller
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Handle teacher attendance submission
+     */
+    public function teacherAttendance()
+    {
+        header('Content-Type: application/json');
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method Not Allowed']);
+            return;
+        }
+
+        try {
+            if (!isset($_SESSION['user_id'])) {
+                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+                return;
+            }
+
+            require_once __DIR__ . '/../Model/teacherAttendance.php';
+
+            $raw = file_get_contents('php://input');
+            $data = json_decode($raw, true);
+
+            $date = $data['date'] ?? null;
+            $attendance = $data['attendance'] ?? [];
+
+            if (!$date || empty($attendance)) {
+                echo json_encode(['success' => false, 'message' => 'Invalid data: date and attendance are required']);
+                return;
+            }
+
+            $teacherAttendanceModel = new TeacherAttendance();
+
+            foreach ($attendance as $teacherId => $status) {
+                $ok = $teacherAttendanceModel->updateAttendance($teacherId, $date, $status);
+                if (!$ok) {
+                    echo json_encode(['success' => false, 'message' => 'Failed to record attendance for teacher ID: ' . $teacherId]);
+                    return;
+                }
+            }
+
+            echo json_encode(['success' => true, 'message' => 'Attendance submitted successfully']);
+        } catch (Exception $e) {
+            error_log('Teacher Attendance API Error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }

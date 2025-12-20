@@ -66,4 +66,16 @@ class TeacherModel extends UserModel
             throw new Exception("Error fetching teacher by user ID: " . $e->getMessage());
         }
     }
+
+    public function getAllTeachers()
+    {
+        $sql = "SELECT t.*, u.*, s.* FROM `{$this->teacherTable}` t JOIN `{$this->userTable}` u ON t.`userID` = u.`userID` JOIN `subject` s ON t.`subjectID` = s.`subjectID`";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching all teachers: " . $e->getMessage());
+        }
+    }
 }
