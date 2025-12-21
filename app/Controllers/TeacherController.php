@@ -5,41 +5,37 @@ class TeacherController extends Controller
 {
     public function index()
     {
-        // Handle announcement actions
+        // Handle announcement actions (✅ DO NOT CHANGE)
         if (isset($_GET['action']) && in_array($_GET['action'], ['delete', 'update'])) {
             $this->handleAnnouncementAction($_GET['action']);
             return;
         }
 
+        // ✅ NEW: handle tabs + reports search
+        $tab = $_GET['tab'] ?? 'Dashboard';
 
+        $behaviorReports = [];
+        $student = null;
 
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
 
-        $behaviorReports = [];
-        $student = null;                // ✅ NEW
-        $tab = $_GET['tab'] ?? 'Dashboard'; // ✅ NEW (keep tab)
+        $q = trim($_GET['q'] ?? '');
 
         if ($tab === 'Reports') {
-
-
-            error_log("Teacher session classID = " . print_r($_SESSION['classID'] ?? null, true));
-            error_log("Search q = " . print_r($_GET['q'] ?? null, true));
-
-
             /** @var ReportModel $reportModel */
             $reportModel = $this->model('ReportModel');
 
+            // Recent behavior reports (your existing UI uses this)
             $behaviorReports = $reportModel->getAllReports();
 
-            // ✅ NEW: search query
-            $q = trim($_GET['q'] ?? '');
-
-            // ✅ NEW: teacher class id from session (change key if your project uses different name)
+            // Teacher class id from session (make sure this is set at login)
             $teacherClassId = $_SESSION['classID'] ?? null;
 
-            if ($teacherClassId && $q !== '') {
-                $student = $reportModel->findStudentInClass((int)$teacherClassId, $q);
+            // If searched, load student details
+            if (!empty($teacherClassId) && $q !== '') {
+                $student = $this->findStudentInClass((int)$teacherClassId, $q);
+
 
                 if (!$student) {
                     $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
@@ -47,13 +43,15 @@ class TeacherController extends Controller
             }
         }
 
+        // ✅ IMPORTANT: pass data to the view
         $this->view('teacher/index', [
-            'tab'             => $tab,            // ✅ NEW
+            'tab' => $tab,
             'behaviorReports' => $behaviorReports,
-            'student'         => $student,        // ✅ NEW
-            'flash'           => $flash,
+            'student' => $student,
+            'flash' => $flash,
         ]);
     }
+
 
     public function materials()
     {
@@ -102,5 +100,12 @@ class TeacherController extends Controller
                 include_once __DIR__ . '/announcement/updateAnnouncementController.php';
                 break;
         }
+    }
+
+
+    public function findStudentInClass($classId, $query)
+    {
+        $model = $this->model('UserModel');
+        return $model->findStudentInClass((int)$classId, $query);
     }
 }
