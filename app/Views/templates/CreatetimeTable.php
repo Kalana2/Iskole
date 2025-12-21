@@ -3,9 +3,9 @@
 $grades = $grades ?? [];
 $classes = $classes ?? [];
 $subjects = $subjects ?? [];
-$teachersMapping = $teachersMapping ?? [];
-$timetable = $timetable ?? [];
-
+$teachers = $teachersMapping ?? [];
+$selectedGrade = $selectedGrade ?? '';
+$selectedClass = $selectedClass ?? '';
 $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 $periods = [
     ['time' => '07:50 - 08:30', 'label' => '1'],
@@ -31,44 +31,47 @@ $periods = [
           <p class="header-subtitle">Manage class schedule. Preview matches student timetable.</p>
         </div>
         <div class="student-info-badge">
-            <div class = "info-item">
-            <label for="grade" class="info-label">Grade</label>
-            <select name="grade" id="grade" class="info-value" required>
-                <option value="">Select Grade</option>
-                <?php if (empty($grades)): ?>
-                    <option value="" disabled>No grades available</option>
-                <?php else: ?>
-                    <?php foreach ($grades as $grade): ?>
-                        <option value="<?php echo $grade['value']; ?>" <?php echo ($selectedGrade ?? '') === $grade['value'] ? 'selected' : ''; ?>>
-                            Grade <?php echo $grade['label']; ?>
-                        </option>
-                    <?php endforeach; ?>
-                <?php endif; ?>
+          <div class="info-item">
+            <span class="info-label">Grade</span>
+            <select name="grade" id="gradeSelect" class="info-value" required>
+              <option value="">Select Grade</option>
+              <?php if (empty($grades)): ?>
+                <option value="" disabled>No grades available</option>
+              <?php else: ?>
+                <?php foreach ($grades as $grade): ?>
+                  <option value="<?php echo $grade['value']; ?>" <?php echo $selectedGrade === $grade['value'] ? 'selected' : ''; ?>>
+                    Grade <?php echo $grade['label']; ?>
+                  </option>
+                <?php endforeach; ?>
+              <?php endif; ?>
             </select>
-            </div>
-
-            <div class = "info-item">
-            <label for="class" class="info-label">Class</label>
-              <select name="class" id="class" class="info-value" required>
-                  <option value="">Select Class</option>
-                  <?php if (empty($classes)): ?>
-                      <option value="" disabled>No classes available</option>
-                  <?php else: ?>
-                      <?php foreach ($classes as $class): ?>
-                          <option value="<?php echo $class; ?>" <?php echo ($selectedClass ?? '') === $class ? 'selected' : ''; ?>>
-                              Class <?php echo $class; ?>
-                          </option>
-                      <?php endforeach; ?>
-                  <?php endif; ?>
-              </select>
-            </div>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Class</span>
+            <select name="classId" id="sectionSelect" class="info-value" required>
+              <option value="">Select Class</option>
+              <?php if (empty($classes)): ?>
+                <option value="" disabled>No classes available</option>
+              <?php else: ?>
+                <?php foreach ($classes as $class): ?>
+                  <?php // $class may be either an ID or a name depending on model; support both ?>
+                  <?php $classValue = is_array($class) && isset($class['classID']) ? $class['classID'] : (is_array($class) && isset($class['class']) ? $class['class'] : $class); ?>
+                  <?php $classLabel = is_array($class) && isset($class['class']) ? $class['class'] : $class; ?>
+                  <option value="<?php echo $classValue; ?>" <?php echo (string)$selectedClass === (string)$classValue ? 'selected' : ''; ?>>
+                    Class <?php echo $classLabel; ?>
+                  </option>
+                <?php endforeach; ?>
+              <?php endif; ?>
+            </select>
+          </div>
         </div>
       </div>
     </div>
 
     <form id="timetableForm" method="post" action="/admin/timetable/save">
-      <input type="hidden" name="class" id="classInput" />
+      <input type="hidden" name="classId" id="classInput" />
       <input type="hidden" name="grade" id="gradeInput" />
+      <input type="hidden" name="section" id="sectionInput" />
 
       <div class="builder-grid">
         <table class="timetable-table">
@@ -98,56 +101,38 @@ $periods = [
                   <?php foreach ($days as $colIndex => $d): ?>
                     <td class="class-cell">
                       <div class="class-card">
-                        <!--<div class="subject-name">
-                          <select name="cells[<?= $d ?>][<?= $rowIndex ?>][subject]" class="subject-select" required>
-                              <option value="">Subject</option>
-                              <?php if (!empty($subjects)): ?>
-                                  <?php foreach ($subjects as $subject): ?>
-                                      <option value="<?php echo $subject['subjectID']; ?>">
-                                          <?php echo $subject['subjectName']; ?>
-                                      </option>
-                                  <?php endforeach; ?>
-                              <?php endif; ?>
+                        <div class="subject-name">
+                          <select name="cells[<?= $d ?>][<?= $rowIndex ?>][subjectId]" placeholder="Subject" required>
+                            <option value="">Subject</option>
+                            <?php if (empty($subjects)): ?>
+                              <option value="" disabled>No subjects available</option>
+                            <?php else: ?>
+                              <?php foreach ($subjects as $subject): ?>
+                                <option value="<?php echo $subject['subjectID']; ?>">
+                                  <?php echo htmlspecialchars($subject['subjectName']); ?>
+                                </option>
+                              <?php endforeach; ?>
+                            <?php endif; ?>
                           </select>
                         </div>
                         <div class="class-details">
                           <span class="teacher-name">
                             <i class="fas fa-user-tie"></i>
-                            <select name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" class="teacher-select" required>
-                                <option value="">Teacher</option>
+                            <select name="cells[<?= $d ?>][<?= $rowIndex ?>][teacherId]" placeholder="Teacher" required>
+                              <option value="">Teacher</option>
+                              <?php if (empty($teachers)): ?>
+                                <option value="" disabled>No teachers available</option>
+                              <?php else: ?>
+                                <?php foreach ($teachers as $subId => $tlist): ?>
+                                  <?php foreach ($tlist as $t): ?>
+                                    <option value="<?php echo $t['teacherID']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
+                                  <?php endforeach; ?>
+                                <?php endforeach; ?>
+                              <?php endif; ?>
                             </select>
                           </span>
-                        </div>-->
-                        <div class="subject-name">
-                          <select name="subject" id="subject" class="form-select" required>
-                            <option value="">Subject</option>
-                            <?php if (empty($subjects)): ?>
-                                <option value="" disabled>No subjects available</option>
-                            <?php else: ?>
-                                <?php foreach ($subjects as $subject): ?>
-                                  <option value="<?php echo $subject['value']; ?>" <?php echo $selectedSubject === $subject['value'] ? 'selected' : ''; ?>>
-                                      <?php echo $subject['label']; ?>
-                                  </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                          </select>
+                          <!-- Room input removed -->
                         </div>
-
-                        <div class="teacher-name">
-                          <select name="teacher" id="teacher" class="form-select" required>
-                            <option value="">Teacher</option>
-                            <?php if (empty($teachers)): ?>
-                                <option value="" disabled>No teachers available</option>
-                            <?php else: ?>
-                                <?php foreach ($subjects as $subject): ?>
-                                  <option value="<?php echo $subject['value']; ?>" <?php echo $selectedSubject === $subject['value'] ? 'selected' : ''; ?>>
-                                      <?php echo $subject['label']; ?>
-                                  </option>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                          </select>
-                        </div>
-
                       </div>
                     </td>
                   <?php endforeach; ?>
@@ -195,9 +180,10 @@ $periods = [
                   <?php foreach ($days as $colIndex => $d): ?>
                     <td class="class-cell">
                       <div class="class-card">
-                        <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" style="font-weight: bold; min-height: 20px;"></div>
+                        <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></div>
                         <div class="class-details">
-                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" style="margin-left: 5px;"></span></span>
+                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></span></span>
+                          <!-- Room preview removed -->
                         </div>
                       </div>
                     </td>
@@ -216,6 +202,7 @@ $periods = [
         <div class="legend-item"><div class="legend-color today-indicator"></div><span>Today's Classes</span></div>
         <div class="legend-item"><div class="legend-color interval-indicator"></div><span>Break Time</span></div>
         <div class="legend-item"><i class="fas fa-user-tie"></i><span>Teacher Name</span></div>
+        <div class="legend-item"><i class="fas fa-door-open"></i><span>Room Number</span></div>
       </div>
     </div>
   </div>
@@ -223,136 +210,39 @@ $periods = [
 
 <script>
 (function(){
-  // Teachers mapping injected from server as JSON (safe-escaped)
-  const teachersMapping = <?php 
-    $tm = $teachersMapping ?? [];
-    echo json_encode($tm, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_SLASHES);
-  ?>;
-  const subjectsData = <?php 
-    $sd = $subjects ?? [];
-    echo json_encode($sd, JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_UNESCAPED_SLASHES);
-  ?>;
-
-  const gradeSelect = document.getElementById('grade');
-  const classSelect = document.getElementById('class');
+  const gradeSel = document.getElementById('gradeSelect');
+  const sectionSel = document.getElementById('sectionSelect');
   const classInput = document.getElementById('classInput');
   const gradeInput = document.getElementById('gradeInput');
+  const sectionInput = document.getElementById('sectionInput');
   const previewBtn = document.getElementById('previewBtn');
   const previewSection = document.getElementById('previewSection');
-  const timetableForm = document.getElementById('timetableForm');
 
-  // Update hidden inputs when grade/class change
   function syncMeta(){
-    const g = gradeSelect?.value || '';
-    const c = classSelect?.value || '';
+    const g = gradeSel?.value || '';
+    const c = sectionSel?.value || '';
+    if(classInput) classInput.value = c; // classId expected by controller
     if(gradeInput) gradeInput.value = g;
-    if(classInput) classInput.value = c;
+    if(sectionInput) sectionInput.value = c;
   }
-  gradeSelect?.addEventListener('change', syncMeta);
-  classSelect?.addEventListener('change', syncMeta);
+  gradeSel?.addEventListener('change', syncMeta);
+  sectionSel?.addEventListener('change', syncMeta);
   syncMeta();
 
-  // When a subject is selected, populate the corresponding teacher select
-  timetableForm.addEventListener('change', function(e) {
-    const subjectSelect = e.target.closest('.subject-select');
-    if (!subjectSelect) return;
-
-    const subjectId = subjectSelect.value;
-    const cellCard = subjectSelect.closest('.class-card');
-    const teacherSelect = cellCard.querySelector('.teacher-select');
-
-    if (!teacherSelect) return;
-
-    // Clear existing options except the placeholder
-    while (teacherSelect.options.length > 1) {
-      teacherSelect.remove(1);
-    }
-
-    // If no subject selected, leave empty
-    if (!subjectId) {
-      return;
-    }
-
-    // Populate teacher options for this subject
-    const teachersForSubject = teachersMapping[subjectId] || [];
-    if (teachersForSubject.length === 0) {
-      const opt = document.createElement('option');
-      opt.value = '';
-      opt.textContent = 'No teachers available';
-      opt.disabled = true;
-      teacherSelect.appendChild(opt);
-      return;
-    }
-
-    teachersForSubject.forEach(function(teacher) {
-      const opt = document.createElement('option');
-      opt.value = teacher.teacherID;
-      opt.textContent = teacher.name;
-      teacherSelect.appendChild(opt);
-    });
-  });
-
-  // Fill preview table from form selections
   function fillPreview(){
     const preview = document.getElementById('previewTable');
     const inputs = document.querySelectorAll('[name^="cells["]');
     preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
 
-    // Create a map of selected values for lookup
-    const selectedMap = {};
     inputs.forEach(inp => {
-      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/);
+      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/); // room removed
       if(!m) return;
       const day = m[1];
       const row = m[2];
       const field = m[3];
-      const key = `${day}_${row}`;
-      if(!selectedMap[key]) selectedMap[key] = {};
-      selectedMap[key][field] = inp.value;
-    });
-
-    // Map subject IDs to subject names for preview
-    const subjectMap = {};
-    subjectsData.forEach(s => {
-      subjectMap[s.subjectID] = s.subjectName;
-    });
-
-    // Update preview elements
-    inputs.forEach(inp => {
-      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/);
-      if(!m) return;
-      const day = m[1];
-      const row = m[2];
-      const field = m[3];
-      const val = inp.value;
-      
-      // Escape day for querySelector - handle special chars
-      const escapedDay = day.replace(/[\"\\]/g, '\\$&');
-      const sel = `[data-prev="${field}"][data-day="${escapedDay}"][data-row="${row}"]`;
+      const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
       const target = preview.querySelector(sel);
-      
-      if(target) {
-        if (field === 'subject') {
-          // Show subject name instead of ID
-          target.textContent = val ? (subjectMap[val] || val) : '';
-        } else if (field === 'teacher') {
-          // Find and show teacher name
-          if (!val) {
-            target.textContent = '';
-            return;
-          }
-          let teacherName = val;
-          for (const subId in teachersMapping) {
-            if (!teachersMapping[subId]) continue;
-            const found = teachersMapping[subId].find(t => String(t.teacherID) === String(val));
-            if (found) {
-              teacherName = found.name;
-              break;
-            }
-          }
-          target.textContent = teacherName;
-        }
-      }
+      if(target) target.textContent = inp.value;
     });
   }
 
@@ -363,8 +253,5 @@ $periods = [
       previewSection.scrollIntoView({behavior:'smooth'});
     }
   });
-
-  // Optional: auto-fill preview on form changes
-  timetableForm.addEventListener('change', fillPreview);
 })();
 </script>
