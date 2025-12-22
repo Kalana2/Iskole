@@ -1,4 +1,5 @@
 <?php
+
 class AdminController extends Controller
 {
     public function index()
@@ -6,12 +7,6 @@ class AdminController extends Controller
         // Handle announcement actions
         if (isset($_GET['action']) && in_array($_GET['action'], ['delete', 'update'])) {
             $this->handleAnnouncementAction($_GET['action']);
-            return;
-        }
-        
-        // Handle timetable actions
-        if (isset($_GET['timetable_action']) && in_array($_GET['timetable_action'], ['create', 'read', 'update', 'delete'])) {
-            $this->handleTimetableAction($_GET['timetable_action']);
             return;
         }
 
@@ -26,24 +21,6 @@ class AdminController extends Controller
                 break;
             case 'update':
                 include_once __DIR__ . '/announcement/updateAnnouncementController.php';
-                break;
-        }
-    }
-
-    private function handleTimetableAction($action)
-    {
-        switch ($action) {
-            case 'create':
-                include_once __DIR__ . '/timeTable/createTimetableController.php';
-                break;
-            case 'read':
-                include_once __DIR__ . '/timeTable/readTimetableController.php';
-                break;
-            case 'update':
-                include_once __DIR__ . '/timeTable/updateTimetableController.php';
-                break;
-            case 'delete':
-                include_once __DIR__ . '/timeTable/deleteTimetableController.php';
                 break;
         }
     }

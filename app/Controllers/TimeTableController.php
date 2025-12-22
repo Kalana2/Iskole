@@ -3,155 +3,146 @@ require_once __DIR__ . '/../Core/Controller.php';
 
 class TimeTableController extends Controller
 {
-	public function index()
-	{
-		$model = $this->model('TimeTableModel');
-		$grades = $model->getGrades();
-		$classes = $model->getClasses();
-		$subjects = $model->getSubjects();
-		$teachersMapping = $model->getTeachersMapping();
+    private function baseData($model, $selectedGrade = '')
+    {
+        return [
+            'grades' => $model->getGrades(),
+            'classes' => $selectedGrade
+                ? $model->getClassesByGrade($selectedGrade)
+                : [],
+            'subjects' => $model->getSubjects(),
+            'teachersMapping' => $model->getTeachersMapping(),
+            'days' => $model->getDays(),       // keep dayID + day
+            'periods' => $model->getPeriods(),
+        ];
+    }
 
-		$this->view('admin/timeTable', [
-			'grades' => $grades,
-			'classes' => $classes,
-			'subjects' => $subjects,
-			'teachersMapping' => $teachersMapping,
-			'selectedGrade' => '',
-			'selectedClass' => ''
-		]);
-	}
+    // Initial page load
+    public function index()
+    {
+        $model = $this->model('TimeTableModel');
 
-	// Load timetable for a specific class
-	public function getTimetable($classId = null)
-	{
-		$model = $this->model('TimeTableModel');
-		$grades = $model->getGrades();
-		$classes = $model->getClasses();
-		$subjects = $model->getSubjects();
-		$teachersMapping = $model->getTeachersMapping();
+        $selectedGrade = $_GET['grade'] ?? '';
+        $selectedClass = $_GET['class'] ?? '';
 
-		$timetable = [];
-		if ($classId) {
-			$timetable = $model->getTimetableByClass($classId);
-		}
+        $data = $this->baseData($model, $selectedGrade);
 
-		$this->view('admin/timeTable', [
-			'grades' => $grades,
-			'classes' => $classes,
-			'subjects' => $subjects,
-			'teachersMapping' => $teachersMapping,
-			'selectedGrade' => '',
-			'selectedClass' => $classId ?? '',
-			'timetable' => $timetable
-		]);
-	}
+        $data['selectedGrade'] = $selectedGrade;
+        $data['selectedClass'] = $selectedClass;
+        $data['timetable'] = $selectedClass
+            ? $model->getTimetableByClass($selectedClass)
+            : [];
 
-	// Save or update a timetable slot
-	public function save()
-	{
-		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-			http_response_code(405);
-			echo json_encode(['error' => 'Method not allowed']);
-			return;
-		}
+        $this->view('admin/timeTable', $data);
+    }
 
-		$model = $this->model('TimeTableModel');
-		$teacherId = $_POST['teacherId'] ?? null;
-		$dayId = $_POST['dayId'] ?? null;
-		$periodId = $_POST['periodId'] ?? null;
-		$classId = $_POST['classId'] ?? null;
-		$subjectId = $_POST['subjectId'] ?? null;
+    // Alias (optional route compatibility)
+    public function getTimetable($classId = null)
+    {
+        $_GET['class'] = $classId;
+        $this->index();
+    }
 
-		if (!$teacherId || !$dayId || !$periodId || !$classId || !$subjectId) {
-			http_response_code(400);
-			echo json_encode(['error' => 'Missing required fields']);
-			return;
-		}
+    // Save or update a timetable slot
+    public function save()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
 
-		$result = $model->insertSlot($teacherId, $dayId, $periodId, $classId, $subjectId);
+        $required = ['teacherId', 'dayId', 'periodId', 'classId', 'subjectId'];
+        foreach ($required as $field) {
+            if (empty($_POST[$field])) {
+                http_response_code(400);
+                echo json_encode(['error' => "Missing {$field}"]);
+                return;
+            }
+        }
 
-		if ($result) {
-			echo json_encode(['success' => true, 'message' => 'Slot saved successfully']);
-		} else {
-			http_response_code(500);
-			echo json_encode(['error' => 'Failed to save slot']);
-		}
-	}
+        $model = $this->model('TimeTableModel');
 
-	// Update an existing slot
-	public function update()
-	{
-		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-			http_response_code(405);
-			echo json_encode(['error' => 'Method not allowed']);
-			return;
-		}
+        $result = $model->insertOrUpdateSlot(
+            $_POST['teacherId'],
+            $_POST['dayId'],
+            $_POST['periodId'],
+            $_POST['classId'],
+            $_POST['subjectId']
+        );
 
-		$model = $this->model('TimeTableModel');
-		$id = $_POST['id'] ?? null;
-		$subjectId = $_POST['subjectId'] ?? null;
-		$teacherId = $_POST['teacherId'] ?? null;
+        echo json_encode([
+            'success' => (bool)$result,
+            'message' => $result ? 'Slot saved successfully' : 'Failed to save slot'
+        ]);
+    }
 
-		if (!$id || !$subjectId || !$teacherId) {
-			http_response_code(400);
-			echo json_encode(['error' => 'Missing required fields']);
-			return;
-		}
+    // Update slot explicitly
+    public function update()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
 
-		$result = $model->updateSlot($id, $subjectId, $teacherId);
+        if (empty($_POST['id']) || empty($_POST['subjectId']) || empty($_POST['teacherId'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing required fields']);
+            return;
+        }
 
-		if ($result) {
-			echo json_encode(['success' => true, 'message' => 'Slot updated successfully']);
-		} else {
-			http_response_code(500);
-			echo json_encode(['error' => 'Failed to update slot']);
-		}
-	}
+        $model = $this->model('TimeTableModel');
+        $result = $model->updateSlot(
+            $_POST['id'],
+            $_POST['subjectId'],
+            $_POST['teacherId']
+        );
 
-	// Delete a slot
-	public function delete()
-	{
-		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-			http_response_code(405);
-			echo json_encode(['error' => 'Method not allowed']);
-			return;
-		}
+        echo json_encode([
+            'success' => (bool)$result,
+            'message' => $result ? 'Slot updated successfully' : 'Failed to update slot'
+        ]);
+    }
 
-		$model = $this->model('TimeTableModel');
-		$id = $_POST['id'] ?? null;
+    // Delete slot
+    public function delete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            http_response_code(405);
+            echo json_encode(['error' => 'Method not allowed']);
+            return;
+        }
 
-		if (!$id) {
-			http_response_code(400);
-			echo json_encode(['error' => 'Missing slot ID']);
-			return;
-		}
+        if (empty($_POST['id'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing slot ID']);
+            return;
+        }
 
-		$result = $model->deleteSlot($id);
+        $model = $this->model('TimeTableModel');
+        $result = $model->deleteSlot($_POST['id']);
 
-		if ($result) {
-			echo json_encode(['success' => true, 'message' => 'Slot deleted successfully']);
-		} else {
-			http_response_code(500);
-			echo json_encode(['error' => 'Failed to delete slot']);
-		}
-	}
+        echo json_encode([
+            'success' => (bool)$result,
+            'message' => $result ? 'Slot deleted successfully' : 'Failed to delete slot'
+        ]);
+    }
 
-	// API: get teachers by subject
-	public function getTeachersBySubject()
-	{
-		header('Content-Type: application/json');
-		$subjectId = $_GET['subjectId'] ?? null;
+    // API: get teachers by subject
+    public function getTeachersBySubject()
+    {
+        header('Content-Type: application/json');
 
-		if (!$subjectId) {
-			http_response_code(400);
-			echo json_encode(['error' => 'Missing subjectId']);
-			return;
-		}
+        if (empty($_GET['subjectId'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Missing subjectId']);
+            return;
+        }
 
-		$model = $this->model('TimeTableModel');
-		$teachers = $model->getTeachersBySubject($subjectId);
-
-		echo json_encode(['teachers' => $teachers]);
-	}
+        $model = $this->model('TimeTableModel');
+        echo json_encode([
+            'teachers' => $model->getTeachersBySubject($_GET['subjectId'])
+        ]);
+    }
 }
-

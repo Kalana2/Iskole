@@ -6,18 +6,30 @@ $subjects = $subjects ?? [];
 $teachers = $teachersMapping ?? [];
 $selectedGrade = $selectedGrade ?? '';
 $selectedClass = $selectedClass ?? '';
-$days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
-$periods = [
-    ['time' => '07:50 - 08:30', 'label' => '1'],
-    ['time' => '08:30 - 09:10', 'label' => '2'],
-    ['time' => '09:10 - 09:50', 'label' => '3'],
-    ['time' => '09:50 - 10:30', 'label' => '4'],
-    ['time' => '10:30 - 10:50', 'label' => 'INTERVAL'],
-    ['time' => '10:50 - 11:30', 'label' => '5'],
-    ['time' => '11:30 - 12:10', 'label' => '6'],
-    ['time' => '12:10 - 12:50', 'label' => '7'],
-    ['time' => '12:50 - 01:30', 'label' => '8']
-];
+$days = $days ?? [];
+if (empty($days)) {
+    $days = [
+        ['id' => 1, 'day' => 'Monday'],
+        ['id' => 2, 'day' => 'Tuesday'],
+        ['id' => 3, 'day' => 'Wednesday'],
+        ['id' => 4, 'day' => 'Thursday'],
+        ['id' => 5, 'day' => 'Friday']
+    ];
+}
+$periods = $periods ?? [];
+if (empty($periods)) {
+  // Use keys expected by the template: 'label' and 'time'.
+  $periods = [
+    ['label' => 1, 'time' => '07:50 - 08:30'],
+    ['label' => 2, 'time' => '08:30 - 09:10'],
+    ['label' => 3, 'time' => '09:10 - 09:50'],
+    ['label' => 4, 'time' => '09:50 - 10:30'],
+    ['label' => 5, 'time' => '10:50 - 11:30'],
+    ['label' => 6, 'time' => '11:30 - 12:10'],
+    ['label' => 7, 'time' => '12:10 - 12:50'],
+    ['label' => 8, 'time' => '12:50 - 13:30']
+  ];
+}
 ?>
 <link rel="stylesheet" href="/css/CreateTimeTable/CreateTimeTable.css">
 <link rel="stylesheet" href="/css/studentTimetable/studentTimetable.css">
@@ -79,7 +91,11 @@ $periods = [
             <tr>
               <th class="time-column sticky-column">Time</th>
               <?php foreach ($days as $d): ?>
-                <th class="day-column"><div class="day-header"><span class="day-name"><?= $d ?></span></div></th>
+                <th class="day-column">
+                  <div class="day-header">
+                    <span class="day-name"><?= htmlspecialchars($d['day']) ?></span>
+                  </div>
+                </th>
               <?php endforeach; ?>
             </tr>
           </thead>
@@ -102,7 +118,7 @@ $periods = [
                     <td class="class-cell">
                       <div class="class-card">
                         <div class="subject-name">
-                          <select name="cells[<?= $d ?>][<?= $rowIndex ?>][subjectId]" placeholder="Subject" required>
+                          <select class="subject-select" name="cells[<?= $d['id'] ?>][<?= $rowIndex ?>][subjectId]">
                             <option value="">Subject</option>
                             <?php if (empty($subjects)): ?>
                               <option value="" disabled>No subjects available</option>
@@ -118,17 +134,15 @@ $periods = [
                         <div class="class-details">
                           <span class="teacher-name">
                             <i class="fas fa-user-tie"></i>
-                            <select name="cells[<?= $d ?>][<?= $rowIndex ?>][teacherId]" placeholder="Teacher" required>
+                            <select class="teacher-select" name="cells[<?= $d['id'] ?>][<?= $rowIndex ?>][teacherId]" required>
                               <option value="">Teacher</option>
-                              <?php if (empty($teachers)): ?>
-                                <option value="" disabled>No teachers available</option>
-                              <?php else: ?>
-                                <?php foreach ($teachers as $subId => $tlist): ?>
-                                  <?php foreach ($tlist as $t): ?>
-                                    <option value="<?php echo $t['teacherID']; ?>"><?php echo htmlspecialchars($t['name']); ?></option>
-                                  <?php endforeach; ?>
+                              <?php foreach ($teachers as $subId => $tlist): ?>
+                                <?php foreach ($tlist as $t): ?>
+                                  <option value="<?= $t['teacherID']; ?>" data-subject="<?= $subId; ?>" style="display:none;">
+                                    <?= htmlspecialchars($t['name']); ?>
+                                  </option>
                                 <?php endforeach; ?>
-                              <?php endif; ?>
+                              <?php endforeach; ?>
                             </select>
                           </span>
                           <!-- Room input removed -->
@@ -157,8 +171,8 @@ $periods = [
           <thead>
             <tr>
               <th class="time-column sticky-column">Time</th>
-              <?php foreach ($days as $d): ?>
-                <th class="day-column"><div class="day-header"><span class="day-name"><?= $d ?></span></div></th>
+                <?php foreach ($days as $d): ?>
+                <th class="day-column"><div class="day-header"><span class="day-name"><?= htmlspecialchars($d['day']) ?></span></div></th>
               <?php endforeach; ?>
             </tr>
           </thead>
@@ -180,9 +194,9 @@ $periods = [
                   <?php foreach ($days as $colIndex => $d): ?>
                     <td class="class-cell">
                       <div class="class-card">
-                        <div class="subject-name" data-prev="subject" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></div>
+                        <div class="subject-name" data-prev="subject" data-day="<?= $d['id'] ?>" data-row="<?= $rowIndex ?>"></div>
                         <div class="class-details">
-                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>"></span></span>
+                          <span class="teacher-name"><i class="fas fa-user-tie"></i> <span data-prev="teacher" data-day="<?= $d['id'] ?>" data-row="<?= $rowIndex ?>"></span></span>
                           <!-- Room preview removed -->
                         </div>
                       </div>
@@ -235,14 +249,22 @@ $periods = [
     preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
 
     inputs.forEach(inp => {
-      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subject|teacher)\]$/); // room removed
+      const m = inp.name.match(/^cells\[(.*?)\]\[(\d+)\]\[(subjectId|teacherId)\]$/);
       if(!m) return;
       const day = m[1];
       const row = m[2];
       const field = m[3];
-      const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
+      const key = field.replace(/Id$/, ''); // subjectId -> subject
+      let value = '';
+      if (inp.tagName === 'SELECT') {
+        const opt = inp.options[inp.selectedIndex];
+        value = opt ? opt.text : '';
+      } else {
+        value = inp.value;
+      }
+      const sel = `[data-prev="${key}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
       const target = preview.querySelector(sel);
-      if(target) target.textContent = inp.value;
+      if(target) target.textContent = value;
     });
   }
 
@@ -254,4 +276,24 @@ $periods = [
     }
   });
 })();
+
+
+document.addEventListener('change', function (e) {
+  if (!e.target.classList.contains('subject-select')) return;
+
+  const subjectId = e.target.value;
+  const cell = e.target.closest('.class-card');
+  const teacherSelect = cell.querySelector('.teacher-select');
+
+  // Reset teacher dropdown
+  teacherSelect.value = '';
+
+  [...teacherSelect.options].forEach(option => {
+    if (!option.dataset.subject) return;
+
+    option.style.display =
+      option.dataset.subject === subjectId ? 'block' : 'none';
+  });
+});
+
 </script>
