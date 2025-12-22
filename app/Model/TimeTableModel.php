@@ -1,5 +1,7 @@
 <?php
 
+include_once __DIR__ . '/../Core/Database.php';
+
 class TimeTableModel
 {
     protected $pdo;
