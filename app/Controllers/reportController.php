@@ -55,6 +55,20 @@ class ReportController extends Controller
         }
 
 
+
+
+        $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? null);
+
+        if (!$teacherUserId) {
+            $_SESSION['report_msg'] = [
+                'type' => 'error',
+                'text' => 'Teacher not logged in.'
+            ];
+            header('Location: /index.php?url=teacher&tab=Reports');
+            exit;
+        }
+
+
         $studentID = $_POST['studentID'] ?? null;
 
         if (!$studentID) {
@@ -86,6 +100,7 @@ class ReportController extends Controller
 
             $model->createReport([
                 'studentID'   => (int)$studentID,
+                'teacherID'   => (int)$teacherUserId, 
                 'report_type' => $reportType,
                 'category'    => $category,
                 'title'       => $title,

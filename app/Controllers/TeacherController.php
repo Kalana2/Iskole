@@ -27,7 +27,9 @@ class TeacherController extends Controller
             $reportModel = $this->model('ReportModel');
 
             // Recent behavior reports (your existing UI uses this)
-            $behaviorReports = $reportModel->getAllReports();
+            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+            $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
+
 
             // Teacher class id from session (make sure this is set at login)
             $teacherClassId = $_SESSION['classID'] ?? null;

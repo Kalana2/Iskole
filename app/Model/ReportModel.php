@@ -16,12 +16,13 @@ class ReportModel
     {
         try {
             $sql = "INSERT INTO {$this->table}
-                    (studentID,report_type, category, title, description, report_date)
-                    VALUES (:studentID,:type, :category, :title, :description, NOW())";
+                    (studentID,teacherID,report_type, category, title, description, report_date)
+                    VALUES (:studentID,:teacherID,:type, :category, :title, :description, NOW())";
 
             $stmt = $this->pdo->prepare($sql);
             $ok = $stmt->execute([
                 ':studentID'   => $data['studentID'],
+                ':teacherID'   => $data['teacherID'],
                 ':type'        => $data['report_type'],
                 ':category'    => $data['category'],
                 ':title'       => $data['title'],
@@ -76,11 +77,6 @@ class ReportModel
 
 
 
-
-
-
-
-
     public function findStudentInClass(int $classId, string $q): ?array
     {
         $sql = "
@@ -118,5 +114,16 @@ class ReportModel
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
+    }
+
+
+    public function getReportsByTeacher(int $teacherId): array
+    {
+        $sql = "SELECT * FROM report
+            WHERE teacherID = :tid
+            ORDER BY report_date DESC, id DESC";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':tid' => $teacherId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 }
