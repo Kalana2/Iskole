@@ -54,6 +54,18 @@ class ReportController extends Controller
             exit;
         }
 
+
+        $studentID = $_POST['studentID'] ?? null;
+
+        if (!$studentID) {
+            $_SESSION['report_msg'] = [
+                'type' => 'error',
+                'text' => 'Please search and select a student before adding a report.'
+            ];
+            header('Location: /index.php?url=teacher&tab=Reports');
+            exit;
+        }
+
         $reportType  = $_POST['report_type'] ?? null;
         $category    = trim($_POST['category'] ?? '');
         $title       = trim($_POST['title'] ?? '');
@@ -73,6 +85,7 @@ class ReportController extends Controller
             $model = $this->model('ReportModel');
 
             $model->createReport([
+                'studentID'   => (int)$studentID,
                 'report_type' => $reportType,
                 'category'    => $category,
                 'title'       => $title,

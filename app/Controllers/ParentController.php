@@ -11,7 +11,25 @@ class ParentController extends Controller
             return;
         }
 
-        $this->view('parent/index');
+
+        $tab = $_GET['tab'] ?? 'Dashboard';
+
+        // ✅ If Behavior tab -> load reports and view parentBehavior
+        if ($tab === 'Behavior') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            $reportModel = $this->model('ReportModel');
+            $behaviorReports = $reportModel->getReportsForParent((int)$parentUserId);
+
+            $this->view('parent/index', [
+                'tab' => $tab,
+                'behaviorReports' => $behaviorReports
+            ]);
+            return;
+        }
+
+        // default
+        $this->view('parent/index', ['tab' => $tab]);
     }
 
     private function handleAnnouncementAction($action)
@@ -85,5 +103,26 @@ class ParentController extends Controller
         $diff = $from->diff($to);
 
         return $diff->days + 1; // +1 to include both start and end dates
+    }
+
+
+
+    public function behavior()
+    {
+        $parentUserId = $_SESSION['userId'] ?? 0;
+
+
+
+        if (!$parentUserId) {
+            header('Location: /login');
+            exit;
+        }
+
+        $reportModel = $this->model('ReportModel');
+        $behaviorReports = $reportModel->getReportsForParent((int)$parentUserId);
+
+        $this->view('parent/parentBehavior', [
+            'behaviorReports' => $behaviorReports
+        ]);
     }
 }

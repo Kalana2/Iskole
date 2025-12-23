@@ -73,7 +73,25 @@ class LoginController extends Controller
         $_SESSION['userEmail'] = $userEmail;
         $_SESSION['user_role'] = $userRole;
         $_SESSION['userRole'] = $userRole;
-        $_SESSION['classID'] = $user['classID'] ?? '';
+        //$_SESSION['classID'] = $user['classID'] ?? '';
+        // ✅ classID should come from teachers join result, not from getUserByEmail()
+        if ($userRole === 2) {
+            $teacherExtra = $userModel->getUserByEmailWithClassID($email);
+            $_SESSION['classID'] = $teacherExtra['classID'] ?? '';
+        } else {
+            $_SESSION['classID'] = '';
+        }
+
+
+
+
+
+
+
+
+
+
+
         error_log("LOGIN teacher classID=" . ($_SESSION['classID'] ?? 'NULL'));
 
 

@@ -158,6 +158,12 @@ $student = $student ?? null;
             <h3 class="report-title">Add Behavior Report</h3>
             <div class="behavior-update">
               <form action="/index.php?url=report/submit" method="POST">
+
+
+                <?php if (!empty($student)): ?>
+                  <input type="hidden" name="studentID" value="<?= htmlspecialchars($student['studentID']) ?>">
+                <?php endif; ?>
+
                 <div class="form-row">
                   <label for="report_type">Report Type</label>
                   <select id="report_type" name="report_type" required id="behaviorForm">

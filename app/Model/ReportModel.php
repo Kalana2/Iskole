@@ -16,11 +16,12 @@ class ReportModel
     {
         try {
             $sql = "INSERT INTO {$this->table}
-                    (report_type, category, title, description, report_date)
-                    VALUES (:type, :category, :title, :description, NOW())";
+                    (studentID,report_type, category, title, description, report_date)
+                    VALUES (:studentID,:type, :category, :title, :description, NOW())";
 
             $stmt = $this->pdo->prepare($sql);
             $ok = $stmt->execute([
+                ':studentID'   => $data['studentID'],
                 ':type'        => $data['report_type'],
                 ':category'    => $data['category'],
                 ':title'       => $data['title'],
@@ -46,6 +47,38 @@ class ReportModel
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+    public function getReportsForParent(int $parentUserId): array
+    {
+        $sql = "
+        SELECT
+            r.*,
+            CONCAT(IFNULL(un.firstName,''),' ',IFNULL(un.lastName,'')) AS teacher_name
+        FROM report r
+        INNER JOIN parents p
+            ON p.studentID = r.studentID
+           AND p.userID = :parentUserId
+        LEFT JOIN teachers t
+            ON t.userID = r.teacherID
+        LEFT JOIN userName un
+            ON un.userID = t.userID
+        ORDER BY r.report_date DESC, r.id DESC
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':parentUserId' => $parentUserId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+
+
+
 
 
     public function findStudentInClass(int $classId, string $q): ?array
