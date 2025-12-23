@@ -1,6 +1,6 @@
 <header class="header">
     <link rel="stylesheet" type="text/css" href="/css/header/header.css">
-    <link rel="stylesheet" href="/css/navigation/navigation.css">
+    <link rel="stylesheet" type="text/css" href="/css/navigation/navigation.css">
 
     <div class="header-container">
         <div class="header-left">
