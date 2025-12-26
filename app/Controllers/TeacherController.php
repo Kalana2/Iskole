@@ -16,6 +16,7 @@ class TeacherController extends Controller
 
         $behaviorReports = [];
         $student = null;
+        $leaveRequests = [];
 
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
@@ -45,12 +46,21 @@ class TeacherController extends Controller
             }
         }
 
+        if ($tab === 'Leave') {
+            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            $leaveModel = $this->model('LeaveRequestModel');
+            $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
+        }
+
+
         // ✅ IMPORTANT: pass data to the view
         $this->view('teacher/index', [
             'tab' => $tab,
             'behaviorReports' => $behaviorReports,
             'student' => $student,
             'flash' => $flash,
+            'leaveRequests' => $leaveRequests,
         ]);
     }
 

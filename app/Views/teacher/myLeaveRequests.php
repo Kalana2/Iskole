@@ -20,49 +20,29 @@
     </div>
 
     <div class="ann-grid" role="list">
+
+
+
+
         <?php
         // Expecting: $leaveRequests = [ [ 'type' => '', 'dateFrom' => '', 'dateTo' => '', 'reason' => '', 'requestedDate' => '', 'status' => 'pending|approved|rejected' ], ... ]
         $now = date('Y-m-d');
-        $sample = [
-            [
-                'type' => 'Medical Leave',
-                'dateFrom' => '2025-01-15',
-                'dateTo' => '2025-01-17',
-                'reason' => 'Medical checkup and recovery period as advised by doctor.',
-                'requestedDate' => '2025-01-10',
-                'status' => 'approved',
-                'duration' => 3,
-            ],
-            [
-                'type' => 'Personal Leave',
-                'dateFrom' => '2025-02-20',
-                'dateTo' => '2025-02-21',
-                'reason' => 'Family event requiring my presence.',
-                'requestedDate' => '2025-02-15',
-                'status' => 'pending',
-                'duration' => 2,
-            ],
-            [
-                'type' => 'Duty Leave',
-                'dateFrom' => '2025-01-05',
-                'dateTo' => '2025-01-05',
-                'reason' => 'Attending educational workshop at the district office.',
-                'requestedDate' => '2025-01-02',
-                'status' => 'approved',
-                'duration' => 1,
-            ],
-            [
-                'type' => 'Medical Leave',
-                'dateFrom' => '2024-12-10',
-                'dateTo' => '2024-12-12',
-                'reason' => 'Flu and fever, doctor recommended rest.',
-                'requestedDate' => '2024-12-08',
-                'status' => 'rejected',
-                'duration' => 3,
-            ],
-        ];
-        $list = isset($leaveRequests) && is_array($leaveRequests) ? $leaveRequests : $sample;
+
+        $list = isset($leaveRequests) && is_array($leaveRequests) ? $leaveRequests : [];
+
         ?>
+
+        <?php if (empty($list)): ?>
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No Leave Requests</h3>
+                <p>You haven’t submitted any leave requests yet.</p>
+            </div>
+        <?php else: ?>
+
+
+
+
 
         <?php foreach ($list as $i => $req): ?>
             <?php
@@ -75,19 +55,35 @@
                 'rejected' => 'badge',
             ][$status] ?? 'badge';
             ?>
+
+            <?php
+            $type = ucfirst($req['leaveType'] ?? '');
+
+            $requestedDate = !empty($req['createdAt'])
+                ? date('Y-m-d', strtotime($req['createdAt']))
+                : '';
+
+            $duration = 1;
+            if (!empty($req['dateFrom']) && !empty($req['dateTo'])) {
+                $from = new DateTime($req['dateFrom']);
+                $to   = new DateTime($req['dateTo']);
+                $duration = $from->diff($to)->days + 1;
+            }
+            ?>
+
             <article role="listitem" class="<?php echo implode(' ', $classes); ?>" tabindex="0"
-                aria-label="Leave Request: <?php echo htmlspecialchars($req['type'] ?? ''); ?>">
+                aria-label="Leave Request: <?php echo htmlspecialchars($type ?? ''); ?>">
                 <div class="ann-card-header">
                     <div class="ann-badges">
                         <span class="<?php echo $statusColor; ?>"
                             aria-label="<?php echo $statusLabel; ?>"><?php echo $statusLabel; ?></span>
-                        <span class="badge"><?php echo htmlspecialchars($req['type'] ?? ''); ?></span>
+                        <span class="badge"><?php echo htmlspecialchars($type ?? ''); ?></span>
                     </div>
                     <time class="ann-date"
-                        datetime="<?php echo htmlspecialchars($req['requestedDate'] ?? ''); ?>">Requested: <?php echo htmlspecialchars($req['requestedDate'] ?? ''); ?></time>
+                        datetime="<?php echo htmlspecialchars($requestedDate ?? ''); ?>">Requested: <?php echo htmlspecialchars($requestedDate ?? ''); ?></time>
                 </div>
 
-                <h3 class="ann-title-text"><?php echo htmlspecialchars($req['type'] ?? ''); ?> - <?php echo htmlspecialchars($req['duration'] ?? ''); ?> Day(s)</h3>
+                <h3 class="ann-title-text"><?php echo htmlspecialchars($type ?? ''); ?> - <?php echo htmlspecialchars($duration ?? ''); ?> Day(s)</h3>
                 <p class="ann-body"><?php echo htmlspecialchars($req['reason'] ?? ''); ?></p>
 
                 <div class="ann-meta">
@@ -99,11 +95,19 @@
                     <button class="btn ghost" type="button">View Details</button>
                     <div class="spacer"></div>
                     <?php if ($status === 'pending'): ?>
-                        <button class="btn" type="button">Cancel Request</button>
+                        <form action="/index.php?url=leave/cancel" method="post" style="display:inline;">
+                            <input type="hidden" name="leave_id" value="<?= (int)$req['id'] ?>">
+                            <button class="btn" type="submit"
+                                onclick="return confirm('Cancel this leave request?')">
+                                Cancel Request
+                            </button>
+                        </form>
                     <?php endif; ?>
+
                 </div>
             </article>
         <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </section>
 
