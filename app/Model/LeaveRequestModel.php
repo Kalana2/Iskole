@@ -71,4 +71,34 @@ class LeaveRequestModel
             ':id'      => $leaveId
         ]);
     }
+
+
+    // Manager: get ONLY pending requests
+    public function getPending(): array
+    {
+        $sql = "SELECT lr.*
+            FROM leave_requests lr
+            WHERE lr.status = 'pending'
+            ORDER BY lr.createdAt DESC";
+        return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    // Manager: approve/reject (status update)
+    public function updateStatus(int $id, int $managerUserID, string $status, ?string $comment = null): bool
+    {
+        $sql = "UPDATE leave_requests
+            SET status = :status,
+                managerUserID = :mid,
+                managerComment = :comment,
+                decidedAt = NOW()
+            WHERE id = :id AND status = 'pending'";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':status' => $status,
+            ':mid' => $managerUserID,
+            ':comment' => $comment,
+            ':id' => $id
+        ]);
+        return $stmt->rowCount() > 0;
+    }
 }

@@ -14,16 +14,13 @@ class LeaveController extends Controller
 
         $leaveModel = $this->model('LeaveRequestModel');
 
-        // ✅ teacherගේ leave requests DB එකෙන්
         $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
 
-        // ✅ teacher tab view එකට pass කරනවා
         $this->view('teacher/index', [
             'tab' => 'Leave',
             'leaveRequests' => $leaveRequests
         ]);
     }
-
 
     // POST: submit leave request
     public function submit()
@@ -66,8 +63,6 @@ class LeaveController extends Controller
         exit;
     }
 
-
-
     public function cancel()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -93,6 +88,31 @@ class LeaveController extends Controller
         }
 
         header('Location: /index.php?url=teacher&tab=Leave');
+        exit;
+    }
+
+    // ✅ ADD THIS METHOD HERE (cancel() එකට පස්සේ)
+    public function decide()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: /index.php?url=mp&tab=Requests');
+            exit;
+        }
+
+        $leaveId = (int)($_POST['leave_id'] ?? 0);
+        $status  = $_POST['status'] ?? '';
+        $managerUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+        if (!$leaveId || !in_array($status, ['approved', 'rejected'], true)) {
+            header('Location: /index.php?url=mp&tab=Requests');
+            exit;
+        }
+
+        $leaveModel = $this->model('LeaveRequestModel');
+        $leaveModel->decide($leaveId, (int)$managerUserId, $status, null);
+
+        // ✅ IMPORTANT: stay in manager panel
+        header('Location: /index.php?url=mp&tab=Requests');
         exit;
     }
 }

@@ -12,8 +12,24 @@ class Mpcontroller extends UserController
             return;
         }
 
-        $this->view('mp/index');
+        // ✅ add tab handling
+        $tab = $_GET['tab'] ?? 'Announcements';
+
+        // ✅ default data array
+        $data = [
+            'tab' => $tab
+        ];
+
+        // ✅ Requests tab → load pending leave requests
+        if ($tab === 'Requests') {
+            $leaveModel = $this->model('LeaveRequestModel');
+            $data['pendingLeaves'] = $leaveModel->getPending();
+        }
+
+        // ✅ pass $data to view
+        $this->view('mp/index', $data);
     }
+
 
     private function handleAnnouncementAction($action)
     {
