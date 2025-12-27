@@ -13,5 +13,18 @@ if (!isset($days)) { $days = []; }
 if (!isset($periods)) { $periods = []; }
 if (!isset($timetable)) { $timetable = []; }
 
-include_once __DIR__ . '/../templates/CreatetimeTable.php';
+// When this view is included from the Admin tab system, it doesn't go through
+// TimeTableController::index(), so we populate the dropdown data here.
+if (empty($grades) || empty($subjects)) {
+	require_once __DIR__ . '/../../Model/TimeTableModel.php';
+	$model = new TimeTableModel();
+	if (empty($grades)) {
+		$grades = $model->getGrades();
+	}
+	if (empty($subjects)) {
+		$subjects = $model->getSubjects();
+	}
+}
+
+include_once __DIR__ . '/../templates/ClassTimeTable.php';
 ?>

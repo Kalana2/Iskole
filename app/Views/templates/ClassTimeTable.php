@@ -2,6 +2,7 @@
 // Admin timetable create/edit form and preview
 $grades = $grades ?? [];
 $classes = $classes ?? [];
+$subjects = $subjects ?? [];
 $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 $periods = [
     ['time' => '07:50 - 08:30', 'label' => '1'],
@@ -49,11 +50,11 @@ $periods = [
               <?php if (empty($classes)): ?>
                   <option value="" disabled>No classes available</option>
               <?php else: ?>
-                  <?php foreach ($classes as $class): ?>
-                      <option value="<?php echo $class; ?>" <?php echo $selectedClass === $class ? 'selected' : ''; ?>>
-                          Class <?php echo $class; ?>
-                      </option>
-                  <?php endforeach; ?>
+                <?php foreach ($classes as $class): ?>
+                  <option value="<?php echo htmlspecialchars($class['value']); ?>" <?php echo $selectedClass === (string)$class['value'] ? 'selected' : ''; ?>>
+                    Class <?php echo htmlspecialchars($class['label']); ?>
+                  </option>
+                <?php endforeach; ?>
               <?php endif; ?>
             </select>
           </div>
@@ -62,7 +63,7 @@ $periods = [
       </div>
     </div>
 
-    <form id="timetableForm" method="post" action="/admin/timetable/save">
+    <form id="timetableForm" method="post" action="/timetable/save">
       <input type="hidden" name="class" id="classInput" />
       <input type="hidden" name="grade" id="gradeInput" />
       <input type="hidden" name="section" id="sectionInput" />
@@ -96,12 +97,19 @@ $periods = [
                     <td class="class-cell">
                       <div class="class-card">
                         <div class="subject-name">
-                          <input name="cells[<?= $d ?>][<?= $rowIndex ?>][subject]" placeholder="Subject" />
+                          <select class="subject-select" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" name="cells[<?= $d ?>][<?= $rowIndex ?>][subject]">
+                            <option value="">Select Subject</option>
+                            <?php foreach ($subjects as $sub): ?>
+                              <option value="<?php echo htmlspecialchars($sub['value']); ?>"><?php echo htmlspecialchars($sub['label']); ?></option>
+                            <?php endforeach; ?>
+                          </select>
                         </div>
                         <div class="class-details">
                           <span class="teacher-name">
                             <i class="fas fa-user-tie"></i>
-                            <input name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" placeholder="Teacher" />
+                            <select class="teacher-select" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" disabled>
+                              <option value="">Select Teacher</option>
+                            </select>
                           </span>
                           <!-- Room input removed -->
                         </div>
@@ -190,16 +198,171 @@ $periods = [
   const previewBtn = document.getElementById('previewBtn');
   const previewSection = document.getElementById('previewSection');
 
+  const teachersCache = new Map();
+
+  function clearAllTeacherSelects(){
+    document.querySelectorAll('.teacher-select').forEach(sel => {
+      sel.innerHTML = '<option value="">Select Teacher</option>';
+      sel.disabled = true;
+    });
+  }
+
+  async function loadClasses(grade){
+    if(!sectionSel) return;
+    sectionSel.innerHTML = '<option value="">Select Class</option>';
+    if(!grade) return;
+    try{
+      const res = await fetch(`/timetable/getClasses?grade=${encodeURIComponent(grade)}`);
+      const rows = await res.json();
+      rows.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r.value;
+        opt.textContent = `Class ${r.label}`;
+        sectionSel.appendChild(opt);
+      });
+    }catch(e){
+      console.error('Failed to load classes', e);
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Error loading classes';
+      sectionSel.appendChild(opt);
+    }
+  }
+
+  async function loadTeachersForCell(subjectID, teacherSelect){
+    const grade = gradeSel?.value || '';
+    const classID = sectionSel?.value || '';
+    if(!teacherSelect) return;
+    teacherSelect.innerHTML = '<option value="">Select Teacher</option>';
+    teacherSelect.disabled = true;
+    if(!subjectID || !grade || !classID) return;
+
+    const cacheKey = `${grade}|${classID}|${subjectID}`;
+    if(teachersCache.has(cacheKey)){
+      const cached = teachersCache.get(cacheKey);
+      cached.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.value;
+        opt.textContent = t.label;
+        teacherSelect.appendChild(opt);
+      });
+      teacherSelect.disabled = false;
+      return;
+    }
+
+    try{
+      const res = await fetch(`/timetable/getTeachers?subjectID=${encodeURIComponent(subjectID)}&grade=${encodeURIComponent(grade)}&classID=${encodeURIComponent(classID)}`);
+      const rows = await res.json();
+      teachersCache.set(cacheKey, rows);
+      rows.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.value;
+        opt.textContent = t.label;
+        teacherSelect.appendChild(opt);
+      });
+      teacherSelect.disabled = false;
+    }catch(e){
+      console.error('Failed to load teachers', e);
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = 'Error loading teachers';
+      teacherSelect.appendChild(opt);
+      teacherSelect.disabled = true;
+    }
+  }
+
+  function clearAllSubjectSelects(){
+    document.querySelectorAll('.subject-select').forEach(sel => {
+      sel.value = '';
+    });
+  }
+
+  async function loadTimetableForSelectedClass(){
+    const classID = sectionSel?.value || '';
+    if(!classID) {
+      clearAllSubjectSelects();
+      clearAllTeacherSelects();
+      return;
+    }
+    try{
+      const res = await fetch(`/timetable/getTimetable?classID=${encodeURIComponent(classID)}`);
+      const data = await res.json();
+      const cells = (data && data.cells) ? data.cells : {};
+
+      // reset
+      clearAllSubjectSelects();
+      clearAllTeacherSelects();
+
+      // set subjects first
+      Object.keys(cells).forEach(day => {
+        const rows = cells[day] || {};
+        Object.keys(rows).forEach(row => {
+          const entry = rows[row] || {};
+          const subj = String(entry.subjectID || '');
+          const sel = document.querySelector(`.subject-select[data-day="${CSS.escape(day)}"][data-row="${CSS.escape(row)}"]`);
+          if(sel instanceof HTMLSelectElement && subj){
+            sel.value = subj;
+          }
+        });
+      });
+
+      // then load teachers per cell and set selected teacher
+      const tasks = [];
+      Object.keys(cells).forEach(day => {
+        const rows = cells[day] || {};
+        Object.keys(rows).forEach(row => {
+          const entry = rows[row] || {};
+          const subj = String(entry.subjectID || '');
+          const tid = String(entry.teacherID || '');
+          const teacherSel = document.querySelector(`.teacher-select[data-day="${CSS.escape(day)}"][data-row="${CSS.escape(row)}"]`);
+          if(teacherSel instanceof HTMLSelectElement && subj){
+            const p = loadTeachersForCell(subj, teacherSel).then(() => {
+              if(tid) teacherSel.value = tid;
+            });
+            tasks.push(p);
+          }
+        });
+      });
+      await Promise.all(tasks);
+    }catch(e){
+      console.error('Failed to load timetable', e);
+    }
+  }
+
   function syncMeta(){
     const g = gradeSel?.value || '';
     const s = sectionSel?.value || '';
-    if(classInput) classInput.value = g && s ? (g + '-' + s) : '';
+    if(classInput) classInput.value = s;
     if(gradeInput) gradeInput.value = g;
-    if(sectionInput) sectionInput.value = s;
+  if(sectionInput) sectionInput.value = s;
   }
-  gradeSel?.addEventListener('change', syncMeta);
-  sectionSel?.addEventListener('change', syncMeta);
+
+  gradeSel?.addEventListener('change', async () => {
+    await loadClasses(gradeSel.value);
+    teachersCache.clear();
+    clearAllTeacherSelects();
+		clearAllSubjectSelects();
+    syncMeta();
+  });
+  sectionSel?.addEventListener('change', () => {
+    teachersCache.clear();
+    clearAllTeacherSelects();
+    syncMeta();
+		loadTimetableForSelectedClass();
+  });
   syncMeta();
+
+  // Cell subject -> teacher dependent dropdown
+  document.addEventListener('change', (e) => {
+    const target = e.target;
+    if(!(target instanceof HTMLSelectElement)) return;
+    if(!target.classList.contains('subject-select')) return;
+    const cell = target.closest('.class-card');
+    const teacherSel = cell ? cell.querySelector('.teacher-select') : null;
+    if(teacherSel instanceof HTMLSelectElement){
+      loadTeachersForCell(target.value, teacherSel);
+    }
+  });
 
   function fillPreview(){
     const preview = document.getElementById('previewTable');
@@ -214,7 +377,13 @@ $periods = [
       const field = m[3];
       const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
       const target = preview.querySelector(sel);
-      if(target) target.textContent = inp.value;
+		if(!target) return;
+		if(inp instanceof HTMLSelectElement){
+			const label = inp.selectedOptions && inp.selectedOptions.length ? inp.selectedOptions[0].textContent : '';
+			target.textContent = (inp.value ? (label || '') : '');
+		} else {
+			target.textContent = inp.value;
+		}
     });
   }
 
