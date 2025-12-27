@@ -9,6 +9,9 @@ if (!isset($subjects)) { $subjects = []; }
 if (!isset($teachersMapping)) { $teachersMapping = []; }
 if (!isset($selectedGrade)) { $selectedGrade = ''; }
 if (!isset($selectedClass)) { $selectedClass = ''; }
+if (!isset($days)) { $days = []; }
+if (!isset($periods)) { $periods = []; }
+if (!isset($timetable)) { $timetable = []; }
 
 include_once __DIR__ . '/../templates/CreatetimeTable.php';
 ?>
