@@ -1,32 +1,28 @@
-// Student data
-let studentData = {
-  subjects: [],
-  terms: { term1: [], term2: [], term3: [] },
+// Fallback/dummy data (used on dashboards that don't yet fetch marks)
+const fallbackStudentData = {
+  subjects: [
+    { name: "Religion", score: 89, grade: "A" },
+    { name: "Sinhala", score: 77, grade: "A" },
+    { name: "Mathematics", score: 92, grade: "A" },
+    { name: "Science", score: 88, grade: "A" },
+    { name: "English", score: 85, grade: "A" },
+    { name: "History", score: 60, grade: "C" },
+    { name: "Geography", score: 73, grade: "B" },
+    { name: "Health & PE", score: 74, grade: "B" },
+    { name: "Tamil", score: 99, grade: "A" },
+    { name: "Aesthetics", score: 55, grade: "C" },
+    { name: "Citizenship", score: 30, grade: "W" },
+    { name: "Practical Skills", score: 45, grade: "S" },
+  ],
+  terms: {
+    term1: [85, 70, 88, 82, 80, 55, 68, 70, 95, 50, 25, 40],
+    term2: [87, 74, 90, 85, 83, 58, 70, 72, 97, 53, 28, 42],
+    term3: [89, 77, 92, 88, 85, 60, 73, 74, 99, 55, 30, 45],
+  },
 };
 
-async function loadStudentData(studentId) {
-  try {
-    const response = await fetch(`/Report/getStudentMarks/${studentId}`);
-    const data = await response.json();
-
-    // Extract subjects from the model (these become chart labels)
-    studentData.subjects = data.subjects.map((s) => s.name);
-
-    // Convert PHP structure into term arrays
-    studentData.terms = { term1: [], term2: [], term3: [] };
-
-    for (const subjectName in data.terms) {
-      const marks = data.terms[subjectName]; // [t1, t2, t3]
-      studentData.terms.term1.push(marks[0] ?? null);
-      studentData.terms.term2.push(marks[1] ?? null);
-      studentData.terms.term3.push(marks[2] ?? null);
-    }
-
-    initChart(); // Draw chart with new data
-  } catch (error) {
-    console.error("Error loading student data:", error);
-  }
-}
+// Live student marks data (loaded from DB for My Marks)
+let studentData = null;
 
 // Chart.js configuration
 let performanceChart = null;
@@ -45,50 +41,330 @@ const colorScheme = {
 
 // Initialize chart
 function initChart() {
-  const ctx = document.getElementById("performanceChart").getContext("2d");
+  const ctx = document.getElementById("performanceChart");
+  if (!ctx) return;
 
-  if (chartInstance) {
-    chartInstance.destroy();
+  if (
+    !studentData ||
+    !studentData.subjects ||
+    studentData.subjects.length === 0
+  ) {
+    // No data to draw yet
+    return;
   }
 
-  chartInstance = new Chart(ctx, {
-    type: currentChartType === "radar" ? "radar" : "line",
+  // Destroy existing chart if it exists
+  if (performanceChart) {
+    performanceChart.destroy();
+  }
+
+  const labels = studentData.subjects.map((s) => s.name);
+
+  // Define datasets for all three terms
+  const termDatasets = [
+    {
+      key: "term1",
+      label: "Term 1",
+      data: studentData.terms.term1,
+      termKey: "term1",
+      borderColor: "rgba(239, 68, 68, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(239, 68, 68, 0.15)"
+          : "rgba(239, 68, 68, 0.1)",
+    },
+    {
+      key: "term2",
+      label: "Term 2",
+      data: studentData.terms.term2,
+      termKey: "term2",
+      borderColor: "rgba(245, 158, 11, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(245, 158, 11, 0.15)"
+          : "rgba(245, 158, 11, 0.1)",
+    },
+    {
+      key: "term3",
+      label: "Term 3",
+      data: studentData.terms.term3,
+      termKey: "term3",
+      borderColor: "rgba(16, 185, 129, 0.8)",
+      backgroundColor:
+        currentChartType === "radar"
+          ? "rgba(16, 185, 129, 0.15)"
+          : "rgba(16, 185, 129, 0.1)",
+    },
+  ];
+
+  // Apply highlighting based on selected term
+  const datasets = termDatasets.map((dataset) => {
+    const isSelected = dataset.key === currentTerm;
+    return {
+      label: dataset.label,
+      data: dataset.data,
+      termKey: dataset.termKey,
+      borderColor: isSelected
+        ? dataset.borderColor
+        : dataset.borderColor.replace("0.8", "0.3"),
+      backgroundColor: isSelected
+        ? dataset.backgroundColor
+        : dataset.backgroundColor.replace(/0\.1\d?/, "0.05"),
+      borderWidth: isSelected ? 3 : 1,
+      pointBackgroundColor: isSelected
+        ? dataset.borderColor
+        : dataset.borderColor.replace("0.8", "0.3"),
+      pointBorderColor: "#fff",
+      pointHoverBackgroundColor: "#fff",
+      pointHoverBorderColor: dataset.borderColor,
+      pointRadius: isSelected ? 4 : 3,
+      tension: 0.4,
+      fill: currentChartType === "line",
+    };
+  });
+
+  const config = {
+    type: currentChartType,
     data: {
-      labels: studentData.subjects, // <-- SUBJECT NAMES HERE
-      datasets: [
-        {
-          label: "Term 1",
-          data: studentData.terms.term1,
-          borderWidth: 2,
-          fill: false,
-        },
-        {
-          label: "Term 2",
-          data: studentData.terms.term2,
-          borderWidth: 2,
-          fill: false,
-        },
-        {
-          label: "Term 3",
-          data: studentData.terms.term3,
-          borderWidth: 2,
-          fill: false,
-        },
-      ],
+      labels: labels,
+      datasets: datasets,
     },
     options: {
       responsive: true,
+      maintainAspectRatio: true,
+      aspectRatio: 2,
+      plugins: {
+        legend: {
+          display: true,
+          position: "top",
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            font: {
+              size: 12,
+              weight: "600",
+            },
+          },
+        },
+        tooltip: {
+          backgroundColor: "rgba(0, 0, 0, 0.8)",
+          padding: 12,
+          cornerRadius: 8,
+          titleFont: {
+            size: 14,
+            weight: "bold",
+          },
+          bodyFont: {
+            size: 13,
+          },
+          callbacks: {
+            label: function (context) {
+              const parsed = context.parsed;
+              const score =
+                parsed && typeof parsed.y !== "undefined"
+                  ? parsed.y
+                  : parsed && typeof parsed.r !== "undefined"
+                  ? parsed.r
+                  : null;
+              const subject = studentData.subjects[context.dataIndex];
+              const termKey = context.dataset.termKey;
+              const grade =
+                (subject &&
+                  subject.grades &&
+                  termKey &&
+                  subject.grades[termKey]) ||
+                (subject && subject.grade) ||
+                "-";
+
+              if (score === null || typeof score === "undefined") {
+                return `${context.dataset.label}: No mark (Grade: ${grade})`;
+              }
+              return `${context.dataset.label}: ${score}/100 (Grade: ${grade})`;
+            },
+          },
+        },
+      },
       scales:
         currentChartType === "radar"
-          ? {}
-          : {
+          ? {
+              r: {
+                beginAtZero: true,
+                max: 100,
+                ticks: {
+                  stepSize: 20,
+                  font: {
+                    size: 11,
+                  },
+                },
+                pointLabels: {
+                  font: {
+                    size: 11,
+                    weight: "600",
+                  },
+                },
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+              },
+            }
+          : currentChartType === "line"
+          ? {
+              x: {
+                grid: {
+                  display: false,
+                },
+                ticks: {
+                  font: {
+                    size: 11,
+                    weight: "600",
+                  },
+                  maxRotation: 45,
+                  minRotation: 45,
+                },
+              },
               y: {
                 beginAtZero: true,
-                suggestedMax: 100,
+                max: 100,
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+                ticks: {
+                  font: {
+                    size: 11,
+                  },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
               },
-            },
+            }
+          : {},
     },
+  };
+
+  performanceChart = new Chart(ctx, config);
+}
+
+async function loadMyMarksData() {
+  const studentIdEl = document.getElementById("studentId");
+  // Only fetch for the student "My Marks" template (it includes #studentId)
+  if (!studentIdEl) {
+    studentData = fallbackStudentData;
+    return true;
+  }
+
+  try {
+    const res = await fetch("/marksReport/myMarks", {
+      method: "GET",
+      headers: { Accept: "application/json" },
+    });
+    const json = await res.json();
+    if (!res.ok || !json || !json.success) {
+      console.error("Failed to load marks:", json);
+      studentData = fallbackStudentData;
+      return false;
+    }
+
+    studentData = buildStudentDataFromMarks(
+      json.marks || [],
+      json.subjects || []
+    );
+    return true;
+  } catch (e) {
+    console.error("Error loading marks:", e);
+    studentData = fallbackStudentData;
+    return false;
+  }
+}
+
+function buildStudentDataFromMarks(rows, allSubjects) {
+  const subjectMap = new Map();
+  const termScores = { term1: new Map(), term2: new Map(), term3: new Map() };
+  const termGrades = { term1: new Map(), term2: new Map(), term3: new Map() };
+
+  // Always start with the full subjects list (so subjects with no marks still show)
+  if (Array.isArray(allSubjects) && allSubjects.length > 0) {
+    allSubjects.forEach((s) => {
+      const subjectId = s.subjectID;
+      const subjectName = s.subjectName || "";
+      if (subjectId === null || typeof subjectId === "undefined") return;
+      if (!subjectMap.has(subjectId)) {
+        subjectMap.set(subjectId, {
+          id: subjectId,
+          name: subjectName,
+          grades: {},
+        });
+      }
+    });
+  }
+
+  rows.forEach((row) => {
+    const subjectId = row.subjectID;
+    const subjectName = row.subjectName || "";
+    if (subjectId === null || typeof subjectId === "undefined") return;
+
+    if (!subjectMap.has(subjectId)) {
+      subjectMap.set(subjectId, {
+        id: subjectId,
+        name: subjectName,
+        grades: {},
+      });
+    }
+
+    const term = String(row.term || "");
+    const termKey =
+      term === "1"
+        ? "term1"
+        : term === "2"
+        ? "term2"
+        : term === "3"
+        ? "term3"
+        : null;
+    if (!termKey) return;
+
+    const markVal = row.marks;
+    const gradeLetter = row.gradeLetter || null;
+    if (markVal !== null && typeof markVal !== "undefined") {
+      termScores[termKey].set(subjectId, Number(markVal));
+    }
+    if (gradeLetter) {
+      termGrades[termKey].set(subjectId, gradeLetter);
+    }
   });
+
+  const subjects = Array.from(subjectMap.values()).sort((a, b) =>
+    String(a.name).localeCompare(String(b.name))
+  );
+
+  // Build term arrays aligned with subject order
+  const terms = { term1: [], term2: [], term3: [] };
+  subjects.forEach((s) => {
+    terms.term1.push(
+      termScores.term1.has(s.id) ? termScores.term1.get(s.id) : 0
+    );
+    terms.term2.push(
+      termScores.term2.has(s.id) ? termScores.term2.get(s.id) : 0
+    );
+    terms.term3.push(
+      termScores.term3.has(s.id) ? termScores.term3.get(s.id) : 0
+    );
+
+    s.grades = {
+      term1: termGrades.term1.get(s.id) || null,
+      term2: termGrades.term2.get(s.id) || null,
+      term3: termGrades.term3.get(s.id) || null,
+    };
+
+    // keep a default grade for any legacy UI usage
+    s.grade =
+      s.grades[currentTerm] ||
+      s.grades.term3 ||
+      s.grades.term2 ||
+      s.grades.term1 ||
+      "-";
+  });
+
+  return { subjects, terms };
 }
 
 // Chart toggle functionality
@@ -287,16 +563,23 @@ function animateProgressBars() {
 
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
-  const studentId = document.getElementById("studentId")?.value;
-
-  if (studentId) {
-    loadStudentData(studentId); // This will call initChart() internally
-  } else {
-    console.error("Student ID not found in DOM");
+  // Check if Chart.js is loaded
+  if (typeof Chart === "undefined") {
+    console.error(
+      "Chart.js is not loaded. Please include Chart.js in your HTML."
+    );
+    setupSearch();
+    setupBehaviorForm();
+    animateProgressBars();
+    return;
   }
 
-  setupChartToggle();
-  setupTermSelector();
+  loadMyMarksData().finally(() => {
+    initChart();
+    setupChartToggle();
+    setupTermSelector();
+  });
+
   setupSearch();
   setupBehaviorForm();
   animateProgressBars();
