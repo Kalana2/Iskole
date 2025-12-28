@@ -364,9 +364,18 @@ $periods = [
     }
   });
 
+  function getSelectLabel(sel){
+    if(!(sel instanceof HTMLSelectElement)) return '';
+    const opt = (sel.selectedOptions && sel.selectedOptions.length)
+      ? sel.selectedOptions[0]
+      : (sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex] : null);
+    return (opt && typeof opt.textContent === 'string') ? opt.textContent.trim() : '';
+  }
+
   function fillPreview(){
     const preview = document.getElementById('previewTable');
     const inputs = document.querySelectorAll('[name^="cells["]');
+    if(!preview) return;
     preview.querySelectorAll('[data-prev]')?.forEach(el => el.textContent = '');
 
     inputs.forEach(inp => {
@@ -378,9 +387,9 @@ $periods = [
       const sel = `[data-prev="${field}"][data-day="${CSS.escape(day)}"][data-row="${row}"]`;
       const target = preview.querySelector(sel);
 		if(!target) return;
-		if(inp instanceof HTMLSelectElement){
-			const label = inp.selectedOptions && inp.selectedOptions.length ? inp.selectedOptions[0].textContent : '';
-			target.textContent = (inp.value ? (label || '') : '');
+      if(inp instanceof HTMLSelectElement){
+        const label = getSelectLabel(inp);
+        target.textContent = (inp.value ? (label || String(inp.value).trim()) : '');
 		} else {
 			target.textContent = inp.value;
 		}
