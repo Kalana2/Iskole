@@ -52,7 +52,13 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
 
                 <div class="info-box border-container">
                     <div class="left">
-                        <span class="heading-name"><?= htmlspecialchars($teacherDisplay) ?></span>
+                        <span class="heading-name">
+                            <?= htmlspecialchars($req['teacher_name'] ?? 'Unknown') ?>
+                            <span style="font-weight:500; color:#6b7280;">
+                                (ID: <?= htmlspecialchars($req['teacher_id'] ?? $req['teacherUserID'] ?? '') ?>)
+                            </span>
+                        </span>
+
 
                         <span class="sub-heading">From: <?= htmlspecialchars($from) ?> → To: <?= htmlspecialchars($to) ?></span>
 

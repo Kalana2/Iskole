@@ -22,15 +22,21 @@ class LeaveRequestModel
         return $stmt->execute($data);
     }
 
-    public function getByTeacher(int $teacherUserID): array
+    public function getByTeacher(int $teacherUserID, int $limit = 6): array
     {
-        $sql = "SELECT * FROM leave_requests
-                WHERE teacherUserID = :tid
-                ORDER BY createdAt DESC, id DESC";
+        $sql = "SELECT *
+            FROM leave_requests
+            WHERE teacherUserID = :tid
+            ORDER BY createdAt DESC, id DESC
+            LIMIT :lim";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':tid' => $teacherUserID]);
+        $stmt->bindValue(':tid', $teacherUserID, PDO::PARAM_INT);
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     public function cancel(int $leaveId, int $teacherUserID): bool
     {
@@ -74,14 +80,24 @@ class LeaveRequestModel
 
 
     // Manager: get ONLY pending requests
-    public function getPending(): array
+    public function getPending(int $limit = 50): array
     {
-        $sql = "SELECT lr.*
+        $sql = "SELECT lr.*,
+                   lr.teacherUserID AS teacher_id,
+                   CONCAT(un.firstName, ' ', un.lastName) AS teacher_name
             FROM leave_requests lr
+            JOIN userName un ON un.userID = lr.teacherUserID
             WHERE lr.status = 'pending'
-            ORDER BY lr.createdAt DESC";
-        return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+            ORDER BY lr.createdAt DESC, lr.id DESC
+            LIMIT :lim";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':lim', $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
 
     // Manager: approve/reject (status update)
     public function updateStatus(int $id, int $managerUserID, string $status, ?string $comment = null): bool
