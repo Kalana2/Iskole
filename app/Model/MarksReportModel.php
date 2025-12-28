@@ -1,74 +1,85 @@
 <?php
-require_once __DIR__ . '/../Core/Database.php';
 
 class MarksReportModel
 {
-    private $db;
+	protected $pdo;
 
-    public function __construct()
-    {
-        $this->db = Database::getInstance();
-    }
+	public function __construct()
+	{
+		$this->pdo = Database::getInstance();
+	}
 
-    // -------------------------------
-    // 1. Latest term marks
-    // -------------------------------
-    public function getSubjectsWithLatestTermMarks($studentId)
-    {
-        $sql = "
-            SELECT s.subjectName AS name, 
-                   m.marks AS score,
-                   m.gradeLetter AS grade
-            FROM marks m
-            JOIN subjects s ON m.subjectID = s.subjectID
-            WHERE m.studentID = ?
-            AND m.term = (
-                SELECT MAX(term) 
-                FROM marks 
-                WHERE studentID = ?
-            )
-            ORDER BY s.subjectID ASC
-        ";
+	public function getStudentByUserId($userId)
+	{
+		$sql = "SELECT st.studentID, st.userID, st.classID, st.gradeID,
+					   un.firstName, un.lastName
+				FROM students st
+				LEFT JOIN userName un ON un.userID = st.userID
+				WHERE st.userID = :uid
+				LIMIT 1";
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute(['uid' => $userId]);
+		$row = $stmt->fetch();
+		if (!$row) return null;
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$studentId, $studentId]);
+		return [
+			'studentID' => $row['studentID'],
+			'userID' => $row['userID'],
+			'classID' => $row['classID'],
+			'gradeID' => $row['gradeID'],
+			'firstName' => $row['firstName'] ?? '',
+			'lastName' => $row['lastName'] ?? '',
+			'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? ''))
+		];
+	}
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+	public function getAllSubjects()
+	{
+		$sql = "SELECT subjectID, subjectName FROM subject ORDER BY subjectName";
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute();
+		$rows = $stmt->fetchAll();
 
-    // -------------------------------
-    // 2. Term-wise marks for chart
-    // -------------------------------
-    public function getTermWiseMarks($studentId)
-    {
-        // Result grouped by subject
-        $result = [];
+		return array_map(function ($r) {
+			return [
+				'subjectID' => isset($r['subjectID']) ? intval($r['subjectID']) : null,
+				'subjectName' => $r['subjectName'] ?? ''
+			];
+		}, $rows);
+	}
 
-        $sql = "
-            SELECT s.subjectName AS subject,
-                   m.term,
-                   m.marks
-            FROM marks m
-            JOIN subjects s ON m.subjectID = s.subjectID
-            WHERE m.studentID = ?
-            ORDER BY s.subjectID ASC, m.term ASC
-        ";
+	public function getMarksForStudent($studentId)
+	{
+		$sql = "SELECT m.markID, m.studentID, m.teacherID, m.subjectID, m.term,
+					   m.marks, m.gradeLetter, m.enteredDate, m.updatedDate,
+					   s.subjectName,
+					   CONCAT(tn.firstName, ' ', tn.lastName) AS teacherName
+				FROM marks m
+				LEFT JOIN subject s ON s.subjectID = m.subjectID
+				LEFT JOIN teachers t ON t.teacherID = m.teacherID
+				LEFT JOIN userName tn ON tn.userID = t.userID
+				WHERE m.studentID = :studentId
+				ORDER BY m.term ASC, s.subjectName ASC";
 
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([$studentId]);
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute(['studentId' => intval($studentId)]);
+		$rows = $stmt->fetchAll();
 
-        while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $subject = $row['subject'];
-
-            // Initialize array if not exists
-            if (!isset($result[$subject])) {
-                $result[$subject] = [null, null, null]; 
-            }
-
-            // Term 1 → index 0, Term 2 → index 1, Term 3 → index 2
-            $result[$subject][$row['term'] - 1] = (int)$row['marks'];
-        }
-
-        return $result;
-    }
+		// Normalize types for JSON consumption
+		return array_map(function ($r) {
+			return [
+				'markID' => isset($r['markID']) ? intval($r['markID']) : null,
+				'studentID' => isset($r['studentID']) ? intval($r['studentID']) : null,
+				'teacherID' => isset($r['teacherID']) ? intval($r['teacherID']) : null,
+				'subjectID' => isset($r['subjectID']) ? intval($r['subjectID']) : null,
+				'subjectName' => $r['subjectName'] ?? '',
+				'teacherName' => trim($r['teacherName'] ?? ''),
+				'term' => isset($r['term']) ? strval($r['term']) : null,
+				'marks' => isset($r['marks']) ? floatval($r['marks']) : null,
+				'gradeLetter' => $r['gradeLetter'] ?? null,
+				'enteredDate' => $r['enteredDate'] ?? null,
+				'updatedDate' => $r['updatedDate'] ?? null,
+			];
+		}, $rows);
+	}
 }

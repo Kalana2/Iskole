@@ -1,26 +1,49 @@
 <?php
+
 require_once __DIR__ . '/../Core/Controller.php';
 
 class MarksReportController extends Controller
 {
-    public function index()
-    {
-        $this->view('marksReport/index');
-    }
+	public function index()
+	{
+		header('Location: /student?tab=My+Marks');
+		exit;
+	}
 
-    public function getStudentMarks($studentId)
-    {
-        header("Content-Type: application/json");
-        http_response_code(200);
+	public function myMarks()
+	{
+		header('Content-Type: application/json');
 
-        $model = $this->model("MarksReportModel");
+		$userId = $this->session->get('user_id');
+		if (!$userId) {
+			http_response_code(401);
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
 
-        $subjects = $model->getSubjectsWithLatestTermMarks($studentId);
-        $terms = $model->getTermWiseMarks($studentId);
+		try {
+			$model = $this->model('MarksReportModel');
 
-        echo json_encode([
-            "subjects" => $subjects ?: [],
-            "terms" => $terms ?: []
-        ]);
-    }
+			$student = $model->getStudentByUserId($userId);
+			if (!$student) {
+				http_response_code(404);
+				echo json_encode(['success' => false, 'message' => 'Student record not found']);
+				return;
+			}
+
+			$marks = $model->getMarksForStudent($student['studentID']);
+			$subjects = $model->getAllSubjects();
+
+			echo json_encode([
+				'success' => true,
+				'student' => $student,
+				'subjects' => $subjects,
+				'marks' => $marks
+			]);
+		} catch (Exception $e) {
+			error_log('MarksReport API error: ' . $e->getMessage());
+			http_response_code(500);
+			echo json_encode(['success' => false, 'message' => 'Server error']);
+		}
+	}
 }
