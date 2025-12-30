@@ -98,8 +98,6 @@
 
         <?php foreach ($byGrade as $g => $items): ?>
             <div class="cs-grade">
-                <h3>Grade <?= (int)$g ?></h3>
-
                 <div class="cs-grid">
                     <?php foreach ($items as $s): ?>
                         <div class="cs-chip">
@@ -108,9 +106,10 @@
                             <form action="/index.php?url=classSubject/deleteSubject" method="post">
                                 <input type="hidden" name="subject_id" value="<?= (int)$s['subjectID'] ?>">
                                 <button class="cs-del" type="submit"
-                                    onclick="return confirm('Delete subject <?= htmlspecialchars($s['subjectName'] ?? '') ?> (Grade <?= (int)$g ?>)?')">
+                                    onclick="return confirm('Delete subject <?= htmlspecialchars($s['subjectName'] ?? '') ?> ?')">
                                     ✕
                                 </button>
+
                             </form>
                         </div>
                     <?php endforeach; ?>
@@ -125,24 +124,14 @@
 
             <div class="cs-row">
                 <div class="cs-field">
-                    <label>Grade</label>
-                    <select name="grade" required>
-                        <?php for ($g = 1; $g <= 13; $g++): ?>
-                            <option value="<?= $g ?>"><?= $g ?></option>
-                        <?php endfor; ?>
-                    </select>
-                </div>
-
-                <div class="cs-field">
                     <label>Subject Name</label>
-                    <input type="text" name="subjectName" placeholder="Maths" required>
+                    <input type="text" name="subjectName" placeholder="Mathematics" required>
                 </div>
 
                 <button class="cs-btn" type="submit">Add</button>
             </div>
-
-
         </form>
+
     </div>
 
 </div>

@@ -84,29 +84,29 @@ class ClassSubjectController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') $this->goBackToTab();
 
-        $grade = (int)($_POST['grade'] ?? 0);
         $name = trim($_POST['subjectName'] ?? '');
 
-        if ($grade < 1 || $grade > 13 || $name === '') {
-            $_SESSION['cs_msg'] = ['type' => 'error', 'text' => 'Grade/Subject invalid.'];
+        if ($name === '') {
+            $_SESSION['cs_msg'] = ['type' => 'error', 'text' => 'Subject name is required.'];
             $this->goBackToTab();
         }
 
         $model = $this->model('ClassSubjectModel');
 
-        if ($model->subjectExists($grade, $name)) {
-            $_SESSION['cs_msg'] = ['type' => 'error', 'text' => "Subject '{$name}' already exists for Grade {$grade}."];
+        if ($model->subjectExists($name)) {
+            $_SESSION['cs_msg'] = ['type' => 'error', 'text' => "Subject '{$name}' already exists."];
             $this->goBackToTab();
         }
 
-        if ($model->createSubject($grade, $name)) {
-            $_SESSION['cs_msg'] = ['type' => 'success', 'text' => "Subject '{$name}' added to Grade {$grade}."];
+        if ($model->createSubject($name)) {
+            $_SESSION['cs_msg'] = ['type' => 'success', 'text' => "Subject '{$name}' added."];
         } else {
             $_SESSION['cs_msg'] = ['type' => 'error', 'text' => "Failed to add subject '{$name}'."];
         }
 
         $this->goBackToTab();
     }
+
 
     public function deleteSubject()
     {

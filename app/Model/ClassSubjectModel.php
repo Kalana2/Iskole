@@ -48,30 +48,29 @@ class ClassSubjectModel
 
     /* ===================== SUBJECTS ===================== */
 
+
+
     public function getAllSubjects(): array
     {
-        $sql = "SELECT subjectID, subjectName
-            FROM subject
-            ORDER BY subjectName ASC";
-
+        $sql = "SELECT subjectID, subjectName FROM subject ORDER BY subjectName ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function subjectExists(int $grade, string $subjectName): bool
+    public function subjectExists(string $subjectName): bool
     {
-        $sql = "SELECT 1 FROM subject WHERE grade = ? AND subjectName = ? LIMIT 1";
+        $sql = "SELECT 1 FROM subject WHERE subjectName = ? LIMIT 1";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$grade, trim($subjectName)]);
+        $stmt->execute([trim($subjectName)]);
         return (bool)$stmt->fetchColumn();
     }
 
-    public function createSubject(int $grade, string $subjectName): bool
+    public function createSubject(string $subjectName): bool
     {
-        $sql = "INSERT INTO subject (grade, subjectName) VALUES (?, ?)";
+        $sql = "INSERT INTO subject (subjectName) VALUES (?)";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$grade, trim($subjectName)]);
+        return $stmt->execute([trim($subjectName)]);
     }
 
     public function deleteSubject(int $subjectId): bool
