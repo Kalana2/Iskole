@@ -1,15 +1,15 @@
     <?php
     // filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\timetable.php
 
-    // Sample timetable data structure
-    $teacherInfo = [
-        'name' => 'Mr. Perera',
-        'subject' => 'Mathematics',
-        'employee_id' => 'T-2024-0156'
+    // Data is provided by TeacherController when the "Time Table" tab is active.
+    // Fall back to sample structures if not provided.
+    $teacherInfo = $teacherInfo ?? [
+        'name' => '—',
+        'subject' => '—',
+        'employee_id' => '—'
     ];
 
-    // Time slots for the week
-    $timeSlots = [
+    $timeSlots = $timeSlots ?? [
         ['time' => '07:30 - 08:30', 'period' => 1],
         ['time' => '08:30 - 09:30', 'period' => 2],
         ['time' => '09:30 - 10:30', 'period' => 3],
@@ -21,72 +21,11 @@
         ['time' => '14:30 - 15:10', 'period' => 8]
     ];
 
-    // Timetable data: [day][period] => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203']
-    $timetable = [
-        'Monday' => [
-            1 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            2 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            3 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102'],
-            5 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => null, // Free period
-            7 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            8 => null
-        ],
-        'Tuesday' => [
-            1 => null,
-            2 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            3 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            5 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            6 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            7 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            8 => ['class' => '10-C', 'subject' => 'Mathematics', 'room' => '204']
-        ],
-        'Wednesday' => [
-            1 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            2 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            3 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            4 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            5 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            6 => null,
-            7 => null,
-            8 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205']
-        ],
-        'Thursday' => [
-            1 => ['class' => '10-C', 'subject' => 'Mathematics', 'room' => '204'],
-            2 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            3 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            5 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            7 => null,
-            8 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102']
-        ],
-        'Friday' => [
-            1 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            2 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102'],
-            3 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            4 => null,
-            5 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            7 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            8 => null
-        ]
-    ];
+    $days = $days ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    $timetable = $timetable ?? array_fill_keys($days, [1 => null, 2 => null, 3 => null, 4 => null, 5 => null, 6 => null, 7 => null, 8 => null]);
 
-    // Calculate statistics
-    $totalClasses = 0;
-    $classesPerDay = [];
-    foreach ($timetable as $day => $periods) {
-        $count = count(array_filter($periods, function ($p) {
-            return $p !== null;
-        }));
-        $classesPerDay[$day] = $count;
-        $totalClasses += $count;
-    }
-
-    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    $totalClasses = $totalClasses ?? 0;
+    $classesPerDay = $classesPerDay ?? array_fill_keys($days, 0);
     $currentDay = date('l');
     ?>
     <link rel="stylesheet" href="/css/timetable/timetable.css">
@@ -104,11 +43,11 @@
                     <div class="teacher-info-badge">
                         <div class="info-item">
                             <span class="info-label">Teacher:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name'] ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject'] ?? '—'); ?></span>
                         </div>
                     </div>
                 </div>
@@ -191,9 +130,9 @@
                                                     <div class="class-card">
                                                         <div class="class-name"><?php echo htmlspecialchars($class['class']); ?></div>
                                                         <div class="class-details">
-                                                            <span class="room-info">
-                                                                <span class="room-icon">🚪</span>
-                                                                Room <?php echo htmlspecialchars($class['room']); ?>
+                                                            <span class="subject-info">
+                                                                <span class="subject-icon">📘</span>
+                                                                <?php echo htmlspecialchars($class['subject'] ?? ''); ?>
                                                             </span>
                                                         </div>
                                                     </div>
