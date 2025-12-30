@@ -35,7 +35,7 @@
             include __DIR__ . '/relief.php';
             break;
         case 'Class & Subjects':
-            include __DIR__ . '/classAndSubjects.php';
+            include __DIR__ . '/classSubjects.php';
             break;
         case 'Exam Time Table':
             include __DIR__ . '/examTimeTable.php';

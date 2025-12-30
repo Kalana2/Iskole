@@ -9,8 +9,35 @@ class AdminController extends Controller
             return;
         }
 
-        $this->view('admin/index');
+        // ✅ tab handling
+        $tab = $_GET['tab'] ?? 'Announcements';
+
+        // ✅ default data passed to view
+        $data = [
+            'tab' => $tab
+        ];
+
+        // ✅ Class & Subjects tab -> load classes/subjects
+        if ($tab === 'Class & Subjects') {
+            $model = $this->model('ClassSubjectModel');
+
+            $data['classes']  = $model->getAllClasses();
+            $data['subjects'] = $model->getAllSubjects();
+
+            $data['flash'] = $_SESSION['cs_msg'] ?? null;
+            unset($_SESSION['cs_msg']);
+        }
+
+        // ✅ Other tabs flash (optional) - keep your existing exam timetable messages
+        if ($tab === 'Exam Time Table') {
+            $data['exam_tt_msg'] = $_SESSION['exam_tt_msg'] ?? null;
+            unset($_SESSION['exam_tt_msg']);
+        }
+
+        // ✅ finally load admin page with tab + data
+        $this->view('admin/index', $data);
     }
+
 
     private function handleAnnouncementAction($action)
     {
