@@ -1,17 +1,17 @@
 <?php
-// Sample timetable data
-$studentInfo = [
-    'name' => 'Kasun Perera',
-    'class' => 'Grade 10-A',
-    'reg_no' => 'STU2024-1025',
-    'class_teacher' => 'Mrs. Samanthi Fernando'
+// Timetable data is provided by StudentController when the "Time Table" tab is active.
+// Fall back to sample data if nothing is provided.
+$studentInfo = $studentInfo ?? [
+    'name' => '—',
+    'class' => '—',
+    'reg_no' => '—',
 ];
 
 $currentDay = date('l'); // Get current day name
 $currentTime = date('H:i');
 
 // Timetable structure
-$timetable = [
+$timetable = $timetable ?? [
     'periods' => [
         ['time' => '07:50 - 08:30', 'period' => 1],
         ['time' => '08:30 - 09:10', 'period' => 2],
@@ -25,68 +25,68 @@ $timetable = [
     ],
     'schedule' => [
         'Monday' => [
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'Science', 'teacher' => 'Mrs. Perera', 'room' => 'Lab-1'],
-            ['subject' => 'English', 'teacher' => 'Ms. Fernando', 'room' => '105'],
-            ['subject' => 'Citizenship Education', 'teacher' => 'Mr. Rathnayake', 'room' => '308'],
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'Science', 'teacher' => 'Mrs. Perera'],
+            ['subject' => 'English', 'teacher' => 'Ms. Fernando'],
+            ['subject' => 'Citizenship Education', 'teacher' => 'Mr. Rathnayake'],
             null, // Interval
-            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe', 'room' => '201'],
-            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena', 'room' => '204'],
-            ['subject' => 'Tamil', 'teacher' => 'Mrs. Rajendran', 'room' => '110'],
-            ['subject' => 'Physical Education', 'teacher' => 'Mr. Jayawardena', 'room' => 'Ground']
+            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe'],
+            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena'],
+            ['subject' => 'Tamil', 'teacher' => 'Mrs. Rajendran'],
+            ['subject' => 'Physical Education', 'teacher' => 'Mr. Jayawardena']
         ],
         'Tuesday' => [
-            ['subject' => 'Science', 'teacher' => 'Mrs. Perera', 'room' => 'Lab-1'],
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe', 'room' => '201'],
-            ['subject' => 'English', 'teacher' => 'Ms. Fernando', 'room' => '105'],
+            ['subject' => 'Science', 'teacher' => 'Mrs. Perera'],
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe'],
+            ['subject' => 'English', 'teacher' => 'Ms. Fernando'],
             null, // Interval
-            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena', 'room' => '204'],
-            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari', 'room' => '112'],
-            ['subject' => 'ICT', 'teacher' => 'Mr. De Silva', 'room' => 'Comp-Lab'],
-            ['subject' => 'Aesthetics', 'teacher' => 'Ms. Rodrigo', 'room' => 'Art Room']
+            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena'],
+            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari'],
+            ['subject' => 'ICT', 'teacher' => 'Mr. De Silva'],
+            ['subject' => 'Aesthetics', 'teacher' => 'Ms. Rodrigo']
         ],
         'Wednesday' => [
-            ['subject' => 'English', 'teacher' => 'Ms. Fernando', 'room' => '105'],
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'Science', 'teacher' => 'Mrs. Perera', 'room' => 'Lab-1'],
+            ['subject' => 'English', 'teacher' => 'Ms. Fernando'],
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'Science', 'teacher' => 'Mrs. Perera'],
             null, // Interval
-            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe', 'room' => '201'],
-            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari', 'room' => '112'],
-            ['subject' => 'Religion', 'teacher' => 'Mr. Samaraweera', 'room' => '115'],
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203']
+            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe'],
+            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari'],
+            ['subject' => 'Religion', 'teacher' => 'Mr. Samaraweera'],
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva']
         ],
         'Thursday' => [
-            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena', 'room' => '204'],
-            ['subject' => 'Tamil', 'teacher' => 'Mrs. Rajendran', 'room' => '110'],
-            ['subject' => 'P.T.S.', 'teacher' => 'Mrs. Bandara', 'room' => '307'],
-            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe', 'room' => '201'],
+            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena'],
+            ['subject' => 'Tamil', 'teacher' => 'Mrs. Rajendran'],
+            ['subject' => 'P.T.S.', 'teacher' => 'Mrs. Bandara'],
+            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe'],
             null, // Interval
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'English', 'teacher' => 'Ms. Fernando', 'room' => '105'],
-            ['subject' => 'Science', 'teacher' => 'Mrs. Perera', 'room' => 'Lab-1'],
-            ['subject' => 'ICT', 'teacher' => 'Mr. De Silva', 'room' => 'Comp-Lab']
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'English', 'teacher' => 'Ms. Fernando'],
+            ['subject' => 'Science', 'teacher' => 'Mrs. Perera'],
+            ['subject' => 'ICT', 'teacher' => 'Mr. De Silva']
         ],
         'Friday' => [
-            ['subject' => 'Health', 'teacher' => 'Mrs. Jayasuriya', 'room' => '210'],
-            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena', 'room' => '204'],
-            ['subject' => 'English', 'teacher' => 'Ms. Fernando', 'room' => '105'],
-            ['subject' => 'Science', 'teacher' => 'Mrs. Perera', 'room' => 'Lab-1'],
+            ['subject' => 'Health', 'teacher' => 'Mrs. Jayasuriya'],
+            ['subject' => 'History', 'teacher' => 'Mr. Gunawardena'],
+            ['subject' => 'English', 'teacher' => 'Ms. Fernando'],
+            ['subject' => 'Science', 'teacher' => 'Mrs. Perera'],
             null, // Interval
-            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva', 'room' => '203'],
-            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe', 'room' => '201'],
-            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari', 'room' => '112'],
-            ['subject' => 'Club Activities', 'teacher' => 'Various', 'room' => 'Various']
+            ['subject' => 'Mathematics', 'teacher' => 'Mr. Silva'],
+            ['subject' => 'Geography', 'teacher' => 'Mrs. Wijesinghe'],
+            ['subject' => 'Sinhala', 'teacher' => 'Mrs. Kumari'],
+            ['subject' => 'Club Activities', 'teacher' => 'Various']
         ]
     ]
 ];
 
 // Statistics
-$stats = [
+$stats = $stats ?? [
     'total_periods' => 40,
-    'subjects_count' => 15,
-    'teachers_count' => 12
+    'subjects_count' => 0,
+    'teachers_count' => 0
 ];
 ?>
 
@@ -104,15 +104,15 @@ $stats = [
                 <div class="student-info-badge">
                     <div class="info-item">
                         <span class="info-label">Student</span>
-                        <span class="info-value"><?php echo $studentInfo['name']; ?></span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Class</span>
-                        <span class="info-value"><?php echo $studentInfo['class']; ?></span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Reg No</span>
-                        <span class="info-value"><?php echo $studentInfo['reg_no']; ?></span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['reg_no'] ?? '—'); ?></span>
                     </div>
                 </div>
             </div>
@@ -214,15 +214,11 @@ $stats = [
                                         <td class="class-cell <?php echo $isToday ? 'today-cell' : ''; ?>">
                                             <?php if ($class): ?>
                                                 <div class="class-card">
-                                                    <div class="subject-name"><?php echo $class['subject']; ?></div>
+                                                    <div class="subject-name"><?php echo htmlspecialchars($class['subject'] ?? ''); ?></div>
                                                     <div class="class-details">
                                                         <span class="teacher-name">
                                                             <i class="fas fa-user-tie"></i>
-                                                            <?php echo $class['teacher']; ?>
-                                                        </span>
-                                                        <span class="room-number">
-                                                            <i class="fas fa-door-open"></i>
-                                                            <?php echo $class['room']; ?>
+                                                            <?php echo htmlspecialchars($class['teacher'] ?? ''); ?>
                                                         </span>
                                                     </div>
                                                 </div>
@@ -252,10 +248,6 @@ $stats = [
                 <div class="legend-item">
                     <i class="fas fa-user-tie"></i>
                     <span>Teacher Name</span>
-                </div>
-                <div class="legend-item">
-                    <i class="fas fa-door-open"></i>
-                    <span>Room Number</span>
                 </div>
             </div>
         </div>
