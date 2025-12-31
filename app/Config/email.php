@@ -15,8 +15,8 @@ return [
     'smtp_auth' => true,
 
     // Email Credentials
-    'smtp_username' => 'your-email@gmail.com',  // Your email address
-    'smtp_password' => 'your-app-password',     // Your app password (not regular password!)
+    'smtp_username' => 'iskole.2y@gmail.com',  // Your email address
+    'smtp_password' => 'tjuj mxzu cufg lcqw ',     // Your app password (not regular password!)
 
     // From Address
     'from_email' => 'noreply@iskole.com',
@@ -24,9 +24,10 @@ return [
 
     // Email Settings
     'charset' => 'UTF-8',
-    'debug' => 0,  // 0 = off, 1 = client, 2 = server, 3 = connection
+    'debug' => 2,  // 0 = off, 1 = client, 2 = server, 3 = connection (verbose for troubleshooting)
 
     // Development Mode
     'development_mode' => true,  // Set to false in production
     'log_emails' => true,        // Log emails to console/file in dev mode
+    'send_in_dev' => true,       // FORCE send emails even in dev mode
 ];

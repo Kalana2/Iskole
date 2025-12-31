@@ -131,7 +131,10 @@ class EmailService
      */
     private function shouldSendInDev()
     {
-        // You can set an environment variable to enable actual sending in dev
+        // Check config file first, then environment variable
+        if (isset($this->config['send_in_dev']) && $this->config['send_in_dev'] === true) {
+            return true;
+        }
         return getenv('SEND_EMAILS_IN_DEV') === 'true';
     }
 
