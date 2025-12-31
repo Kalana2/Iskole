@@ -1,0 +1,16 @@
+/* Exam timetable image – balanced size */
+.exam-tt-image {
+    width: 100%;
+    max-width: 900px;      /* ✅ smaller than before */
+    height: auto;
+    display: block;
+    margin: 0 auto;        /* center */
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,.1);
+}
+
+/* Prevent card from stretching too wide */
+section.mp-announcements[aria-labelledby="exam-tt-title"] .ann-card {
+    max-width: 1000px;
+    margin: 0 auto;
+}
