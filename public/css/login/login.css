@@ -6,7 +6,8 @@ body {
     sans-serif;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-end;
+  padding-right: 10%;
   position: relative;
   overflow: hidden;
 }
@@ -23,7 +24,7 @@ body::before {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  filter: blur(12px) brightness(0.5);
+  filter: blur(5px) brightness(0.5);
   transform: scale(1.1);
   z-index: -2;
 }
@@ -306,6 +307,11 @@ button[type="submit"]:disabled {
 
 /* Responsive design */
 @media (max-width: 768px) {
+  body {
+    justify-content: center;
+    padding-right: 0;
+  }
+
   .login-container {
     width: 90%;
     max-width: 400px;
@@ -331,6 +337,11 @@ button[type="submit"]:disabled {
 }
 
 @media (max-width: 480px) {
+  body {
+    justify-content: center;
+    padding-right: 0;
+  }
+
   .login-container {
     width: 90%;
     padding: 35px 25px;
