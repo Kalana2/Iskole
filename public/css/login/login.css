@@ -425,28 +425,35 @@ select {
   flex-shrink: 0;
 }
 
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-8px);
-  }
-  75% {
-    transform: translateX(8px);
-  }
+/* Success message styling */
+.success {
+  background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(38, 222, 129, 0.3);
+  animation: fadeIn 0.4s ease-out;
+  border-left: 4px solid #20bf6b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.success::before {
+  content: "✓";
+  font-size: 18px;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+/* Link hover effect */
+a:hover {
+  color: rgba(255, 255, 255, 1) !important;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
 }
 
 /* Glass reflection effect */
