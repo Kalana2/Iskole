@@ -9,7 +9,32 @@ class AdminController extends Controller
             return;
         }
 
-        $this->view('admin/index');
+        // Provide data for Relief tab
+        $data = [];
+        $tab = $_GET['tab'] ?? '';
+        if ($tab === 'Relief') {
+            $date = $_GET['date'] ?? date('Y-m-d');
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $date = date('Y-m-d');
+            }
+
+            require_once __DIR__ . '/../Model/reliefModel.php';
+            $reliefModel = new reliefModel();
+
+            try {
+                $data['selectedDate'] = $date;
+                $data['pendingRelief'] = $reliefModel->getPendingReliefSlots($date);
+                $data['presentTeacherCount'] = $reliefModel->getPresentTeacherCount($date);
+            } catch (Exception $e) {
+                error_log('Admin relief load error: ' . $e->getMessage());
+                $data['selectedDate'] = $date;
+                $data['pendingRelief'] = [];
+                $data['presentTeacherCount'] = 0;
+                $data['reliefError'] = 'Failed to load relief data.';
+            }
+        }
+
+        $this->view('admin/index', $data);
     }
 
     private function handleAnnouncementAction($action)
