@@ -30,7 +30,6 @@ $student = $student ?? null;
     <div class="center-container card">
 
 
-
       <div class="search-container">
         <form method="GET" action="/index.php" style="display: contents;">
           <input type="hidden" name="url" value="teacher">
@@ -41,7 +40,18 @@ $student = $student ?? null;
             placeholder="Search student..."
             id="searchInput"
             name="q"
+            list="studentList"
+            autocomplete="off"
             value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+            
+          <datalist id="studentList">
+            <?php foreach (($suggestions ?? []) as $s): ?>
+              <option value="<?= htmlspecialchars(trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? ''))) ?>">
+                <?= htmlspecialchars(trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? '')) . ' (' . $s['studentID'] . ')') ?>
+              </option>
+            <?php endforeach; ?>
+          </datalist>
+
 
           <button type="submit" class="search-btn">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
@@ -52,13 +62,6 @@ $student = $student ?? null;
           </button>
         </form>
       </div>
-
-
-
-
-
-
-
 
       <div class="student-container">
         <!-- Student Details Card -->

@@ -30,6 +30,17 @@ class TeacherController extends Controller
             $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
             $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
 
+            $teacherModel = $this->model('TeacherModel');
+            $studentModel = $this->model('StudentModel');
+
+            $teacher = $teacherModel->getTeacherByUserID($_SESSION['user_id'] ?? 0);
+            $grade = (int)($teacher['grade'] ?? 0);
+
+            $suggestions = [];
+            if ($grade > 0) {
+                $suggestions = $studentModel->getStudentsByGrade($grade);
+            }
+
 
             // Teacher class id from session (make sure this is set at login)
             $teacherClassId = $_SESSION['classID'] ?? null;
@@ -51,6 +62,7 @@ class TeacherController extends Controller
             'behaviorReports' => $behaviorReports,
             'student' => $student,
             'flash' => $flash,
+            'suggestions' => $suggestions, // ✅ ADD THIS
         ]);
     }
 
