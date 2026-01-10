@@ -114,10 +114,11 @@ class TeacherTimeTableModel
 
     private function getPeriodIdToNumber(): array
     {
-        if (!$this->tableExists('periods')) {
+        $periodTable = $this->pickExistingTable(['periods', 'period']);
+        if (!$periodTable) {
             return [];
         }
-        $stmt = $this->pdo->prepare('SELECT periodID FROM periods ORDER BY periodID');
+        $stmt = $this->pdo->prepare("SELECT periodID FROM `{$periodTable}` ORDER BY periodID");
         $stmt->execute();
         $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
         $out = [];
@@ -130,6 +131,85 @@ class TeacherTimeTableModel
             }
         }
         return $out;
+    }
+
+    private function normalizeTimeValue(?string $value): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+        // Handles HH:MM:SS or HH:MM
+        if (preg_match('/^\d{2}:\d{2}/', $value)) {
+            return substr($value, 0, 5);
+        }
+        return $value;
+    }
+
+    /**
+     * Build UI time slots from period table (periodID,startTime,endTime).
+     * Inserts an INTERVAL row between period 4 and 5 when possible.
+     */
+    private function buildTimeSlotsFromPeriods(): array
+    {
+        $periodTable = $this->pickExistingTable(['periods', 'period']);
+        if (!$periodTable) {
+            return [];
+        }
+
+        // Validate columns exist
+        $cols = [];
+        try {
+            $colsInfo = $this->pdo->query("DESCRIBE `{$periodTable}`")->fetchAll(PDO::FETCH_ASSOC);
+            $cols = array_map(static fn($c) => (string) $c['Field'], $colsInfo);
+        } catch (Throwable $e) {
+            $cols = [];
+        }
+        if (!in_array('startTime', $cols, true) || !in_array('endTime', $cols, true)) {
+            return [];
+        }
+
+        $stmt = $this->pdo->prepare("SELECT periodID, startTime, endTime FROM `{$periodTable}` ORDER BY periodID");
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+        $slots = [];
+        $periodTimes = []; // periodNumber => ['start'=>..,'end'=>..]
+        $n = 0;
+        foreach ($rows as $r) {
+            $n++;
+            $start = $this->normalizeTimeValue($r['startTime'] ?? '');
+            $end = $this->normalizeTimeValue($r['endTime'] ?? '');
+            $periodTimes[$n] = ['start' => $start, 'end' => $end];
+            if ($n >= 8) {
+                break;
+            }
+        }
+
+        for ($p = 1; $p <= min(8, count($periodTimes)); $p++) {
+            $start = $periodTimes[$p]['start'] ?? '';
+            $end = $periodTimes[$p]['end'] ?? '';
+            $slots[] = [
+                'time' => ($start !== '' && $end !== '') ? ($start . ' - ' . $end) : '',
+                'period' => $p,
+                'startTime' => $start,
+                'endTime' => $end,
+            ];
+
+            if ($p === 4) {
+                $breakStart = $periodTimes[4]['end'] ?? '';
+                $breakEnd = $periodTimes[5]['start'] ?? '';
+                $breakTime = ($breakStart !== '' && $breakEnd !== '') ? ($breakStart . ' - ' . $breakEnd) : 'INTERVAL';
+                $slots[] = [
+                    'time' => $breakTime,
+                    'period' => 'break',
+                    'startTime' => $breakStart,
+                    'endTime' => $breakEnd,
+                ];
+            }
+        }
+
+        return $slots;
     }
 
     private function getClassLabelById(int $classId): string
@@ -183,17 +263,21 @@ class TeacherTimeTableModel
 
         $fullName = $this->getUserFullName($userId);
 
-        $timeSlots = [
-            ['time' => '07:30 - 08:30', 'period' => 1],
-            ['time' => '08:30 - 09:30', 'period' => 2],
-            ['time' => '09:30 - 10:30', 'period' => 3],
-            ['time' => '10:30 - 11:30', 'period' => 4],
-            ['time' => 'INTERVAL', 'period' => 'break'],
-            ['time' => '11:50 - 12:50', 'period' => 5],
-            ['time' => '12:50 - 13:30', 'period' => 6],
-            ['time' => '13:30 - 14:30', 'period' => 7],
-            ['time' => '14:30 - 15:10', 'period' => 8],
-        ];
+        $timeSlots = $this->buildTimeSlotsFromPeriods();
+        if (empty($timeSlots)) {
+            // Safe fallback (matches student timetable template defaults)
+            $timeSlots = [
+                ['time' => '07:50 - 08:30', 'period' => 1, 'startTime' => '07:50', 'endTime' => '08:30'],
+                ['time' => '08:30 - 09:10', 'period' => 2, 'startTime' => '08:30', 'endTime' => '09:10'],
+                ['time' => '09:10 - 09:50', 'period' => 3, 'startTime' => '09:10', 'endTime' => '09:50'],
+                ['time' => '09:50 - 10:30', 'period' => 4, 'startTime' => '09:50', 'endTime' => '10:30'],
+                ['time' => '10:30 - 10:50', 'period' => 'break', 'startTime' => '10:30', 'endTime' => '10:50'],
+                ['time' => '10:50 - 11:30', 'period' => 5, 'startTime' => '10:50', 'endTime' => '11:30'],
+                ['time' => '11:30 - 12:10', 'period' => 6, 'startTime' => '11:30', 'endTime' => '12:10'],
+                ['time' => '12:10 - 12:50', 'period' => 7, 'startTime' => '12:10', 'endTime' => '12:50'],
+                ['time' => '12:50 - 13:30', 'period' => 8, 'startTime' => '12:50', 'endTime' => '13:30'],
+            ];
+        }
 
         $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
         $schedule = [];

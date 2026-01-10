@@ -10,15 +10,15 @@
     ];
 
     $timeSlots = $timeSlots ?? [
-        ['time' => '07:30 - 08:30', 'period' => 1],
-        ['time' => '08:30 - 09:30', 'period' => 2],
-        ['time' => '09:30 - 10:30', 'period' => 3],
-        ['time' => '10:30 - 11:30', 'period' => 4],
-        ['time' => 'INTERVAL', 'period' => 'break'],
-        ['time' => '11:50 - 12:50', 'period' => 5],
-        ['time' => '12:50 - 13:30', 'period' => 6],
-        ['time' => '13:30 - 14:30', 'period' => 7],
-        ['time' => '14:30 - 15:10', 'period' => 8]
+        ['time' => '07:50 - 08:30', 'period' => 1, 'startTime' => '07:50', 'endTime' => '08:30'],
+        ['time' => '08:30 - 09:10', 'period' => 2, 'startTime' => '08:30', 'endTime' => '09:10'],
+        ['time' => '09:10 - 09:50', 'period' => 3, 'startTime' => '09:10', 'endTime' => '09:50'],
+        ['time' => '09:50 - 10:30', 'period' => 4, 'startTime' => '09:50', 'endTime' => '10:30'],
+        ['time' => '10:30 - 10:50', 'period' => 'break', 'startTime' => '10:30', 'endTime' => '10:50'],
+        ['time' => '10:50 - 11:30', 'period' => 5, 'startTime' => '10:50', 'endTime' => '11:30'],
+        ['time' => '11:30 - 12:10', 'period' => 6, 'startTime' => '11:30', 'endTime' => '12:10'],
+        ['time' => '12:10 - 12:50', 'period' => 7, 'startTime' => '12:10', 'endTime' => '12:50'],
+        ['time' => '12:50 - 13:30', 'period' => 8, 'startTime' => '12:50', 'endTime' => '13:30']
     ];
 
     $days = $days ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -108,8 +108,7 @@
                                         <td colspan="6" class="interval-cell">
                                             <div class="interval-content">
                                                 <span class="interval-icon">☕</span>
-                                                <span class="interval-text">INTERVAL (20 minutes)</span>
-                                                <span class="interval-time">10:30 - 10:50</span>
+                                                <span class="interval-text">INTERVAL</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -184,48 +183,24 @@
             const currentMinute = now.getMinutes();
             const currentTime = currentHour * 60 + currentMinute; // Time in minutes since midnight
 
-            // Define time ranges in minutes
-            const periods = [{
-                    start: 7 * 60 + 30,
-                    end: 8 * 60 + 30,
-                    period: 1
-                },
-                {
-                    start: 8 * 60 + 30,
-                    end: 9 * 60 + 30,
-                    period: 2
-                },
-                {
-                    start: 9 * 60 + 30,
-                    end: 10 * 60 + 30,
-                    period: 3
-                },
-                {
-                    start: 10 * 60 + 30,
-                    end: 11 * 60 + 30,
-                    period: 4
-                },
-                {
-                    start: 11 * 60 + 50,
-                    end: 12 * 60 + 50,
-                    period: 5
-                },
-                {
-                    start: 12 * 60 + 50,
-                    end: 13 * 60 + 30,
-                    period: 6
-                },
-                {
-                    start: 13 * 60 + 30,
-                    end: 14 * 60 + 30,
-                    period: 7
-                },
-                {
-                    start: 14 * 60 + 30,
-                    end: 15 * 60 + 10,
-                    period: 8
-                }
-            ];
+            const timeSlots = <?php echo json_encode($timeSlots); ?>;
+
+            function toMinutes(hhmm) {
+                if (!hhmm) return null;
+                const m = String(hhmm).match(/^(\d{2}):(\d{2})/);
+                if (!m) return null;
+                return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+            }
+
+            // Build time ranges from server-provided period times
+            const periods = (timeSlots || [])
+                .filter(s => s && s.period !== 'break')
+                .map(s => {
+                    const start = toMinutes(s.startTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[0].trim()) : null);
+                    const end = toMinutes(s.endTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[1].trim()) : null);
+                    return { start, end, period: s.period };
+                })
+                .filter(p => typeof p.period === 'number' && p.start !== null && p.end !== null);
 
             // Find current period
             const currentPeriod = periods.find(p => currentTime >= p.start && currentTime <= p.end);
