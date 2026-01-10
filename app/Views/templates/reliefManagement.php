@@ -1,9 +1,5 @@
 <?php
 // Relief Management Assignment Section
-// Expecting from controller:
-// - $pendingRelief: array of timetable slots + availableTeachers
-// - $selectedDate: YYYY-MM-DD
-// - $presentTeacherCount: int
 
 $selectedDate = $selectedDate ?? ($_GET['date'] ?? date('Y-m-d'));
 if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
@@ -13,6 +9,51 @@ if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
 $pendingRelief = $pendingRelief ?? [];
 $presentTeacherCount = $presentTeacherCount ?? 0;
 $reliefError = $reliefError ?? null;
+
+// Demo mode: /admin?tab=Relief&demo=1
+// Keeps production behavior unchanged unless explicitly enabled.
+$demoMode = isset($_GET['demo']) && (string)$_GET['demo'] === '1';
+if ($demoMode) {
+  $pendingRelief = [
+    [
+      'timetableID' => 101,
+      'absentTeacherID' => 12,
+      'dayID' => 1,
+      'periodID' => 2,
+      'classID' => 7,
+      'grade' => '10',
+      'section' => 'A',
+      'subjectID' => 3,
+      'subjectName' => 'Mathematics',
+      'absentTeacherName' => 'Mr. Perera',
+      'availableTeachers' => [
+        ['teacherID' => 21, 'teacherSubjectID' => 3, 'name' => 'Ms. Silva', 'subjectName' => 'Mathematics'],
+        ['teacherID' => 22, 'teacherSubjectID' => 3, 'name' => 'Mr. Fernando', 'subjectName' => 'Mathematics'],
+        ['teacherID' => 25, 'teacherSubjectID' => 5, 'name' => 'Ms. Jayasinghe', 'subjectName' => 'Science'],
+      ],
+    ],
+    [
+      'timetableID' => 102,
+      'absentTeacherID' => 18,
+      'dayID' => 1,
+      'periodID' => 5,
+      'classID' => 9,
+      'grade' => '8',
+      'section' => 'B',
+      'subjectID' => 6,
+      'subjectName' => 'English Language',
+      'absentTeacherName' => 'Ms. Kumari',
+      'availableTeachers' => [
+        ['teacherID' => 31, 'teacherSubjectID' => 6, 'name' => 'Mr. Dias', 'subjectName' => 'English Language'],
+        ['teacherID' => 33, 'teacherSubjectID' => 2, 'name' => 'Ms. Wickramasinghe', 'subjectName' => 'History'],
+        ['teacherID' => 34, 'teacherSubjectID' => 4, 'name' => 'Mr. Gunasekara', 'subjectName' => 'ICT'],
+      ],
+    ],
+  ];
+
+  $presentTeacherCount = 42;
+  $reliefError = null;
+}
 ?>
 <link rel="stylesheet" href="/css/reliefManagement/reliefManagement.css" />
 <section class="mp-relief theme-light" aria-labelledby="relief-assign-title">
@@ -49,6 +90,7 @@ $reliefError = $reliefError ?? null;
             <tr class="table-row">
               <th class="table-head">Class</th>
               <th class="table-head">Period</th>
+              <th class="table-head">Subject</th>
               <th class="table-head">Absent Teacher</th>
               <th class="table-head">Select Teacher</th>
               <th class="table-head">Status</th>
@@ -57,7 +99,7 @@ $reliefError = $reliefError ?? null;
           <tbody>
             <?php if (empty($pendingRelief)): ?>
               <tr class="table-row">
-                <td class="table-data" colspan="5">No pending relief slots for the selected date.</td>
+                <td class="table-data" colspan="6">No pending relief slots for the selected date.</td>
               </tr>
             <?php endif; ?>
 
@@ -67,6 +109,17 @@ $reliefError = $reliefError ?? null;
                   ? ((string)$row['grade'] . ' - ' . (string)($row['section'] ?? ''))
                   : (string)($row['classID'] ?? '');
                 $available = $row['availableTeachers'] ?? [];
+                $slotSubjectId = (int)($row['subjectID'] ?? 0);
+                $sameSubject = [];
+                $otherSubject = [];
+                foreach ($available as $t) {
+                  $tSubject = (int)($t['teacherSubjectID'] ?? 0);
+                  if ($slotSubjectId > 0 && $tSubject === $slotSubjectId) {
+                    $sameSubject[] = $t;
+                  } else {
+                    $otherSubject[] = $t;
+                  }
+                }
               ?>
               <tr
                 data-row-index="<?php echo $idx; ?>"
@@ -77,16 +130,34 @@ $reliefError = $reliefError ?? null;
               >
                 <td class="table-data" data-col="class"><?php echo htmlspecialchars($classLabel); ?></td>
                 <td class="table-data" data-col="period"><?php echo htmlspecialchars((string)$row['periodID']); ?></td>
+                <td class="table-data" data-col="subject"><?php echo htmlspecialchars((string)($row['subjectName'] ?? '')); ?></td>
                 <td class="table-data" data-col="absent"><?php echo htmlspecialchars((string)($row['absentTeacherName'] ?? '')); ?></td>
                 <td class="table-data" data-col="teacher">
-                  <select class="input input--select teacher-select" aria-label="Select teacher for period <?php echo htmlspecialchars((string)$row['periodID']); ?> class <?php echo htmlspecialchars($classLabel); ?>">
-                    <option value="" selected disabled><?php echo empty($available) ? 'No free teachers' : 'Select Teacher'; ?></option>
-                    <?php foreach ($available as $t): ?>
-                      <option value="<?php echo (int)$t['teacherID']; ?>">
-                        <?php echo htmlspecialchars($t['name'] . (isset($t['subjectName']) && $t['subjectName'] ? ' (' . $t['subjectName'] . ')' : '')); ?>
-                      </option>
-                    <?php endforeach; ?>
-                  </select>
+                  <div class="teacher-select-group">
+                    <div class="teacher-select-block">
+                      <div class="teacher-select-label">Same Subject (Free)</div>
+                      <select class="input input--select teacher-select teacher-select--same" aria-label="Select same-subject teacher for period <?php echo htmlspecialchars((string)$row['periodID']); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($sameSubject) ? 'disabled' : ''; ?>>
+                        <option value="" selected><?php echo empty($sameSubject) ? 'No same-subject teachers' : 'Select Teacher'; ?></option>
+                        <?php foreach ($sameSubject as $t): ?>
+                          <option value="<?php echo (int)$t['teacherID']; ?>">
+                            <?php echo htmlspecialchars($t['name'] . (isset($t['subjectName']) && $t['subjectName'] ? ' (' . $t['subjectName'] . ')' : '')); ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+
+                    <div class="teacher-select-block">
+                      <div class="teacher-select-label">Other Free Teachers</div>
+                      <select class="input input--select teacher-select teacher-select--other" aria-label="Select other free teacher for period <?php echo htmlspecialchars((string)$row['periodID']); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($otherSubject) ? 'disabled' : ''; ?>>
+                        <option value="" selected><?php echo empty($otherSubject) ? 'No other free teachers' : 'Select Teacher'; ?></option>
+                        <?php foreach ($otherSubject as $t): ?>
+                          <option value="<?php echo (int)$t['teacherID']; ?>">
+                            <?php echo htmlspecialchars($t['name'] . (isset($t['subjectName']) && $t['subjectName'] ? ' (' . $t['subjectName'] . ')' : '')); ?>
+                          </option>
+                        <?php endforeach; ?>
+                      </select>
+                    </div>
+                  </div>
                 </td>
                 <td class="table-data status-cell" data-col="status"><span class="status-badge pending">Pending</span></td>
               </tr>
@@ -113,10 +184,22 @@ $reliefError = $reliefError ?? null;
     badge.textContent = status;
     badge.className = 'status-badge ' + cls;
   }
-  form.querySelectorAll('.teacher-select').forEach(sel => {
+  form.querySelectorAll('.teacher-select--same, .teacher-select--other').forEach(sel => {
     sel.addEventListener('change', e => {
       const row = e.target.closest('tr');
-      if (e.target.value) {
+      const cell = e.target.closest('td');
+      const sameSel = cell ? cell.querySelector('.teacher-select--same') : null;
+      const otherSel = cell ? cell.querySelector('.teacher-select--other') : null;
+
+      if (e.target.classList.contains('teacher-select--same') && otherSel) {
+        otherSel.value = '';
+      }
+      if (e.target.classList.contains('teacher-select--other') && sameSel) {
+        sameSel.value = '';
+      }
+
+      const selected = (sameSel && sameSel.value) || (otherSel && otherSel.value);
+      if (selected) {
         updateStatus(row, 'Ready', 'ready');
       } else {
         updateStatus(row, 'Pending', 'pending');
@@ -124,7 +207,7 @@ $reliefError = $reliefError ?? null;
     });
   });
   document.getElementById('clearSelections').addEventListener('click', () => {
-    form.querySelectorAll('.teacher-select').forEach(sel => { sel.value = ''; });
+    form.querySelectorAll('.teacher-select--same, .teacher-select--other').forEach(sel => { sel.value = ''; });
     form.querySelectorAll('tr.relief-row').forEach(r => updateStatus(r, 'Pending', 'pending'));
     logEl.textContent = 'Selections cleared.';
   });
@@ -132,13 +215,15 @@ $reliefError = $reliefError ?? null;
     e.preventDefault();
     const data = [];
     form.querySelectorAll('tr.relief-row').forEach(r => {
-      const teacherSel = r.querySelector('.teacher-select');
-      if (teacherSel.value) {
+      const sameSel = r.querySelector('.teacher-select--same');
+      const otherSel = r.querySelector('.teacher-select--other');
+      const teacherId = Number((sameSel && sameSel.value) || (otherSel && otherSel.value) || 0);
+      if (teacherId) {
         data.push({
           timetableID: Number(r.dataset.timetableId),
           dayID: Number(r.dataset.dayId),
           periodID: Number(r.dataset.periodId),
-          reliefTeacherID: Number(teacherSel.value),
+          reliefTeacherID: teacherId,
           reliefDate: selectedDate
         });
       }
@@ -158,8 +243,10 @@ $reliefError = $reliefError ?? null;
       }
       logEl.textContent = `Assignments saved: ${resp.saved || 0}.`;
       form.querySelectorAll('tr.relief-row').forEach(r => {
-        const sel = r.querySelector('.teacher-select');
-        if (sel && sel.value) updateStatus(r, 'Assigned', 'assigned');
+        const sameSel = r.querySelector('.teacher-select--same');
+        const otherSel = r.querySelector('.teacher-select--other');
+        const teacherId = Number((sameSel && sameSel.value) || (otherSel && otherSel.value) || 0);
+        if (teacherId) updateStatus(r, 'Assigned', 'assigned');
       });
     }).catch(() => { logEl.textContent = 'Failed to save assignments.'; });
   });

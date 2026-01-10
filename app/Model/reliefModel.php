@@ -80,6 +80,7 @@ class reliefModel
 	{
 		$sql = "SELECT
 					t.teacherID,
+					t.subjectID AS teacherSubjectID,
 					CONCAT(un.firstName, ' ', un.lastName) AS name,
 					s.subjectName
 				FROM teachers t
