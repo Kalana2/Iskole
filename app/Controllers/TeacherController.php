@@ -23,38 +23,41 @@ class TeacherController extends Controller
         $q = trim($_GET['q'] ?? '');
 
         if ($tab === 'Reports') {
-            /** @var ReportModel $reportModel */
+
             $reportModel = $this->model('ReportModel');
 
-            // Recent behavior reports (your existing UI uses this)
+            // Behavior reports
             $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
             $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
 
+            // Models
             $teacherModel = $this->model('TeacherModel');
             $studentModel = $this->model('StudentModel');
 
-            $teacher = $teacherModel->getTeacherByUserID($_SESSION['user_id'] ?? 0);
-            $grade = (int)($teacher['grade'] ?? 0);
+            // ✅ teacher classID
+            $teacher = $teacherModel->getTeacherByUserID($teacherUserId);
+            $teacherClassId = (int)($teacher['classID'] ?? 0);
 
+            // ✅ dropdown suggestions (ONLY this class)
             $suggestions = [];
-            if ($grade > 0) {
-                $suggestions = $studentModel->getStudentsByGrade($grade);
+            if ($teacherClassId > 0) {
+                $suggestions = $studentModel->getStudentsByClassId($teacherClassId);
             }
 
-
-            // Teacher class id from session (make sure this is set at login)
-            $teacherClassId = $_SESSION['classID'] ?? null;
-
-            // If searched, load student details
-            if (!empty($teacherClassId) && $q !== '') {
-                $student = $this->findStudentInClass((int)$teacherClassId, $q);
-
+            // 🔍 search result (still class-based)
+            if ($teacherClassId > 0 && $q !== '') {
+                $student = $this->findStudentInClass($teacherClassId, $q);
 
                 if (!$student) {
-                    $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
+                    $flash = [
+                        'type' => 'error',
+                        'text' => 'Student not found in your class.'
+                    ];
                 }
             }
         }
+
+
 
         // ✅ IMPORTANT: pass data to the view
         $this->view('teacher/index', [
