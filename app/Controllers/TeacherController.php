@@ -34,6 +34,7 @@ class TeacherController extends Controller
         $behaviorReports = [];
         $student = null;
         $leaveRequests = [];
+        $suggestions = [];
 
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
@@ -41,24 +42,36 @@ class TeacherController extends Controller
         $q = trim($_GET['q'] ?? '');
 
         if ($tab === 'Reports') {
-            /** @var ReportModel $reportModel */
+
             $reportModel = $this->model('ReportModel');
 
-            // Recent behavior reports (your existing UI uses this)
+            // Behavior reports
             $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
             $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
 
+            // Models
+            $teacherModel = $this->model('TeacherModel');
+            $studentModel = $this->model('StudentModel');
 
-            // Teacher class id from session (make sure this is set at login)
-            $teacherClassId = $_SESSION['classID'] ?? null;
+            // ✅ teacher classID
+            $teacher = $teacherModel->getTeacherByUserID($teacherUserId);
+            $teacherClassId = (int)($teacher['classID'] ?? 0);
 
-            // If searched, load student details
-            if (!empty($teacherClassId) && $q !== '') {
-                $student = $this->findStudentInClass((int)$teacherClassId, $q);
+            // ✅ dropdown suggestions (ONLY this class)
+            $suggestions = [];
+            if ($teacherClassId > 0) {
+                $suggestions = $studentModel->getStudentsByClassId($teacherClassId);
+            }
 
+            // 🔍 search result (still class-based)
+            if ($teacherClassId > 0 && $q !== '') {
+                $student = $this->findStudentInClass($teacherClassId, $q);
 
                 if (!$student) {
-                    $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
+                    $flash = [
+                        'type' => 'error',
+                        'text' => 'Student not found in your class.'
+                    ];
                 }
             }
         }
@@ -78,6 +91,7 @@ class TeacherController extends Controller
             'student' => $student,
             'flash' => $flash,
             'leaveRequests' => $leaveRequests,
+            'suggestions' => $suggestions, // ✅ ADD THIS
         ]);
     }
 
