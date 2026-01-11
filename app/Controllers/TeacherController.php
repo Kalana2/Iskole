@@ -16,6 +16,7 @@ class TeacherController extends Controller
 
         $behaviorReports = [];
         $student = null;
+        $suggestions = [];
 
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
