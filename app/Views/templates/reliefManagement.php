@@ -52,6 +52,60 @@ if ($demoMode) {
 
   $presentTeacherCount = 42;
   $reliefError = null;
+// Relief Management Assignment Section
+
+$selectedDate = $selectedDate ?? ($_GET['date'] ?? date('Y-m-d'));
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+  $selectedDate = date('Y-m-d');
+}
+
+$pendingRelief = $pendingRelief ?? [];
+$presentTeacherCount = $presentTeacherCount ?? 0;
+$reliefError = $reliefError ?? null;
+
+// Demo mode: /admin?tab=Relief&demo=1
+// Keeps production behavior unchanged unless explicitly enabled.
+$demoMode = isset($_GET['demo']) && (string)$_GET['demo'] === '1';
+if ($demoMode) {
+  $pendingRelief = [
+    [
+      'timetableID' => 101,
+      'absentTeacherID' => 12,
+      'dayID' => 1,
+      'periodID' => 2,
+      'classID' => 7,
+      'grade' => '10',
+      'section' => 'A',
+      'subjectID' => 3,
+      'subjectName' => 'Mathematics',
+      'absentTeacherName' => 'Mr. Perera',
+      'availableTeachers' => [
+        ['teacherID' => 21, 'teacherSubjectID' => 3, 'name' => 'Ms. Silva', 'subjectName' => 'Mathematics'],
+        ['teacherID' => 22, 'teacherSubjectID' => 3, 'name' => 'Mr. Fernando', 'subjectName' => 'Mathematics'],
+        ['teacherID' => 25, 'teacherSubjectID' => 5, 'name' => 'Ms. Jayasinghe', 'subjectName' => 'Science'],
+      ],
+    ],
+    [
+      'timetableID' => 102,
+      'absentTeacherID' => 18,
+      'dayID' => 1,
+      'periodID' => 5,
+      'classID' => 9,
+      'grade' => '8',
+      'section' => 'B',
+      'subjectID' => 6,
+      'subjectName' => 'English Language',
+      'absentTeacherName' => 'Ms. Kumari',
+      'availableTeachers' => [
+        ['teacherID' => 31, 'teacherSubjectID' => 6, 'name' => 'Mr. Dias', 'subjectName' => 'English Language'],
+        ['teacherID' => 33, 'teacherSubjectID' => 2, 'name' => 'Ms. Wickramasinghe', 'subjectName' => 'History'],
+        ['teacherID' => 34, 'teacherSubjectID' => 4, 'name' => 'Mr. Gunasekara', 'subjectName' => 'ICT'],
+      ],
+    ],
+  ];
+
+  $presentTeacherCount = 42;
+  $reliefError = null;
 }
 ?>
 <link rel="stylesheet" href="/css/reliefManagement/reliefManagement.css" />
