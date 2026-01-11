@@ -152,6 +152,49 @@ class reliefModel
 		return $stmt->execute([$timetableId, $reliefTeacherId, $reliefDate, $dayId, $periodId, $createdBy]);
 	}
 
+	/**
+	 * Relief assignments for a specific teacher and date.
+	 * Used by /teacher/relief.
+	 */
+	public function getReliefAssignmentsForTeacher(int $teacherId, string $date): array
+	{
+		$sql = "SELECT
+				ra.timetableID,
+				ra.reliefTeacherID,
+				ra.reliefDate,
+				ra.dayID,
+				ra.periodID,
+				ra.status,
+				ct.classID,
+				ct.subjectID,
+				ct.teacherID AS absentTeacherID,
+				c.grade,
+				c.class AS section,
+				s.subjectName,
+				CONCAT(un.firstName, ' ', un.lastName) AS absentTeacherName,
+				(
+					SELECT COUNT(*)
+					FROM students st
+					JOIN user u2 ON u2.userID = st.userID
+					WHERE st.classID = ct.classID AND u2.active = 1
+				) AS studentCount
+			FROM reliefAssignments ra
+			JOIN classTimetable ct ON ct.id = ra.timetableID
+			LEFT JOIN class c ON c.classID = ct.classID
+			LEFT JOIN subject s ON s.subjectID = ct.subjectID
+			LEFT JOIN teachers tAbs ON tAbs.teacherID = ct.teacherID
+			LEFT JOIN user uAbs ON uAbs.userID = tAbs.userID
+			LEFT JOIN userName un ON un.userID = uAbs.userID
+			WHERE ra.reliefTeacherID = ?
+			  AND ra.reliefDate = ?
+			  AND (ra.status IS NULL OR ra.status <> 'cancelled')
+			ORDER BY ra.periodID ASC";
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute([$teacherId, $date]);
+		return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+	}
+
 	private function dateToDayId(string $date): int
 	{
 		$ts = strtotime($date);

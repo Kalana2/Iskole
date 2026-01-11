@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../Core/Controller.php';
+require_once __DIR__ . '/../Model/TeacherModel.php';
+require_once __DIR__ . '/../Model/reliefModel.php';
 
 class TeacherController extends Controller
 {
@@ -49,6 +51,42 @@ class TeacherController extends Controller
         }
 
         $this->view('teacher/materials');
+    }
+
+    public function relief()
+    {
+        $selectedDate = $_GET['date'] ?? date('Y-m-d');
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $selectedDate)) {
+            $selectedDate = date('Y-m-d');
+        }
+
+        $userId = (int)($_SESSION['user_id'] ?? 0);
+        $error = null;
+        $reliefPeriods = [];
+
+        try {
+            $teacherModel = new TeacherModel();
+            $teacherId = $teacherModel->getTeacherIDByUserID($userId);
+
+            if (!$teacherId) {
+                $error = 'Teacher profile not found for this account.';
+            } else {
+                // Helpful for existing attendance APIs that check this session key.
+                $_SESSION['teacher_id'] = (int)$teacherId;
+
+                $reliefModel = new reliefModel();
+                $reliefPeriods = $reliefModel->getReliefAssignmentsForTeacher((int)$teacherId, $selectedDate);
+            }
+        } catch (Exception $e) {
+            error_log('Teacher relief load error: ' . $e->getMessage());
+            $error = 'Failed to load relief periods.';
+        }
+
+        $this->view('teacher/relief', [
+            'selectedDate' => $selectedDate,
+            'reliefPeriods' => $reliefPeriods,
+            'error' => $error,
+        ]);
     }
 
     private function handleAnnouncementAction($action)

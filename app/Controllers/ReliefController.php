@@ -109,5 +109,40 @@ class ReliefController extends Controller
 			echo json_encode(['success' => false, 'message' => 'Failed to save assignments']);
 		}
 	}
+
+	/**
+	 * JSON: students for a class/date (for relief teacher view modal).
+	 * GET /relief/students?classID=123&date=YYYY-MM-DD
+	 */
+	public function students()
+	{
+		header('Content-Type: application/json');
+
+		if (!isset($_SESSION['user_id'])) {
+			http_response_code(401);
+			echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+			return;
+		}
+
+		$classId = (int)($_GET['classID'] ?? 0);
+		$date = (string)($_GET['date'] ?? date('Y-m-d'));
+
+		if ($classId <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'message' => 'Invalid classID or date']);
+			return;
+		}
+
+		try {
+			require_once __DIR__ . '/../Model/StudentAttendance.php';
+			$studentAttendance = new StudentAttendance();
+			$students = $studentAttendance->getStudentsWithAttendance($classId, $date);
+			echo json_encode(['success' => true, 'students' => $students]);
+		} catch (Exception $e) {
+			error_log('Relief students error: ' . $e->getMessage());
+			http_response_code(500);
+			echo json_encode(['success' => false, 'message' => 'Failed to load students']);
+		}
+	}
 }
 
