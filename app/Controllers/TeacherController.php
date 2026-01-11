@@ -131,7 +131,7 @@ class TeacherController extends Controller
         $reliefPeriods = [];
 
         try {
-            $teacherModel = new TeacherModel();
+            $teacherModel = $this->model('TeacherModel');
             $teacherId = $teacherModel->getTeacherIDByUserID($userId);
 
             if (!$teacherId) {
