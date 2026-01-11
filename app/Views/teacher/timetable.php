@@ -1,92 +1,31 @@
     <?php
     // filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\timetable.php
 
-    // Sample timetable data structure
-    $teacherInfo = [
-        'name' => 'Mr. Perera',
-        'subject' => 'Mathematics',
-        'employee_id' => 'T-2024-0156'
+    // Data is provided by TeacherController when the "Time Table" tab is active.
+    // Fall back to sample structures if not provided.
+    $teacherInfo = $teacherInfo ?? [
+        'name' => '—',
+        'subject' => '—',
+        'employee_id' => '—'
     ];
 
-    // Time slots for the week
-    $timeSlots = [
-        ['time' => '07:30 - 08:30', 'period' => 1],
-        ['time' => '08:30 - 09:30', 'period' => 2],
-        ['time' => '09:30 - 10:30', 'period' => 3],
-        ['time' => '10:30 - 11:30', 'period' => 4],
-        ['time' => 'INTERVAL', 'period' => 'break'],
-        ['time' => '11:50 - 12:50', 'period' => 5],
-        ['time' => '12:50 - 13:30', 'period' => 6],
-        ['time' => '13:30 - 14:30', 'period' => 7],
-        ['time' => '14:30 - 15:10', 'period' => 8]
+    $timeSlots = $timeSlots ?? [
+        ['time' => '07:50 - 08:30', 'period' => 1, 'startTime' => '07:50', 'endTime' => '08:30'],
+        ['time' => '08:30 - 09:10', 'period' => 2, 'startTime' => '08:30', 'endTime' => '09:10'],
+        ['time' => '09:10 - 09:50', 'period' => 3, 'startTime' => '09:10', 'endTime' => '09:50'],
+        ['time' => '09:50 - 10:30', 'period' => 4, 'startTime' => '09:50', 'endTime' => '10:30'],
+        ['time' => '10:30 - 10:50', 'period' => 'break', 'startTime' => '10:30', 'endTime' => '10:50'],
+        ['time' => '10:50 - 11:30', 'period' => 5, 'startTime' => '10:50', 'endTime' => '11:30'],
+        ['time' => '11:30 - 12:10', 'period' => 6, 'startTime' => '11:30', 'endTime' => '12:10'],
+        ['time' => '12:10 - 12:50', 'period' => 7, 'startTime' => '12:10', 'endTime' => '12:50'],
+        ['time' => '12:50 - 13:30', 'period' => 8, 'startTime' => '12:50', 'endTime' => '13:30']
     ];
 
-    // Timetable data: [day][period] => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203']
-    $timetable = [
-        'Monday' => [
-            1 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            2 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            3 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102'],
-            5 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => null, // Free period
-            7 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            8 => null
-        ],
-        'Tuesday' => [
-            1 => null,
-            2 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            3 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            5 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            6 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            7 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            8 => ['class' => '10-C', 'subject' => 'Mathematics', 'room' => '204']
-        ],
-        'Wednesday' => [
-            1 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            2 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            3 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            4 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            5 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            6 => null,
-            7 => null,
-            8 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205']
-        ],
-        'Thursday' => [
-            1 => ['class' => '10-C', 'subject' => 'Mathematics', 'room' => '204'],
-            2 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            3 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            4 => ['class' => '9-A', 'subject' => 'Mathematics', 'room' => '101'],
-            5 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            7 => null,
-            8 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102']
-        ],
-        'Friday' => [
-            1 => ['class' => '9-B', 'subject' => 'Mathematics', 'room' => '102'],
-            2 => ['class' => '9-C', 'subject' => 'Mathematics', 'room' => '102'],
-            3 => ['class' => '10-A', 'subject' => 'Mathematics', 'room' => '203'],
-            4 => null,
-            5 => ['class' => '10-B', 'subject' => 'Mathematics', 'room' => '203'],
-            6 => ['class' => '11-A', 'subject' => 'Mathematics', 'room' => '205'],
-            7 => ['class' => '11-B', 'subject' => 'Mathematics', 'room' => '205'],
-            8 => null
-        ]
-    ];
+    $days = $days ?? ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    $timetable = $timetable ?? array_fill_keys($days, [1 => null, 2 => null, 3 => null, 4 => null, 5 => null, 6 => null, 7 => null, 8 => null]);
 
-    // Calculate statistics
-    $totalClasses = 0;
-    $classesPerDay = [];
-    foreach ($timetable as $day => $periods) {
-        $count = count(array_filter($periods, function ($p) {
-            return $p !== null;
-        }));
-        $classesPerDay[$day] = $count;
-        $totalClasses += $count;
-    }
-
-    $days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+    $totalClasses = $totalClasses ?? 0;
+    $classesPerDay = $classesPerDay ?? array_fill_keys($days, 0);
     $currentDay = date('l');
     ?>
     <link rel="stylesheet" href="/css/timetable/timetable.css">
@@ -104,11 +43,11 @@
                     <div class="teacher-info-badge">
                         <div class="info-item">
                             <span class="info-label">Teacher:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name'] ?? '—'); ?></span>
                         </div>
                         <div class="info-item">
                             <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
+                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject'] ?? '—'); ?></span>
                         </div>
                     </div>
                 </div>
@@ -169,8 +108,7 @@
                                         <td colspan="6" class="interval-cell">
                                             <div class="interval-content">
                                                 <span class="interval-icon">☕</span>
-                                                <span class="interval-text">INTERVAL (20 minutes)</span>
-                                                <span class="interval-time">10:30 - 10:50</span>
+                                                <span class="interval-text">INTERVAL</span>
                                             </div>
                                         </td>
                                     </tr>
@@ -191,9 +129,9 @@
                                                     <div class="class-card">
                                                         <div class="class-name"><?php echo htmlspecialchars($class['class']); ?></div>
                                                         <div class="class-details">
-                                                            <span class="room-info">
-                                                                <span class="room-icon">🚪</span>
-                                                                Room <?php echo htmlspecialchars($class['room']); ?>
+                                                            <span class="subject-info">
+                                                                <span class="subject-icon">📘</span>
+                                                                <?php echo htmlspecialchars($class['subject'] ?? ''); ?>
                                                             </span>
                                                         </div>
                                                     </div>
@@ -245,48 +183,24 @@
             const currentMinute = now.getMinutes();
             const currentTime = currentHour * 60 + currentMinute; // Time in minutes since midnight
 
-            // Define time ranges in minutes
-            const periods = [{
-                    start: 7 * 60 + 30,
-                    end: 8 * 60 + 30,
-                    period: 1
-                },
-                {
-                    start: 8 * 60 + 30,
-                    end: 9 * 60 + 30,
-                    period: 2
-                },
-                {
-                    start: 9 * 60 + 30,
-                    end: 10 * 60 + 30,
-                    period: 3
-                },
-                {
-                    start: 10 * 60 + 30,
-                    end: 11 * 60 + 30,
-                    period: 4
-                },
-                {
-                    start: 11 * 60 + 50,
-                    end: 12 * 60 + 50,
-                    period: 5
-                },
-                {
-                    start: 12 * 60 + 50,
-                    end: 13 * 60 + 30,
-                    period: 6
-                },
-                {
-                    start: 13 * 60 + 30,
-                    end: 14 * 60 + 30,
-                    period: 7
-                },
-                {
-                    start: 14 * 60 + 30,
-                    end: 15 * 60 + 10,
-                    period: 8
-                }
-            ];
+            const timeSlots = <?php echo json_encode($timeSlots); ?>;
+
+            function toMinutes(hhmm) {
+                if (!hhmm) return null;
+                const m = String(hhmm).match(/^(\d{2}):(\d{2})/);
+                if (!m) return null;
+                return parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
+            }
+
+            // Build time ranges from server-provided period times
+            const periods = (timeSlots || [])
+                .filter(s => s && s.period !== 'break')
+                .map(s => {
+                    const start = toMinutes(s.startTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[0].trim()) : null);
+                    const end = toMinutes(s.endTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[1].trim()) : null);
+                    return { start, end, period: s.period };
+                })
+                .filter(p => typeof p.period === 'number' && p.start !== null && p.end !== null);
 
             // Find current period
             const currentPeriod = periods.find(p => currentTime >= p.start && currentTime <= p.end);
