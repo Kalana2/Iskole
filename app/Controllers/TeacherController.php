@@ -23,8 +23,64 @@ class TeacherController extends Controller
             }
         }
 
-        $this->view('teacher/index');
+        // // Handle announcement actions (✅ DO NOT CHANGE)
+        // if (isset($_GET['action']) && in_array($_GET['action'], ['delete', 'update'])) {
+        //     $this->handleAnnouncementAction($_GET['action']);
+        //     return;
+        // }
+
+        // ✅ NEW: handle tabs + reports search
+
+        $behaviorReports = [];
+        $student = null;
+        $leaveRequests = [];
+
+        $flash = $_SESSION['report_msg'] ?? null;
+        unset($_SESSION['report_msg']);
+
+        $q = trim($_GET['q'] ?? '');
+
+        if ($tab === 'Reports') {
+            /** @var ReportModel $reportModel */
+            $reportModel = $this->model('ReportModel');
+
+            // Recent behavior reports (your existing UI uses this)
+            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+            $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
+
+
+            // Teacher class id from session (make sure this is set at login)
+            $teacherClassId = $_SESSION['classID'] ?? null;
+
+            // If searched, load student details
+            if (!empty($teacherClassId) && $q !== '') {
+                $student = $this->findStudentInClass((int)$teacherClassId, $q);
+
+
+                if (!$student) {
+                    $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
+                }
+            }
+        }
+
+        if ($tab === 'Leave') {
+            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            $leaveModel = $this->model('LeaveRequestModel');
+            $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
+        }
+
+
+        // ✅ IMPORTANT: pass data to the view
+        $this->view('teacher/index', [
+            'tab' => $tab,
+            'behaviorReports' => $behaviorReports,
+            'student' => $student,
+            'flash' => $flash,
+            'leaveRequests' => $leaveRequests,
+        ]);
     }
+
 
     public function materials()
     {
@@ -109,5 +165,12 @@ class TeacherController extends Controller
                 include_once __DIR__ . '/announcement/updateAnnouncementController.php';
                 break;
         }
+    }
+
+
+    public function findStudentInClass($classId, $query)
+    {
+        $model = $this->model('UserModel');
+        return $model->findStudentInClass((int)$classId, $query);
     }
 }

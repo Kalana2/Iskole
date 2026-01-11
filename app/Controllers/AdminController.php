@@ -34,8 +34,30 @@ class AdminController extends Controller
             }
         }
 
+        // Handle Class & Subjects tab
+        if ($tab === 'Class & Subjects') {
+            $model = $this->model('ClassSubjectModel');
+
+            $data['classes']  = $model->getAllClasses();
+            $data['subjects'] = $model->getAllSubjects();
+
+            $data['flash'] = $_SESSION['cs_msg'] ?? null;
+            unset($_SESSION['cs_msg']);
+        }
+
+        // Handle Exam Time Table flash messages
+        if ($tab === 'Exam Time Table') {
+            $data['exam_tt_msg'] = $_SESSION['exam_tt_msg'] ?? null;
+            unset($_SESSION['exam_tt_msg']);
+        }
+
+        // Pass tab to view data
+        $data['tab'] = $tab;
+
+        // Render admin page with tab + data
         $this->view('admin/index', $data);
     }
+
 
     private function handleAnnouncementAction($action)
     {

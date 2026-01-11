@@ -29,8 +29,29 @@ class UserModel
         $data = $stmt->fetch();
 
         return $data;
-
     }
+
+    public function getUserByEmailWithClassID($email)
+    {
+        $stmt = $this->pdo->prepare("
+        SELECT 
+            {$this->userTable}.*,
+            {$this->userNameTable}.firstName,
+            {$this->userNameTable}.lastName,
+            t.classID AS classID
+        FROM {$this->userTable}
+        LEFT JOIN {$this->userNameTable}
+            ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        LEFT JOIN teachers t
+            ON t.userID = {$this->userTable}.userID
+        WHERE {$this->userTable}.email = :email
+          AND {$this->userTable}.active = 1
+        LIMIT 1
+    ");
+        $stmt->execute(['email' => $email]);
+        return $stmt->fetch();
+    }
+
 
     public function getUserById($userId)
     {
@@ -265,4 +286,44 @@ class UserModel
         }
     }
 
+
+
+    public function findStudentInClass(int $classId, string $q): ?array
+    {
+        $sql = "
+        SELECT
+            s.studentID,
+            s.classID,
+            s.gradeID,
+            u.userID,
+            u.email,
+            u.phone,
+            u.dateOfBirth,
+            un.firstName,
+            un.lastName
+        FROM students s
+        INNER JOIN user u ON u.userID = s.userID
+        LEFT JOIN userName un ON un.userID = s.userID
+        WHERE s.classID = :class_id
+          AND (
+                s.studentID = :exact
+             OR u.email LIKE :like
+             OR u.phone LIKE :like
+             OR CONCAT(IFNULL(un.firstName,''),' ',IFNULL(un.lastName,'')) LIKE :like
+             OR un.firstName LIKE :like
+             OR un.lastName LIKE :like
+          )
+        LIMIT 1
+    ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':class_id' => $classId,
+            ':exact' => $q,
+            ':like' => "%$q%",
+        ]);
+
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
 }
