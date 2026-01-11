@@ -326,4 +326,23 @@ class UserModel
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
+
+    public function updatePassword($userId, $hashedPassword)
+    {
+        try {
+            $sql = "UPDATE {$this->userTable} SET password = :password, pwdChanged = :pwdChanged WHERE userID = :userId";
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute([
+                'password' => $hashedPassword,
+                'pwdChanged' => date('Y-m-d H:i:s'),
+                'userId' => $userId
+            ]);
+
+            return $result && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error updating password: " . $e->getMessage());
+            return false;
+        }
+    }
+
 }
