@@ -1,7 +1,7 @@
 <div class="teacher-container">
     <?php
     // Provide navigation items and active label for Teacher
-    $items = ['Announcements', 'Attendance', 'Materials', 'Reports', 'Leave', 'Student Absence', 'Relief', 'Time Table', 'Mark Entry'];
+    $items = ['Announcements', 'Attendance', 'Materials', 'Reports', 'Leave', 'Student Absence', 'Relief', 'Time Table', 'Mark Entry', 'Exam Time Table'];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
     $active = in_array($tab, $items) ? $tab : 'Announcements';
 
@@ -28,7 +28,10 @@
         include __DIR__ . '/attendance.php';
     } else if ($active === 'Student Absence') {
         include __DIR__ . '/studentAbsence.php';
-    } else {
+    } else if ($active === 'Exam Time Table') {
+        include __DIR__ . '/examTimeTable.php';
+    } 
+    else {
         include __DIR__ . '/announcements.php';
     }
     ?>
