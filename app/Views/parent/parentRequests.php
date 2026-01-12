@@ -197,8 +197,9 @@ $recentRequests = $absenceRequests ?? [
                 <div class="form-group">
                     <label for="reason">Reason for Absence</label>
                     <textarea id="reason" name="reason" class="textarea-details"
-                        placeholder="Please provide detailed reason for the absence request" rows="4"
+                        placeholder="Please provide detailed reason for the absence request" rows="4" maxlength="500"
                         required></textarea>
+                    <small class="hint" id="msg-count">0/1000</small>
                 </div>
 
                 <button type="submit" class="btn-submit">Submit Request</button>
@@ -230,7 +231,7 @@ $recentRequests = $absenceRequests ?? [
                 <div class="form-group">
                     <label for="edit-reason">Reason for Absence</label>
                     <textarea id="edit-reason" name="reason" class="textarea-details"
-                        placeholder="Update absence reason" rows="4" required></textarea>
+                        placeholder="Update absence reason" rows="4" maxlength="500" required></textarea>
                 </div>
             </div>
             <div class="modal-actions">
@@ -242,6 +243,48 @@ $recentRequests = $absenceRequests ?? [
 </div>
 
 <script>
+    // Character count for reason textarea(s)
+    (function () {
+        const defaultMax = 1000;
+
+        document.querySelectorAll('textarea.textarea-details').forEach(ta => {
+            // Determine max length: prefer explicit maxlength, then data-max, then default
+            const max = (ta.maxLength && ta.maxLength > 0)
+                ? ta.maxLength
+                : (ta.dataset.max ? parseInt(ta.dataset.max, 10) : defaultMax);
+
+            // Reuse existing #msg-count for the main submit textarea (if present)
+            let counter = (ta.id === 'reason') ? document.getElementById('msg-count') : null;
+
+            // Otherwise find an existing sibling .hint
+            if (!counter) {
+                let sib = ta.nextElementSibling;
+                while (sib && !(sib.classList && sib.classList.contains('hint'))) {
+                    sib = sib.nextElementSibling;
+                }
+                counter = sib || null;
+            }
+
+            // If no counter found, create one
+            if (!counter) {
+                counter = document.createElement('small');
+                counter.className = 'hint';
+                ta.parentNode.insertBefore(counter, ta.nextSibling);
+            }
+
+            // Update function
+            const updateCount = () => {
+                const cur = ta.value.length;
+                counter.textContent = `${cur}/${max}`;
+            };
+
+            // Initialize and bind
+            updateCount();
+            ta.addEventListener('input', updateCount);
+        });
+    })();
+
+
     // Filter functionality
     document.addEventListener('DOMContentLoaded', function () {
         const chips = document.querySelectorAll('.chip[data-filter]');
@@ -321,4 +364,7 @@ $recentRequests = $absenceRequests ?? [
             form.submit();
         }
     }
+
+
+
 </script>
