@@ -93,9 +93,6 @@ $recentRequests = $absenceRequests ?? [
                 <button class="chip" role="tab" aria-selected="false" data-filter="acknowledged">
                     Acknowledgements
                 </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="not_seen">
-                    Not Seen
-                </button>
             </div>
         </div>
 
@@ -139,11 +136,6 @@ $recentRequests = $absenceRequests ?? [
                                 </p>
                             <?php endif; ?>
 
-                            <?php if ($status === 'not_seen'): ?>
-                                <p class="status-note not-seen">
-                                    ⊘ Not yet reviewed by teacher
-                                </p>
-                            <?php endif; ?>
                         </div>
 
                         <div class="right two-com">
@@ -199,7 +191,9 @@ $recentRequests = $absenceRequests ?? [
                     <textarea id="reason" name="reason" class="textarea-details"
                         placeholder="Please provide detailed reason for the absence request" rows="4" maxlength="500"
                         required></textarea>
-                    <small class="hint" id="msg-count">0/1000</small>
+                    <div class="meta">
+                        <span class="hint" id="msg-count">0/500</span>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-submit">Submit Request</button>
