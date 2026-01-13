@@ -1,4 +1,9 @@
-<?php ?>
+<?php
+// Ensure session is started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 
 <link rel="stylesheet" href="/css/addNewUser/addNewUser.css">
 
@@ -11,7 +16,7 @@
     </header>
 
     <div class="card">
-        <form action="../Teacher/teacherDashboard.php" method="post" enctype="multipart/form-data" novalidate>
+        <form action="/teacher/materials?action=create" method="post" enctype="multipart/form-data" id="material-upload-form">
             <div class="form-grid">
                 <div class="field">
                     <label for="Grade">Select Grade</label>
@@ -108,5 +113,42 @@
                 invalid?.focus();
             }
         });
+
+        // Uploading via Fetch API
+        formEl.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(formEl);
+
+            const submitButton = formEl.querySelector('button[type="submit"]');
+            submitButton.disabled = true;
+            submitButton.textContent = 'Uploading...';
+
+            fetch('/teacher/materials?action=create', {
+                method: 'POST',
+                body: formData // sends form data directly without jsonification
+            }).then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            }).then(result => {
+                if (result.success) {
+                    alert(result.message || 'Material uploaded successfully!');
+                    formEl.reset();
+                    updateCounts();
+                    location.reload();
+                } else {
+                    alert(result.message || 'Failed to upload material. Please try again.');
+                }
+            }).catch(error => {
+                console.error('Upload error:', error);
+                alert('An error occurred while uploading. Please check the console for details.');
+            }).finally(() => {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Publish Material';
+            });
+        })
     })();
 </script>

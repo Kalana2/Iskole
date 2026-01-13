@@ -1,5 +1,17 @@
 <?php
+// Start session if not already started
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+include_once __DIR__ . '/../../Controllers/material/materialController.php';
+$materialController = new MaterialController();
+
+// Debug session info
+echo "<!-- Debug Info: User ID: " . ($_SESSION['user_id'] ?? 'not set') . ", User Role: " . ($_SESSION['userRole'] ?? 'not set') . " -->";
+
+$materials = $materialController->studentView();
+echo "<!-- Debug: Materials count: " . count($materials) . " -->";
 
 // Sample data for demonstration (remove when backend is implemented)
 $sampleMaterials = [
@@ -146,13 +158,12 @@ if (empty($materials)) {
                     <p class="ann-body"><?php echo htmlspecialchars($material['description']); ?></p>
 
                     <div class="ann-meta">
-                        <span class="author">By <?php echo htmlspecialchars($material['fName'] . " " . $material['lName']); ?></span>
+                        <span class="author">By <?php echo htmlspecialchars($material['firstName'] . " " . $material['lastName']); ?></span>
                     </div>
 
                     <div class="ann-actions-row">
                         <div class="spacer"></div>
-                        <form method="POST" action="../../app/Controllers/materialController.php" target="_blank" style="display: inline;">
-                            <input type="hidden" name="download" value="1">
+                        <form method="POST" action="" style="display: inline;" onsubmit="downloadMaterial(event);">
                             <input type="hidden" name="materialID" value="<?= htmlspecialchars($material['materialID']); ?>">
                             <button type="submit" class="btn">Download</button>
                         </form>
@@ -210,4 +221,53 @@ if (empty($materials)) {
             });
         });
     })();
+
+    function downloadMaterial(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const materialID = form.querySelector('input[name="materialID"]').value;
+        const button = form.querySelector('button');
+
+        // Show loading state
+        const originalText = button.textContent;
+        button.textContent = 'Downloading...';
+        button.disabled = true;
+
+        // Create form data
+        const formData = new FormData();
+        formData.append('materialID', materialID);
+
+        // Use fetch to download file
+        fetch('/material/download', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Download failed');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                // Create download link
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `material_${materialID}.pdf`; // You can get actual filename from response headers
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Download error:', error);
+                alert('Download failed. Please try again.');
+            })
+            .finally(() => {
+                // Reset button state
+                button.textContent = originalText;
+                button.disabled = false;
+            });
+    }
 </script>

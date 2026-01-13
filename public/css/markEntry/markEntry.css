@@ -336,7 +336,8 @@
 .col-prev,
 .col-grade,
 .col-attendance,
-.col-status {
+.col-status,
+.col-action {
   width: 100px;
   text-align: center;
 }
@@ -512,6 +513,35 @@
 .status-pending {
   background: rgba(245, 158, 11, 0.15);
   color: var(--warning);
+}
+
+.status-pending {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--warning);
+}
+
+.status-remove {
+  appearance: none;
+  border: none;
+  padding: 0.35rem 0.7rem;
+  cursor: pointer;
+  background: rgba(239, 68, 68, 0.15);
+  color: var(--danger-dark);
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.2s ease;
+}
+
+.status-remove:hover {
+  background: rgba(239, 68, 68, 0.25);
+  transform: translateY(-2px);
+}
+
+.status-remove:active {
+  transform: translateY(0);
 }
 
 /* Action Buttons */

@@ -1,7 +1,7 @@
-<?php
-// filepath: /home/snake/Projects/Iskole/app/Views/templates/announcements.php
-?>
 <link rel="stylesheet" href="/css/announcements/announcements.css">
+<?php include __DIR__ . '/../../Controllers/announcement/readAnnouncementController.php'; ?>
+<?php include __DIR__ . '/../../Controllers/announcement/deleteAnnouncementController.php'; ?>
+<?php include __DIR__ . '/../../Controllers/announcement/updateAnnouncementController.php'; ?>
 
 <section class="mp-announcements theme-light" aria-labelledby="ann-title">
     <div class="ann-header">
@@ -19,40 +19,12 @@
 
     <div class="ann-grid" role="list">
         <?php
-        // Expecting: $announcements = [ [ 'title' => '', 'body' => '', 'author' => '', 'author_id' => '', 'date' => '' ], ... ]
-        // $currentUserId should be set by the controller
-        $now = date('Y-m-d');
-        $sample = [
-            [
-                'id' => '1',
-                'title' => 'System Maintenance Window',
-                'body' => 'Scheduled maintenance will occur on Friday from 10:00 PM to 12:00 AM. During this period, access to certain features may be limited. We appreciate your understanding.',
-                'author' => 'Admin',
-                'author_id' => '1',
-                'date' => $now,
-                'audience' => 'all',
-            ],
-            [
-                'id' => '2',
-                'title' => 'Midterm Exam Schedule Released',
-                'body' => 'The midterm exam timetable is now available. Please review the schedule carefully and contact your subject teacher for any discrepancies.',
-                'author' => 'Management Panel',
-                'author_id' => '2',
-                'date' => $now,
-                'audience' => 'students',
-            ],
-            [
-                'id' => '3',
-                'title' => 'Staff Meeting Reminder',
-                'body' => 'A reminder that the monthly staff meeting will be held on Wednesday at 2:00 PM in the conference hall.',
-                'author' => 'Management Panel',
-                'author_id' => '1',
-                'date' => $now,
-                'audience' => 'teachers',
-            ],
-        ];
-        $list = isset($announcements) && is_array($announcements) ? $announcements : $sample;
-        $currentUserId = $currentUserId ?? '1'; // Should be set by controller
+        $list = $announcements ?? [];
+        $currentUserId = $_SESSION['user_id'] ?? null;
+
+        if (empty($list)) {
+            echo '<div class="no-announcements-wrapper"><p class="no-announcements">No announcements available at this time.</p></div>';
+        }
         ?>
 
         <?php foreach ($list as $i => $a): ?>
@@ -84,12 +56,22 @@
                             data-id="<?php echo htmlspecialchars($a['id'] ?? $i); ?>"
                             data-title="<?php echo htmlspecialchars($a['title'] ?? '', ENT_QUOTES); ?>"
                             data-body="<?php echo htmlspecialchars($a['body'] ?? '', ENT_QUOTES); ?>"
-                            data-audience="<?php echo htmlspecialchars($a['audience'] ?? 'all', ENT_QUOTES); ?>">
+                            data-audience="<?php echo htmlspecialchars($a['audience'] ?? '', ENT_QUOTES); ?>">
                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                                 <path d="M11.333 2.00004C11.5081 1.82494 11.716 1.68605 11.9447 1.59129C12.1735 1.49653 12.4187 1.44775 12.6663 1.44775C12.914 1.44775 13.1592 1.49653 13.3879 1.59129C13.6167 1.68605 13.8246 1.82494 13.9997 2.00004C14.1748 2.17513 14.3137 2.383 14.4084 2.61178C14.5032 2.84055 14.552 3.08575 14.552 3.33337C14.552 3.58099 14.5032 3.82619 14.4084 4.05497C14.3137 4.28374 14.1748 4.49161 13.9997 4.66671L5.33301 13.3334L1.99967 14L2.66634 10.6667L11.333 2.00004Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
                             </svg>
                             Edit
                         </button>
+                        <button class="btn-delete" type="button"
+                            data-id="<?php echo htmlspecialchars($a['id'] ?? $i); ?>">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash-icon lucide-trash">
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />
+                                <path d="M3 6h18" />
+                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                            </svg>
+                            Delete
+                        </button>
+
                     </div>
                 <?php endif; ?>
             </article>
@@ -117,15 +99,46 @@
                 <textarea id="edit_body" name="body" class="form-control" rows="6" required></textarea>
             </div>
 
-            <div class="form-group">
-                <label for="edit_audience">Select Audience <span class="required">*</span></label>
-                <select id="edit_audience" name="audience" class="form-control" required>
-                    <option value="all">All Users</option>
-                    <option value="teachers">Teachers</option>
-                    <option value="students">Students</option>
-                    <option value="parents">Parents</option>
-                    <option value="admin">Admin</option>
-                </select>
+            <div class="field span-2">
+                <label for="targetAudience">Target Audience</label>
+                <?php if ($_SESSION['userRole'] == 2): ?>
+                    <label>
+                        <input type="checkbox" name="roles[]" value="parent">
+                        Parent
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="student">
+                        Student
+                    </label>
+                <?php else: ?>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="admin">
+                        Admin
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="mp">
+                        Management Panel (MP)
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="teacher">
+                        Teacher
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="parent">
+                        Parent
+                    </label>
+
+                    <label>
+                        <input type="checkbox" name="roles[]" value="student">
+                        Student
+                    </label>
+                <?php endif; ?>
+                <small class="hint">Choose who should receive this announcement.</small>
             </div>
 
             <div class="modal-footer">
@@ -137,6 +150,7 @@
 </div>
 
 <script>
+    // filter announcements
     (function() {
         const container = document.querySelector('.mp-announcements');
         if (!container) return;
@@ -147,18 +161,7 @@
             const cards = grid.querySelectorAll('.ann-card');
             cards.forEach(card => {
                 const isMyAnnouncement = card.classList.contains('is-my-announcement');
-                let show = true;
-                switch (key) {
-                    case 'all':
-                        show = true;
-                        break;
-                    case 'my':
-                        show = isMyAnnouncement;
-                        break;
-                    default:
-                        show = true;
-                        break;
-                }
+                const show = key === 'all' || (key === 'my' && isMyAnnouncement);
                 card.style.display = show ? '' : 'none';
             });
         };
@@ -183,6 +186,9 @@
         const closeBtn = document.getElementById('closeModalBtn');
         const cancelBtn = document.getElementById('cancelBtn');
 
+        // Ensure modal is hidden on page load
+        modal.style.display = 'none';
+
         // Open modal when edit button is clicked
         document.addEventListener('click', function(e) {
             if (e.target.closest('.btn-edit')) {
@@ -195,28 +201,25 @@
                 document.getElementById('edit_announcement_id').value = id;
                 document.getElementById('edit_title').value = title;
                 document.getElementById('edit_body').value = body;
-                document.getElementById('edit_audience').value = audience || 'all';
+
+                // Reset all checkboxes first
+                const checkboxes = form.querySelectorAll('input[name="roles[]"]');
+                checkboxes.forEach(cb => cb.checked = false);
+
+                // Populate audience checkboxes based on current audience
+                if (audience && audience !== 'all') {
+                    const audiences = audience.split(',');
+                    audiences.forEach(aud => {
+                        const checkbox = form.querySelector(`input[name="roles[]"][value="${aud.trim()}"]`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    });
+                } else if (audience === 'all') {
+                    checkboxes.forEach(cb => cb.checked = true);
+                }
 
                 modal.style.display = 'flex';
-            }
-        });
-
-        // Close modal function
-        function closeModal() {
-            modal.style.display = 'none';
-            form.reset();
-        }
-
-        // Close modal on close button click
-        closeBtn.addEventListener('click', closeModal);
-
-        // Close modal on cancel button click
-        cancelBtn.addEventListener('click', closeModal);
-
-        // Close modal when clicking outside
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) {
-                closeModal();
             }
         });
 
@@ -229,38 +232,71 @@
                 announcement_id: formData.get('announcement_id'),
                 title: formData.get('title'),
                 body: formData.get('body'),
-                audience: formData.get('audience')
+                audience: formData.getAll('roles[]')
             };
+
+            // Validate data before sending
+            if (!data.announcement_id || !data.title || !data.body) {
+                alert('Please fill in all required fields.');
+                return;
+            }
+
+            // Check if at least one audience is selected
+            if (!data.audience || data.audience.length === 0) {
+                alert('Please select at least one target audience.');
+                return;
+            }
 
             // Disable submit button during request
             const submitBtn = form.querySelector('.btn-save');
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
 
+            console.log('Sending data:', data); // Debug log
+
             // Send update request to server
-            fetch('/mp/announcements/update', {
+            fetch(window.location.pathname + '?action=update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify(data)
                 })
-                .then(response => response.json())
-                .then(result => {
-                    if (result.success) {
-                        alert('Announcement updated successfully!');
-                        closeModal();
-                        // Reload the page to show updated data
-                        location.reload();
-                    } else {
-                        alert('Error updating announcement: ' + (result.message || 'Unknown error'));
+                .then(response => {
+                    console.log('Response status:', response.status); // Debug log
+                    console.log('Response headers:', response.headers.get('content-type')); // Debug log
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    return response.text(); // Get as text first to debug
+                })
+                .then(text => {
+                    console.log('Raw response:', text); // Debug log
+
+                    try {
+                        const result = JSON.parse(text);
+                        if (result.success) {
+                            alert('Announcement updated successfully!');
+                            closeModal();
+                            location.reload();
+                        } else {
+                            alert('Error updating announcement: ' + (result.error || result.message || 'Unknown error'));
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Save Changes';
+                        }
+                    } catch (parseError) {
+                        console.error('JSON parse error:', parseError);
+                        console.error('Response text that failed to parse:', text);
+                        alert('Server returned invalid response. Please check the console for details.');
                         submitBtn.disabled = false;
                         submitBtn.textContent = 'Save Changes';
                     }
                 })
                 .catch(error => {
-                    console.error('Error:', error);
-                    alert('Failed to update announcement. Please try again.');
+                    console.error('Fetch error:', error);
+                    alert('Failed to update announcement. Please try again. Check console for details.');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Save Changes';
                 });
@@ -270,6 +306,79 @@
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && modal.style.display === 'flex') {
                 closeModal();
+            }
+        });
+
+        // Close modal function
+        function closeModal() {
+            modal.style.display = 'none';
+            form.reset();
+        }
+
+        // Close modal event listeners
+        [closeBtn, cancelBtn].forEach(btn => btn.addEventListener('click', closeModal));
+
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                closeModal();
+            }
+        });
+
+    })();
+
+    // Delete Announcement
+    (function() {
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.btn-delete')) {
+                const btn = e.target.closest('.btn-delete');
+                const id = btn.getAttribute('data-id');
+
+                if (!id) {
+                    alert('Error: No announcement ID found');
+                    return;
+                }
+
+                if (confirm('Are you sure you want to delete this announcement?')) {
+                    // Disable the delete button during the request
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+
+                    fetch(window.location.pathname + '?action=delete', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                announcement_id: id
+                            })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(result => {
+                            if (result.success) {
+                                alert('Announcement deleted successfully!');
+                                // Reload the page to reflect changes
+                                location.reload();
+                            } else {
+                                alert('Error deleting announcement: ' + (result.error || result.message || 'Unknown error'));
+                                // Re-enable the button if there's an error
+                                btn.disabled = false;
+                                btn.style.opacity = '1';
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Failed to delete announcement. Please try again.');
+                            // Re-enable the button if there's an error
+                            btn.disabled = false;
+                            btn.style.opacity = '1';
+                        });
+                }
             }
         });
     })();

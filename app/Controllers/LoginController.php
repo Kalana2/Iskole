@@ -42,7 +42,9 @@ class LoginController extends Controller
         $userId = isset($user['userID']) ? (int) $user['userID'] : (int) ($user['id'] ?? 0);
         $userRole = isset($user['role']) ? (int) $user['role'] : 0;
         $userEmail = $user['email'] ?? '';
-        $userName = $user['fName'] ?? ($user['firstName'] ?? '');
+        $userfirstName = $user['firstName'] ?? '';
+        $userlastName = $user['lastName'] ?? '';
+        $userName = $userfirstName . ' ' . $userlastName;
 
         // Using Session helper
         $this->session->set('user_id', $userId);

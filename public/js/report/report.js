@@ -338,7 +338,13 @@ function addBehaviorReportCard(report) {
 }
 
 function escapeHtml(str) {
-  return str
+  if (str === null || str === undefined) return "";
+  if (typeof str === "object") {
+    console.error("escapeHtml received object:", str);
+    return String(str);
+  }
+  const text = String(str);
+  return text
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")

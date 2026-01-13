@@ -8,8 +8,8 @@
     </header>
 
     <div class="card">
-        <form action="../../Controllers/addNewUser/addNewUser.php" method="post" >
-            <div class="form-grid">
+        <form action="/addNewUser/submit" method="post" >
+              <div class="form-grid">
                 <div class="field">
                     <label for="fName">First Name</label>
                     <input type="text" id="fName" name="fName" placeholder="Kalana" title="Enter first name" required>
@@ -134,6 +134,7 @@
                     </select>
                 </div>
             </div>
+
 
             <div class="form-actions">
                 <button class="btn btn-ghost" type="reset">Clear</button>

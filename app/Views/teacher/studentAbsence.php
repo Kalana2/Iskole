@@ -1,84 +1,9 @@
 <?php
-// filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\studentAbsence.php
-
-// Sample data for student absence requests
-$absences = [
-    [
-        'id' => 1,
-        'fName' => 'Amal',
-        'lName' => 'Perera',
-        'grade' => '10',
-        'class' => 'A',
-        'from_date' => '2025-11-10',
-        'to_date' => '2025-11-12',
-        'reason' => 'Medical appointment and recovery period. Will provide medical certificate upon return.',
-        'submitted_date' => '2025-11-05',
-        'status' => 'pending',
-        'duration' => 3,
-        'parent_contact' => '077-1234567'
-    ],
-    [
-        'id' => 2,
-        'fName' => 'Nimal',
-        'lName' => 'Silva',
-        'grade' => '10',
-        'class' => 'B',
-        'from_date' => '2025-11-08',
-        'to_date' => '2025-11-08',
-        'reason' => 'Family emergency requiring immediate attention.',
-        'submitted_date' => '2025-11-07',
-        'status' => 'pending',
-        'duration' => 1,
-        'parent_contact' => '071-9876543'
-    ],
-    [
-        'id' => 3,
-        'fName' => 'Kumari',
-        'lName' => 'Fernando',
-        'grade' => '11',
-        'class' => 'A',
-        'from_date' => '2025-11-06',
-        'to_date' => '2025-11-07',
-        'reason' => 'Attending a regional sports tournament representing the school.',
-        'submitted_date' => '2025-11-01',
-        'status' => 'approved',
-        'duration' => 2,
-        'parent_contact' => '075-5551234',
-        'approved_by' => 'Mrs. Jayawardena',
-        'approved_date' => '2025-11-02'
-    ],
-    [
-        'id' => 4,
-        'fName' => 'Saman',
-        'lName' => 'Rajapaksa',
-        'grade' => '9',
-        'class' => 'C',
-        'from_date' => '2025-11-15',
-        'to_date' => '2025-11-17',
-        'reason' => 'Cultural event participation as school representative.',
-        'submitted_date' => '2025-11-04',
-        'status' => 'pending',
-        'duration' => 3,
-        'parent_contact' => '078-3334567'
-    ],
-    [
-        'id' => 5,
-        'fName' => 'Dilini',
-        'lName' => 'Wickramasinghe',
-        'grade' => '10',
-        'class' => 'A',
-        'from_date' => '2025-11-01',
-        'to_date' => '2025-11-01',
-        'reason' => 'Dental treatment scheduled by orthodontist.',
-        'submitted_date' => '2025-10-28',
-        'status' => 'rejected',
-        'duration' => 1,
-        'parent_contact' => '076-7778899',
-        'rejected_by' => 'Mr. Bandara',
-        'rejected_date' => '2025-10-30',
-        'rejection_reason' => 'Important exam scheduled on this date.'
-    ]
-];
+require_once __DIR__ . "/../../Controllers/StudentAbsenceReasonController.php";
+$studentAbsence = new StudentAbsenceReasonController();
+$absenceRequests = $studentAbsence->viewAbsencesByTeacherUserId($_SESSION['user_id']);
+// Use the data fetched from the database
+$absences = $absenceRequests;
 ?>
 <link rel="stylesheet" href="/css/studentAbsence/studentAbsence.css">
 
@@ -99,11 +24,8 @@ $absences = [
                 <button class="chip" role="tab" aria-selected="false" data-filter="pending">
                     Pending
                 </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="approved">
-                    Approved
-                </button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="rejected">
-                    Rejected
+                <button class="chip" role="tab" aria-selected="false" data-filter="acknowledged">
+                    Acknowledgements
                 </button>
             </div>
         </div>
@@ -136,7 +58,8 @@ $absences = [
                                 <?php if ($fromFmt !== $toFmt): ?>
                                     - <?php echo htmlspecialchars($toFmt); ?>
                                 <?php endif; ?>
-                                <span class="duration-badge"><?php echo $duration; ?> day<?php echo $duration > 1 ? 's' : ''; ?></span>
+                                <span class="duration-badge"><?php echo $duration; ?>
+                                    day<?php echo $duration > 1 ? 's' : ''; ?></span>
                             </p>
                             <p class="sub-heading"><?php echo htmlspecialchars($req['reason'] ?? 'No reason provided'); ?></p>
                             <p class="sub-heading meta-info">
@@ -147,35 +70,22 @@ $absences = [
                                 <?php endif; ?>
                             </p>
 
-                            <?php if ($status === 'approved' && isset($req['approved_by'])): ?>
-                                <p class="status-note approved">
-                                    ✓ Approved by <?php echo htmlspecialchars($req['approved_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['approved_date'])); ?>
-                                </p>
-                            <?php endif; ?>
-
-                            <?php if ($status === 'rejected' && isset($req['rejected_by'])): ?>
-                                <p class="status-note rejected">
-                                    ✗ Rejected by <?php echo htmlspecialchars($req['rejected_by']); ?>
-                                    on <?php echo date('M j, Y', strtotime($req['rejected_date'])); ?>
-                                    <?php if (isset($req['rejection_reason'])): ?>
-                                        <br><small>Reason: <?php echo htmlspecialchars($req['rejection_reason']); ?></small>
-                                    <?php endif; ?>
+                            <?php if ($status === 'acknowledged' && isset($req['acknowledged_by'])): ?>
+                                <p class="status-note acknowledged">
+                                    ✓ Acknowledged by <?php echo htmlspecialchars($req['acknowledged_by']); ?>
+                                    on <?php echo date('M j, Y', strtotime($req['acknowledged_date'])); ?>
                                 </p>
                             <?php endif; ?>
                         </div>
 
                         <div class="right two-com">
                             <?php if ($status === 'pending'): ?>
-                                <button class="btn btn-green" onclick="approveRequest(<?php echo $req['id']; ?>)">
-                                    Approve
-                                </button>
-                                <button class="btn btn-red" onclick="rejectRequest(<?php echo $req['id']; ?>)">
-                                    Reject
+                                <button class="btn btn-green" onclick="acknowledgeRequest(<?php echo $req['id']; ?>)">
+                                    Acknowledge
                                 </button>
                             <?php else: ?>
-                                <span class="label <?php echo $status === 'approved' ? 'label-green' : 'label-red'; ?>">
-                                    <?php echo ucfirst($status); ?>
+                                <span class="label label-green">
+                                    Acknowledged
                                 </span>
                             <?php endif; ?>
                         </div>
@@ -195,12 +105,12 @@ $absences = [
 
 <script>
     // Filter functionality
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const chips = document.querySelectorAll('.chip[data-filter]');
         const cards = document.querySelectorAll('.info-box[data-status]');
 
         chips.forEach(chip => {
-            chip.addEventListener('click', function() {
+            chip.addEventListener('click', function () {
                 // Update active state
                 chips.forEach(c => {
                     c.classList.remove('active');
@@ -222,21 +132,39 @@ $absences = [
         });
     });
 
-    // Action handlers (to be implemented with backend)
-    function approveRequest(id) {
-        if (confirm('Are you sure you want to approve this absence request?')) {
-            console.log('Approving request:', id);
-            // TODO: Implement AJAX call to backend
-            alert('Approval functionality to be implemented');
-        }
-    }
+    // Action handlers
+    function acknowledgeRequest(id) {
+        if (confirm('Are you sure you want to acknowledge this absence request?')) {
+            // Disable the button to prevent double-clicks
+            const button = event.target;
+            button.disabled = true;
+            button.textContent = 'Processing...';
 
-    function rejectRequest(id) {
-        const reason = prompt('Please provide a reason for rejection (optional):');
-        if (reason !== null) {
-            console.log('Rejecting request:', id, 'Reason:', reason);
-            // TODO: Implement AJAX call to backend
-            alert('Rejection functionality to be implemented');
+            fetch('/studentAbsenceReason/acknowledge', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ reasonId: id })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Absence request acknowledged successfully!');
+                        // Reload the page to show updated status
+                        location.reload();
+                    } else {
+                        alert('Failed to acknowledge: ' + (data.message || 'Unknown error'));
+                        button.disabled = false;
+                        button.textContent = 'Acknowledge';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while acknowledging the request.');
+                    button.disabled = false;
+                    button.textContent = 'Acknowledge';
+                });
         }
     }
 </script>
