@@ -100,7 +100,7 @@ class ReportController extends Controller
 
             $model->createReport([
                 'studentID'   => (int)$studentID,
-                'teacherID'   => (int)$teacherUserId, 
+                'teacherID'   => (int)$teacherUserId,
                 'report_type' => $reportType,
                 'category'    => $category,
                 'title'       => $title,
@@ -122,4 +122,141 @@ class ReportController extends Controller
         header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
+
+
+
+    public function delete()
+    {
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header("Location: /index.php?url=teacher&tab=Reports");
+            exit;
+        }
+
+        $reportId = (int)($_POST['report_id'] ?? 0);
+        $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+
+        if ($reportId <= 0) {
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Invalid report ID.'];
+            header("Location: /index.php?url=teacher&tab=Reports");
+            exit;
+        }
+
+        $reportModel = $this->model('ReportModel');
+
+        // ✅ Security: teacher ට අයිති report එකක්ද කියලා check කරලා delete කරන්න
+        $deleted = $reportModel->deleteReportByIdAndTeacher($reportId, $teacherUserId);
+
+        if ($deleted) {
+            $_SESSION['report_msg'] = ['type' => 'success', 'text' => 'Report deleted successfully.'];
+        } else {
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Delete failed (not found or not allowed).'];
+        }
+
+        // search q එක තියෙනව නම් ආපහු ඒකත් preserve කරලා redirect කරන්න
+        $q = trim($_POST['q'] ?? '');
+        $redirect = "/index.php?url=teacher&tab=Reports";
+        if ($q !== '') $redirect .= "&q=" . urlencode($q);
+
+        header("Location: $redirect");
+        exit;
+    }
+
+
+
+
+    public function edit()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+    $reportId = (int)($_POST['report_id'] ?? 0);
+    $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+
+    if ($reportId <= 0 || $teacherUserId <= 0) {
+        $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Invalid edit request.'];
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+    /** @var ReportModel $reportModel */
+    $reportModel = $this->model('ReportModel');
+
+    // ✅ security: teacher owns this report
+    $report = $reportModel->getReportByIdAndTeacher($reportId, $teacherUserId);
+
+    if (!$report) {
+        $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Report not found or not allowed.'];
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+  
+    $_SESSION['edit_report'] = $report;
+
+    // preserve q
+    $q = trim($_POST['q'] ?? '');
+    $redirect = "/index.php?url=teacher&tab=Reports";
+    if ($q !== '') $redirect .= "&q=" . urlencode($q);
+
+    header("Location: $redirect");
+    exit;
+}
+
+
+public function update()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+    $reportId = (int)($_POST['report_id'] ?? 0);
+    $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+
+    if ($reportId <= 0 || $teacherUserId <= 0) {
+        $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Invalid update request.'];
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+    $reportType  = $_POST['report_type'] ?? '';
+    $category    = trim($_POST['category'] ?? '');
+    $title       = trim($_POST['title'] ?? '');
+    $description = trim($_POST['description'] ?? '');
+
+    if ($reportType === '' || $category === '' || $title === '' || $description === '') {
+        $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Missing required fields.'];
+        header("Location: /index.php?url=teacher&tab=Reports");
+        exit;
+    }
+
+    /** @var ReportModel $reportModel */
+    $reportModel = $this->model('ReportModel');
+
+
+    $ok = $reportModel->updateReportByTeacher($reportId, $teacherUserId, [
+        'report_type' => $reportType,
+        'category'    => $category,
+        'title'       => $title,
+        'description' => $description,
+    ]);
+
+    if ($ok) {
+        $_SESSION['report_msg'] = ['type' => 'success', 'text' => 'Report updated successfully.'];
+        unset($_SESSION['edit_report']); // ✅ stop edit mode
+    } else {
+        $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Update failed (not found or not allowed).'];
+    }
+
+    // preserve q
+    $q = trim($_POST['q'] ?? '');
+    $redirect = "/index.php?url=teacher&tab=Reports";
+    if ($q !== '') $redirect .= "&q=" . urlencode($q);
+
+    header("Location: $redirect");
+    exit;
+}
+
 }

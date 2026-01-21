@@ -126,4 +126,57 @@ class ReportModel
         $stmt->execute([':tid' => $teacherId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+
+    public function deleteReportByIdAndTeacher(int $reportId, int $teacherId): bool
+    {
+        $sql = "DELETE FROM report 
+            WHERE id = :id AND teacherID = :teacherID";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $reportId,
+            ':teacherID' => $teacherId
+        ]);
+    }
+
+
+
+    public function getReportByIdAndTeacher(int $reportId, int $teacherId)
+    {
+        $sql = "SELECT * FROM report WHERE id = :id AND teacherID = :tid";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':id' => $reportId,
+            ':tid' => $teacherId
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+
+
+
+    public function updateReportByTeacher(int $reportId, int $teacherId, array $data): bool
+    {
+        $sql = "UPDATE report SET
+              report_type = :type,
+              category = :cat,
+              title = :title,
+              description = :desc
+            WHERE id = :id AND teacherID = :tid";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':type'  => $data['report_type'],
+            ':cat'   => $data['category'],
+            ':title' => $data['title'],
+            ':desc'  => $data['description'],
+            ':id'    => $reportId,
+            ':tid'   => $teacherId
+        ]);
+    }
 }

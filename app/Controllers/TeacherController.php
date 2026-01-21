@@ -36,6 +36,10 @@ class TeacherController extends Controller
         $leaveRequests = [];
         $suggestions = [];
 
+
+        $editReport = $_SESSION['edit_report'] ?? null;
+        unset($_SESSION['edit_report']);
+
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
 
@@ -91,7 +95,8 @@ class TeacherController extends Controller
             'student' => $student,
             'flash' => $flash,
             'leaveRequests' => $leaveRequests,
-            'suggestions' => $suggestions, // ✅ ADD THIS
+            'suggestions' => $suggestions,
+            'editReport' => $editReport,
         ]);
     }
 
