@@ -23,19 +23,10 @@ class TeacherController extends Controller
             }
         }
 
-        // // Handle announcement actions (✅ DO NOT CHANGE)
-        // if (isset($_GET['action']) && in_array($_GET['action'], ['delete', 'update'])) {
-        //     $this->handleAnnouncementAction($_GET['action']);
-        //     return;
-        // }
-
-        // ✅ NEW: handle tabs + reports search
-
         $behaviorReports = [];
         $student = null;
         $leaveRequests = [];
         $suggestions = [];
-
 
         $editReport = $_SESSION['edit_report'] ?? null;
         unset($_SESSION['edit_report']);
@@ -47,11 +38,14 @@ class TeacherController extends Controller
 
         if ($tab === 'Reports') {
 
+            /** @var ReportModel $reportModel */
             $reportModel = $this->model('ReportModel');
 
-            // Behavior reports
-            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
-            $behaviorReports = $reportModel->getReportsByTeacher((int)$teacherUserId);
+            // ✅ teacher user id (keep consistent)
+            $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+
+            // Behavior reports (only this teacher)
+            $behaviorReports = $reportModel->getReportsByTeacher($teacherUserId);
 
             // Models
             $teacherModel = $this->model('TeacherModel');
@@ -67,9 +61,11 @@ class TeacherController extends Controller
                 $suggestions = $studentModel->getStudentsByClassId($teacherClassId);
             }
 
-            // 🔍 search result (still class-based)
+            // 🔍 search result (STRICT class-based)
             if ($teacherClassId > 0 && $q !== '') {
-                $student = $this->findStudentInClass($teacherClassId, $q);
+
+                // ✅ FIX: use ReportModel->findStudentInClass() (this has correct SQL with classID filter)
+                $student = $reportModel->findStudentInClass($teacherClassId, $q);
 
                 if (!$student) {
                     $flash = [
@@ -81,12 +77,11 @@ class TeacherController extends Controller
         }
 
         if ($tab === 'Leave') {
-            $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+            $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
 
             $leaveModel = $this->model('LeaveRequestModel');
-            $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
+            $leaveRequests = $leaveModel->getByTeacher($teacherUserId);
         }
-
 
         // ✅ IMPORTANT: pass data to the view
         $this->view('teacher/index', [
@@ -100,10 +95,8 @@ class TeacherController extends Controller
         ]);
     }
 
-
     public function materials()
     {
-        // Handle material upload actions
         if (isset($_GET['action']) && $_GET['action'] === 'create') {
             require_once __DIR__ . '/MaterialController.php';
             $materialController = new MaterialController();
@@ -111,13 +104,11 @@ class TeacherController extends Controller
             return;
         }
 
-        // Handle material hide action
         if (isset($_GET['action']) && $_GET['action'] === 'hide') {
             include_once __DIR__ . '/material/hideMaterialController.php';
             return;
         }
 
-        // Handle material unhide action
         if (isset($_GET['action']) && $_GET['action'] === 'unhide') {
             include_once __DIR__ . '/material/unhideMaterialController.php';
             return;
@@ -156,7 +147,6 @@ class TeacherController extends Controller
             if (!$teacherId) {
                 $error = 'Teacher profile not found for this account.';
             } else {
-                // Helpful for existing attendance APIs that check this session key.
                 $_SESSION['teacher_id'] = (int)$teacherId;
 
                 $reliefModel = new reliefModel();
@@ -186,10 +176,5 @@ class TeacherController extends Controller
         }
     }
 
-
-    public function findStudentInClass($classId, $query)
-    {
-        $model = $this->model('UserModel');
-        return $model->findStudentInClass((int)$classId, $query);
-    }
+  
 }

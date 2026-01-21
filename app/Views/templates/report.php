@@ -49,13 +49,18 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
             name="q"
             list="studentList"
             autocomplete="off"
-            value="<?= htmlspecialchars($_GET['q'] ?? '') ?>">
+            spellcheck="false"
+            autocapitalize="off"
+            autocorrect="off"
+            value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
+            onfocus="this.value=''; this.dispatchEvent(new Event('input'));">
 
           <datalist id="studentList">
             <?php foreach (($suggestions ?? []) as $s): ?>
-              <option value="<?= htmlspecialchars(trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? ''))) ?>">
+              <option value="<?= htmlspecialchars(($s['studentID'] ?? '') . ' - ' . trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? ''))) ?>">
                 <?= htmlspecialchars(trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? '')) . ' (' . ($s['studentID'] ?? '') . ')') ?>
               </option>
+
             <?php endforeach; ?>
           </datalist>
 
@@ -93,10 +98,11 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 
               <div class="info-grid">
                 <div class="info-item"><span class="label">Grade:</span>
-                  <span class="value"><?= htmlspecialchars($student['gradeID'] ?? 'N/A') ?></span>
+                  <span class="value"><?= htmlspecialchars($student['grade'] ?? 'N/A') ?></span>
                 </div>
                 <div class="info-item"><span class="label">Class:</span>
-                  <span class="value"><?= htmlspecialchars($student['classID'] ?? 'N/A') ?></span>
+                  <span class="value"><?= htmlspecialchars($student['className'] ?? 'N/A') ?></span>
+
                 </div>
                 <div class="info-item"><span class="label">Student ID:</span>
                   <span class="value"><?= htmlspecialchars($student['studentID'] ?? 'N/A') ?></span>
@@ -319,3 +325,14 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
     </div>
   </div>
 </section>
+
+<script>
+  window.addEventListener("load", () => {
+    const dl = document.getElementById("studentList");
+    if (!dl) return;
+
+    // clone & replace = clears browser cached datalist entries
+    const newDl = dl.cloneNode(true);
+    dl.parentNode.replaceChild(newDl, dl);
+  });
+</script>
