@@ -58,7 +58,6 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
           <datalist id="studentList">
             <?php foreach (($suggestions ?? []) as $s): ?>
               <option value="<?= htmlspecialchars(($s['studentID'] ?? '') . ' - ' . trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? ''))) ?>">
-                <?= htmlspecialchars(trim(($s['firstName'] ?? '') . ' ' . ($s['lastName'] ?? '')) . ' (' . ($s['studentID'] ?? '') . ')') ?>
               </option>
 
             <?php endforeach; ?>
