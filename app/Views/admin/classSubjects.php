@@ -30,16 +30,16 @@
 
             <?php foreach ($classesList as $c): ?>
                 <?php
-                $grade  = trim($c['grade'] ?? '');
+                $grade = trim($c['grade'] ?? '');
                 // ✅ DB column is `class` (A/B)
-                $sec    = strtoupper(trim($c['class'] ?? ''));
-                $label  = $grade . $sec; // 6A, 6B ...
+                $sec = strtoupper(trim($c['class'] ?? ''));
+                $label = $grade . $sec; // 6A, 6B ...
                 ?>
                 <div class="cs-chip">
                     <span><?= htmlspecialchars($label) ?></span>
 
                     <form action="/index.php?url=classSubject/deleteClass" method="post">
-                        <input type="hidden" name="class_id" value="<?= (int)($c['classID'] ?? 0) ?>">
+                        <input type="hidden" name="class_id" value="<?= (int) ($c['classID'] ?? 0) ?>">
                         <button class="cs-del" type="submit"
                             onclick="return confirm('Delete class <?= htmlspecialchars($label) ?> ?')">✕</button>
                     </form>
@@ -79,14 +79,14 @@
     <div class="cs-card">
         <div class="cs-head">
             <h2>Subjects</h2>
-            <p>Subjects relevant to grade (6,7,8,9...)</p>
+            <p>Subjects relevant to grade (6,7,8,9)</p>
         </div>
 
         <?php
         $subjectsList = isset($subjects) && is_array($subjects) ? $subjects : [];
         $byGrade = [];
         foreach ($subjectsList as $s) {
-            $g = (int)($s['grade'] ?? 0);
+            $g = (int) ($s['grade'] ?? 0);
             $byGrade[$g][] = $s;
         }
         ksort($byGrade);
@@ -97,14 +97,16 @@
         <?php endif; ?>
 
         <?php foreach ($byGrade as $g => $items): ?>
+
             <div class="cs-grade">
+                <!-- <h3>Grade <?= (int) $g ?></h3> -->
                 <div class="cs-grid">
                     <?php foreach ($items as $s): ?>
                         <div class="cs-chip">
                             <span><?= htmlspecialchars($s['subjectName'] ?? '') ?></span>
 
                             <form action="/index.php?url=classSubject/deleteSubject" method="post">
-                                <input type="hidden" name="subject_id" value="<?= (int)$s['subjectID'] ?>">
+                                <input type="hidden" name="subject_id" value="<?= (int) $s['subjectID'] ?>">
                                 <button class="cs-del" type="submit"
                                     onclick="return confirm('Delete subject <?= htmlspecialchars($s['subjectName'] ?? '') ?> ?')">
                                     ✕
