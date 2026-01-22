@@ -63,7 +63,8 @@ try {
         </div>
         <!-- Filter Form -->
         <div class="filter-container">
-            <form action="" method="GET" class="filter-form" id="filterForm">
+            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?url=' . ($_GET['url'] ?? 'Mp')); ?>" method="GET" class="filter-form" id="filterForm">
+                <input type="hidden" name="url" value="<?php echo htmlspecialchars($_GET['url'] ?? 'Mp'); ?>">
                 <input type="hidden" name="tab" value="Attendance">
                 <div class="filter-grid">
                     <div class="form-group">
