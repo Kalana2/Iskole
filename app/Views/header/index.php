@@ -11,7 +11,7 @@
         </div>
 
         <div class="header-right">
-            <div class="user-info">
+            <a href="/profile" class="user-info" title="View your profile">
                 <div class="user-avatar">
                     <?php
                     $name = $_SESSION['name'] ?? 'User';
@@ -20,10 +20,10 @@
                 </div>
                 <div class="user-details">
                     <span class="user-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></span>
-                    <a class="user-email" href="/profile"
-                        title="View profile"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'user@example.com'); ?></a>
+                    <span
+                        class="user-email"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'user@example.com'); ?></span>
                 </div>
-            </div>
+            </a>
 
             <a class="logout-btn" href="/login/logout">
                 <img src="/assets/logout.svg" alt="Logout">

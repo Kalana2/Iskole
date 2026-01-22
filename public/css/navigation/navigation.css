@@ -1,4 +1,3 @@
-/* Deprecated: Navigation styles have been moved to /css/mp/navigation.css */
 .mp-nav {
   width: 100%;
   background: linear-gradient(135deg, #1a1f3a 0%, #2d1b4e 100%);
@@ -41,15 +40,16 @@
 }
 
 .nav-links a::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, 
-    transparent, 
-    rgba(255, 255, 255, 0.1), 
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
     transparent
   );
   transition: left 0.5s ease;
@@ -67,18 +67,26 @@
 }
 
 .nav-links a.active {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.25));
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.25),
+    rgba(118, 75, 162, 0.25)
+  );
   color: #ffffff;
   box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3),
-              inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .nav-links a.active:hover {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.35), rgba(118, 75, 162, 0.35));
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.35),
+    rgba(118, 75, 162, 0.35)
+  );
   box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4),
-              inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 .nav-links span {
@@ -95,17 +103,24 @@
 }
 
 .nav-links span::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
   transition: left 0.5s ease;
 }
 
-.nav-links span:hover::before { left: 100%; }
+.nav-links span:hover::before {
+  left: 100%;
+}
 
 .nav-links span:hover {
   transform: translateY(-2px);
@@ -115,16 +130,26 @@
 }
 
 .nav-links span.active {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.25), rgba(118, 75, 162, 0.25));
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.25),
+    rgba(118, 75, 162, 0.25)
+  );
   color: #ffffff;
-  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .nav-links span.active:hover {
   transform: translateY(-2px);
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.35), rgba(118, 75, 162, 0.35));
-  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.35),
+    rgba(118, 75, 162, 0.35)
+  );
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
 /* Responsive */
@@ -132,30 +157,36 @@
   .nav-links {
     gap: 0.2rem;
   }
-  
+
   .nav-links a {
     padding: 0.5rem 0.9rem;
     font-size: 0.85rem;
   }
 
-  .nav-links span { padding: 0.5rem 0.9rem; font-size: 0.85rem; }
+  .nav-links span {
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+  }
 }
 
 @media (max-width: 600px) {
   .mp-nav-inner {
     padding: 0.4rem 0.5rem;
   }
-  
+
   .nav-links {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.25rem;
   }
-  
+
   .nav-links a {
     padding: 0.45rem 0.75rem;
     font-size: 0.8rem;
   }
 
-  .nav-links span { padding: 0.45rem 0.75rem; font-size: 0.8rem; }
+  .nav-links span {
+    padding: 0.45rem 0.75rem;
+    font-size: 0.8rem;
+  }
 }
