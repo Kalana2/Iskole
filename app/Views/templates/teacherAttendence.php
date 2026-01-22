@@ -187,9 +187,6 @@ try {
                                                 <button type="button"
                                                     class="action-btn btn-absent <?php echo $t['status'] === 'absent' ? 'active' : ''; ?>"
                                                     onclick="markTeacherStatus(<?php echo $t['id']; ?>,'absent')" aria-label="Mark Absent">❌</button>
-                                                <button type="button"
-                                                    class="action-btn btn-leave <?php echo $t['status'] === 'leave' ? 'active' : ''; ?>"
-                                                    onclick="markTeacherStatus(<?php echo $t['id']; ?>,'leave')" aria-label="Mark Leave">📝</button>
                                             </div>
                                             <input type="hidden" id="input-<?php echo $t['id']; ?>"
                                                 name="attendance[<?php echo $t['id']; ?>]" value="<?php echo htmlspecialchars($t['status']); ?>">

@@ -116,7 +116,7 @@ try {
         <div class="heading-section">
             <div class="header-content">
                 <div>
-                    <h1 class="heading-text" id="attendance-title">Mark Attendance</h1>
+                    <h1 class="heading-text" id="attendance-title">Student Attendance</h1>
                     <p class="sub-heding-text">Record and manage daily attendance for your classes</p>
                 </div>
             </div>
@@ -124,7 +124,8 @@ try {
 
         <!-- Filter Form -->
         <div class="filter-container">
-            <form action="" method="GET" class="filter-form" id="filterForm">
+            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?url=' . ($_GET['url'] ?? 'admin')); ?>" method="GET" class="filter-form" id="filterForm">
+                <input type="hidden" name="url" value="<?php echo htmlspecialchars($_GET['url'] ?? 'admin'); ?>">
                 <input type="hidden" name="tab" value="Attendance">
                 <div class="filter-grid">
                     <div class="form-group">
