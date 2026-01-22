@@ -5,6 +5,11 @@ require_once __DIR__ . '/../../Model/teacherAttendance.php';
 $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $today = date('Y-m-d');
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
+$isToday = ($selectedDate === $today); // Check if viewing today's attendance
+$isReadOnly = !$isToday; // Read-only mode for past dates
+
+// Check if form was explicitly submitted (has 'load' parameter)
+$formSubmitted = isset($_GET['load']) && $_GET['load'] === '1';
 
 // Initialize model and fetch data
 $teacherAttendanceModel = new TeacherAttendance();
@@ -15,39 +20,42 @@ $leaveCount = 0;
 $totalTeachers = 0;
 $attendancePercentage = 0;
 
-try {
-    // Fetch teachers with attendance status from database
-    $teachers = $teacherAttendanceModel->getTeachersWithAttendance($selectedDate);
+// Only fetch data if form was submitted
+if ($formSubmitted) {
+    try {
+        // Fetch teachers with attendance status from database
+        $teachers = $teacherAttendanceModel->getTeachersWithAttendance($selectedDate);
 
-    // Filter by search query if provided
-    if (!empty($searchQuery)) {
-        $teachers = array_filter($teachers, function ($t) use ($searchQuery) {
-            return stripos($t['name'], $searchQuery) !== false;
-        });
-        $teachers = array_values($teachers); // Re-index array
-    }
-
-    // Normalize status values (convert 'not-marked' to 'absent' for display)
-    foreach ($teachers as &$t) {
-        if ($t['status'] === 'not-marked') {
-            $t['status'] = 'absent';
+        // Filter by search query if provided
+        if (!empty($searchQuery)) {
+            $teachers = array_filter($teachers, function ($t) use ($searchQuery) {
+                return stripos($t['name'], $searchQuery) !== false;
+            });
+            $teachers = array_values($teachers); // Re-index array
         }
-        if ($t['status'] === 'late') {
-            $t['status'] = 'present';
-        }
-    }
-    unset($t);
 
-    // Calculate statistics
-    $presentCount = count(array_filter($teachers, fn($t) => $t['status'] === 'present'));
-    $absentCount = count(array_filter($teachers, fn($t) => $t['status'] === 'absent'));
-    $leaveCount = count(array_filter($teachers, fn($t) => $t['status'] === 'leave'));
-    $totalTeachers = count($teachers);
-    $attendancePercentage = $totalTeachers > 0 ? round(($presentCount / $totalTeachers) * 100) : 0;
-} catch (Exception $e) {
-    error_log("Error loading teacher attendance: " . $e->getMessage());
-    // Show error message in UI
-    $loadError = "Failed to load teacher data. Please try again.";
+        // Normalize status values (convert 'not-marked' to 'absent' for display)
+        foreach ($teachers as &$t) {
+            if ($t['status'] === 'not-marked') {
+                $t['status'] = 'absent';
+            }
+            if ($t['status'] === 'late') {
+                $t['status'] = 'present';
+            }
+        }
+        unset($t);
+
+        // Calculate statistics
+        $presentCount = count(array_filter($teachers, fn($t) => $t['status'] === 'present'));
+        $absentCount = count(array_filter($teachers, fn($t) => $t['status'] === 'absent'));
+        $leaveCount = count(array_filter($teachers, fn($t) => $t['status'] === 'leave'));
+        $totalTeachers = count($teachers);
+        $attendancePercentage = $totalTeachers > 0 ? round(($presentCount / $totalTeachers) * 100) : 0;
+    } catch (Exception $e) {
+        error_log("Error loading teacher attendance: " . $e->getMessage());
+        // Show error message in UI
+        $loadError = "Failed to load teacher data. Please try again.";
+    }
 }
 ?>
 <link rel="stylesheet" href="/css/mp/teacherAttencence.css">
@@ -66,6 +74,7 @@ try {
             <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?url=' . ($_GET['url'] ?? 'Mp')); ?>" method="GET" class="filter-form" id="filterForm">
                 <input type="hidden" name="url" value="<?php echo htmlspecialchars($_GET['url'] ?? 'Mp'); ?>">
                 <input type="hidden" name="tab" value="Attendance">
+                <input type="hidden" name="load" value="1">
                 <div class="filter-grid">
                     <div class="form-group">
                         <label for="date" class="form-label">Date</label>
@@ -92,48 +101,58 @@ try {
                 <strong>Error:</strong> <?php echo htmlspecialchars($loadError); ?>
             </div>
         <?php endif; ?>
-        <!-- Summary -->
-        <div class="selection-summary">
-            <div class="summary-badge">
-                <span class="summary-icon">📅</span>
-                <span class="summary-text">Attendance for
-                    <strong><?php echo date('l, F j, Y', strtotime($selectedDate)); ?></strong>
-                    <?php if ($selectedDate === $today): ?><span class="today-tag">Today</span><?php endif; ?></span>
-            </div>
-        </div>
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card present-stat">
-                <div class="stat-icon">✅</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo $presentCount; ?></div>
-                    <div class="stat-label">Present</div>
+
+        <?php if ($formSubmitted): ?>
+            <!-- Summary -->
+            <div class="selection-summary">
+                <div class="summary-badge">
+                    <span class="summary-icon">📅</span>
+                    <span class="summary-text">Attendance for
+                        <strong><?php echo date('l, F j, Y', strtotime($selectedDate)); ?></strong>
+                        <?php if ($isToday): ?><span class="today-tag">Today</span><?php endif; ?>
+                        <?php if ($isReadOnly): ?><span class="readonly-tag" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;">View Only</span><?php endif; ?>
+                    </span>
                 </div>
             </div>
-            <div class="stat-card absent-stat">
-                <div class="stat-icon">❌</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo $absentCount; ?></div>
-                    <div class="stat-label">Absent</div>
+            <?php if ($isReadOnly): ?>
+                <div class="readonly-notice" style="background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.25rem;">🔒</span>
+                    <span><strong>View Only Mode:</strong> You can only modify attendance for today's date. Past attendance records are locked for viewing only.</span>
                 </div>
-            </div>
-            <!-- <div class="stat-card leave-stat">
+            <?php endif; ?>
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card present-stat">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><?php echo $presentCount; ?></div>
+                        <div class="stat-label">Present</div>
+                    </div>
+                </div>
+                <div class="stat-card absent-stat">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><?php echo $absentCount; ?></div>
+                        <div class="stat-label">Absent</div>
+                    </div>
+                </div>
+                <!-- <div class="stat-card leave-stat">
                 <div class="stat-icon">📝</div>
                 <div class="stat-content">
                     <div class="stat-value"><?php echo $leaveCount; ?></div>
                     <div class="stat-label">On Leave</div>
                 </div>
             </div> -->
-            <div class="stat-card total-stat">
-                <div class="stat-icon">👥</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo $attendancePercentage; ?>%</div>
-                    <div class="stat-label">Attendance Rate</div>
+                <div class="stat-card total-stat">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-content">
+                        <div class="stat-value"><?php echo $attendancePercentage; ?>%</div>
+                        <div class="stat-label">Attendance Rate</div>
+                    </div>
                 </div>
             </div>
-        </div>
-        <!-- Quick Actions -->
-        <!-- <div class="quick-actions">
+            <!-- Quick Actions -->
+            <!-- <div class="quick-actions">
             <button type="button" class="quick-btn" onclick="markAllTeachers('present')"><span
                     class="quick-icon">✅</span><span class="quick-text">All Present</span></button>
             <button type="button" class="quick-btn" onclick="markAllTeachers('absent')"><span
@@ -143,70 +162,80 @@ try {
             <button type="button" class="quick-btn" onclick="resetAttendance()"><span class="quick-icon">🔄</span><span
                     class="quick-text">Reset</span></button>
         </div> -->
-        <!-- Table -->
-        <div class="attendance-table-container">
-            <form action="#" method="POST" id="teacherAttendanceForm">
-                <input type="hidden" name="date" value="<?php echo htmlspecialchars($selectedDate); ?>">
-                <div class="table-wrapper">
-                    <table class="attendance-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Name</th>
-                                <th>Subject</th>
-                                <th>Current Status</th>
-                                <th>Mark Attendance</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php if (empty($teachers)): ?>
+            <!-- Table -->
+            <div class="attendance-table-container">
+                <form action="#" method="POST" id="teacherAttendanceForm">
+                    <input type="hidden" name="date" value="<?php echo htmlspecialchars($selectedDate); ?>">
+                    <div class="table-wrapper">
+                        <table class="attendance-table">
+                            <thead>
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 2rem; color: #666;">
-                                        <?php if (!empty($searchQuery)): ?>
-                                            No teachers found matching "<?php echo htmlspecialchars($searchQuery); ?>"
-                                        <?php else: ?>
-                                            No teachers found in the system.
-                                        <?php endif; ?>
-                                    </td>
+                                    <th>#</th>
+                                    <th>Name</th>
+                                    <th>Subject</th>
+                                    <th>Current Status</th>
+                                    <th>Mark Attendance</th>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($teachers as $i => $t): ?>
-                                    <tr class="teacher-row" data-teacher-id="<?php echo $t['id']; ?>"
-                                        data-status="<?php echo htmlspecialchars($t['status']); ?>">
-                                        <td><?php echo htmlspecialchars($t['id']); ?></td>
-                                        <td class="col-name"><?php echo htmlspecialchars($t['name'] ?? 'Unknown'); ?></td>
-                                        <td><?php echo htmlspecialchars($t['subject'] ?? 'N/A'); ?></td>
-                                        <td class="col-status"><span id="status-<?php echo $t['id']; ?>"
-                                                class="status-badge status-<?php echo htmlspecialchars($t['status']); ?>"><?php echo ucfirst($t['status']); ?></span>
-                                        </td>
-                                        <td class="col-actions">
-                                            <div class="action-buttons-group">
-                                                <button type="button"
-                                                    class="action-btn btn-present <?php echo $t['status'] === 'present' ? 'active' : ''; ?>"
-                                                    onclick="markTeacherStatus(<?php echo $t['id']; ?>,'present')" aria-label="Mark Present">✅</button>
-                                                <button type="button"
-                                                    class="action-btn btn-absent <?php echo $t['status'] === 'absent' ? 'active' : ''; ?>"
-                                                    onclick="markTeacherStatus(<?php echo $t['id']; ?>,'absent')" aria-label="Mark Absent">❌</button>
-                                            </div>
-                                            <input type="hidden" id="input-<?php echo $t['id']; ?>"
-                                                name="attendance[<?php echo $t['id']; ?>]" value="<?php echo htmlspecialchars($t['status']); ?>">
+                            </thead>
+                            <tbody>
+                                <?php if (empty($teachers)): ?>
+                                    <tr>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: #666;">
+                                            <?php if (!empty($searchQuery)): ?>
+                                                No teachers found matching "<?php echo htmlspecialchars($searchQuery); ?>"
+                                            <?php else: ?>
+                                                No teachers found in the system.
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
-                                <?php endforeach; ?>
-                            <?php endif; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <?php if (!empty($teachers)): ?>
-                    <div class="form-actions">
-                        <button type="button" class="btn btn-secondary" onclick="cancelAttendance()"><span
-                                class="btn-icon">✗</span><span class="btn-text">Cancel</span></button>
-                        <button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span
-                                class="btn-text">Submit Attendance</span></button>
+                                <?php else: ?>
+                                    <?php foreach ($teachers as $i => $t): ?>
+                                        <tr class="teacher-row" data-teacher-id="<?php echo $t['id']; ?>"
+                                            data-status="<?php echo htmlspecialchars($t['status']); ?>">
+                                            <td><?php echo htmlspecialchars($t['id']); ?></td>
+                                            <td class="col-name"><?php echo htmlspecialchars($t['name'] ?? 'Unknown'); ?></td>
+                                            <td><?php echo htmlspecialchars($t['subject'] ?? 'N/A'); ?></td>
+                                            <td class="col-status"><span id="status-<?php echo $t['id']; ?>"
+                                                    class="status-badge status-<?php echo htmlspecialchars($t['status']); ?>"><?php echo ucfirst($t['status']); ?></span>
+                                            </td>
+                                            <td class="col-actions">
+                                                <div class="action-buttons-group">
+                                                    <button type="button"
+                                                        class="action-btn btn-present <?php echo $t['status'] === 'present' ? 'active' : ''; ?>"
+                                                        onclick="markTeacherStatus(<?php echo $t['id']; ?>,'present')" aria-label="Mark Present"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>✅</button>
+                                                    <button type="button"
+                                                        class="action-btn btn-absent <?php echo $t['status'] === 'absent' ? 'active' : ''; ?>"
+                                                        onclick="markTeacherStatus(<?php echo $t['id']; ?>,'absent')" aria-label="Mark Absent"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>❌</button>
+                                                </div>
+                                                <input type="hidden" id="input-<?php echo $t['id']; ?>"
+                                                    name="attendance[<?php echo $t['id']; ?>]" value="<?php echo htmlspecialchars($t['status']); ?>">
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </tbody>
+                        </table>
                     </div>
-                <?php endif; ?>
-            </form>
-        </div>
+                    <?php if (!empty($teachers) && !$isReadOnly): ?>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="cancelAttendance()"><span
+                                    class="btn-icon">✗</span><span class="btn-text">Cancel</span></button>
+                            <button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span
+                                    class="btn-text">Submit Attendance</span></button>
+                        </div>
+                    <?php endif; ?>
+                </form>
+            </div>
+        <?php else: ?>
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3 class="empty-title">Select Date</h3>
+                <p class="empty-description">Please select a date and click "Load Attendance" to view teacher attendance list.</p>
+            </div>
+        <?php endif; ?>
     </div>
 </section>
 <script>

@@ -7,6 +7,8 @@ $today = date('Y-m-d');
 $selectedGrade = isset($_GET['grade']) ? $_GET['grade'] : '';
 $selectedClass = isset($_GET['class']) ? $_GET['class'] : '';
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
+$isToday = ($selectedDate === $today); // Check if viewing today's attendance
+$isReadOnly = !$isToday; // Read-only mode for past dates
 
 // Initialize model and fetch data
 $studentAttendanceModel = new StudentAttendance();
@@ -196,12 +198,21 @@ try {
                     <span class="summary-text">
                         Attendance for: <strong>Grade <?php echo $selectedGrade; ?>-<?php echo $selectedClass; ?></strong> •
                         <strong><?php echo date('l, F j, Y', strtotime($selectedDate)); ?></strong>
-                        <?php if ($selectedDate === $today): ?>
+                        <?php if ($isToday): ?>
                             <span class="today-tag">Today</span>
+                        <?php endif; ?>
+                        <?php if ($isReadOnly): ?>
+                            <span class="readonly-tag" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;">View Only</span>
                         <?php endif; ?>
                     </span>
                 </div>
             </div>
+            <?php if ($isReadOnly): ?>
+                <div class="readonly-notice" style="background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.25rem;">🔒</span>
+                    <span><strong>View Only Mode:</strong> You can only modify attendance for today's date. Past attendance records are locked for viewing only.</span>
+                </div>
+            <?php endif; ?>
 
             <!-- Statistics Grid -->
             <div class="stats-grid">
@@ -230,20 +241,22 @@ try {
             </div>
 
             <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button type="button" class="quick-btn" onclick="markAllPresent()">
-                    <span class="quick-icon">✅</span>
-                    <span class="quick-text">Mark All Present</span>
-                </button>
-                <button type="button" class="quick-btn" onclick="markAllAbsent()">
-                    <span class="quick-icon">❌</span>
-                    <span class="quick-text">Mark All Absent</span>
-                </button>
-                <button type="button" class="quick-btn" onclick="resetAttendance()">
-                    <span class="quick-icon">🔄</span>
-                    <span class="quick-text">Reset</span>
-                </button>
-            </div>
+            <?php if (!$isReadOnly): ?>
+                <div class="quick-actions">
+                    <button type="button" class="quick-btn" onclick="markAllPresent()">
+                        <span class="quick-icon">✅</span>
+                        <span class="quick-text">Mark All Present</span>
+                    </button>
+                    <button type="button" class="quick-btn" onclick="markAllAbsent()">
+                        <span class="quick-icon">❌</span>
+                        <span class="quick-text">Mark All Absent</span>
+                    </button>
+                    <button type="button" class="quick-btn" onclick="resetAttendance()">
+                        <span class="quick-icon">🔄</span>
+                        <span class="quick-text">Reset</span>
+                    </button>
+                </div>
+            <?php endif; ?>
 
             <!-- Attendance Table -->
             <div class="attendance-table-container">
@@ -304,12 +317,14 @@ try {
                                                     <input type="hidden" name="attendance[<?php echo $student['id']; ?>]" value="<?php echo htmlspecialchars($student['status']); ?>" id="input-<?php echo $student['id']; ?>">
                                                     <button type="button" class="action-btn btn-present <?php echo $student['status'] === 'present' ? 'active' : ''; ?>"
                                                         onclick="markStatus(<?php echo $student['id']; ?>, 'present')"
-                                                        title="Mark Present">
+                                                        title="Mark Present"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>
                                                         ✓
                                                     </button>
                                                     <button type="button" class="action-btn btn-absent <?php echo $student['status'] === 'absent' ? 'active' : ''; ?>"
                                                         onclick="markStatus(<?php echo $student['id']; ?>, 'absent')"
-                                                        title="Mark Absent">
+                                                        title="Mark Absent"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>
                                                         ✗
                                                     </button>
                                                 </div>
@@ -321,7 +336,7 @@ try {
                         </table>
                     </div>
 
-                    <?php if (!empty($students)): ?>
+                    <?php if (!empty($students) && !$isReadOnly): ?>
                         <!-- Action Buttons -->
                         <div class="form-actions">
                             <button type="button" class="btn btn-secondary" onclick="cancelAttendance()">
