@@ -66,14 +66,23 @@ class StudentTimeTableModel
             return null;
         }
 
-        // Try common registration number column names
+        // Try common student-ID / registration number column names
         $possibleRegCols = ['studentIDNumber', 'reg_no', 'regNo', 'registrationNo', 'registrationNumber'];
+        $possibleStudentIdCols = ['studentID', 'studentId', 'student_id'];
         $cols = [];
         try {
             $colsInfo = $this->pdo->query("DESCRIBE `{$studentTable}`")->fetchAll(PDO::FETCH_ASSOC);
             $cols = array_map(static fn($c) => (string) $c['Field'], $colsInfo);
         } catch (Throwable $e) {
             $cols = [];
+        }
+
+        $studentIdCol = null;
+        foreach ($possibleStudentIdCols as $c) {
+            if (in_array($c, $cols, true)) {
+                $studentIdCol = $c;
+                break;
+            }
         }
 
         $regCol = null;
@@ -84,10 +93,60 @@ class StudentTimeTableModel
             }
         }
 
-        $selectReg = $regCol ? ", {$regCol} as reg_no" : ", NULL as reg_no";
+        $selectStudentId = $studentIdCol ? ", `{$studentIdCol}` as studentID" : ", NULL as studentID";
+        $selectReg = $regCol ? ", `{$regCol}` as reg_no" : ", NULL as reg_no";
 
-        $stmt = $this->pdo->prepare("SELECT classID {$selectReg} FROM `{$studentTable}` WHERE userID = :userID LIMIT 1");
+        $stmt = $this->pdo->prepare("SELECT classID{$selectStudentId} {$selectReg} FROM `{$studentTable}` WHERE userID = :userID LIMIT 1");
         $stmt->execute(['userID' => $userId]);
+        $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        return $row ?: null;
+    }
+
+    private function getStudentRecordByStudentId(int $studentId): ?array
+    {
+        $studentTable = $this->pickExistingTable(['students', 'student']);
+        if (!$studentTable) {
+            return null;
+        }
+
+        $possibleRegCols = ['studentIDNumber', 'reg_no', 'regNo', 'registrationNo', 'registrationNumber'];
+        $possibleStudentIdCols = ['studentID', 'studentId', 'student_id'];
+
+        $cols = [];
+        try {
+            $colsInfo = $this->pdo->query("DESCRIBE `{$studentTable}`")->fetchAll(PDO::FETCH_ASSOC);
+            $cols = array_map(static fn($c) => (string) $c['Field'], $colsInfo);
+        } catch (Throwable $e) {
+            $cols = [];
+        }
+
+        $studentIdCol = null;
+        foreach ($possibleStudentIdCols as $c) {
+            if (in_array($c, $cols, true)) {
+                $studentIdCol = $c;
+                break;
+            }
+        }
+        if (!$studentIdCol) {
+            // Most schemas use `studentID`
+            $studentIdCol = 'studentID';
+        }
+
+        $regCol = null;
+        foreach ($possibleRegCols as $c) {
+            if (in_array($c, $cols, true)) {
+                $regCol = $c;
+                break;
+            }
+        }
+
+        $selectStudentId = $studentIdCol ? ", `{$studentIdCol}` as studentID" : ", NULL as studentID";
+        $selectReg = $regCol ? ", `{$regCol}` as reg_no" : ", NULL as reg_no";
+
+        $stmt = $this->pdo->prepare(
+            "SELECT userID, classID{$selectStudentId} {$selectReg} FROM `{$studentTable}` WHERE `{$studentIdCol}` = :studentID LIMIT 1"
+        );
+        $stmt->execute(['studentID' => (int) $studentId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
@@ -212,6 +271,7 @@ class StudentTimeTableModel
         $studentRow = $this->getStudentRecordByUserId($userId);
         $classId = $studentRow ? (int) ($studentRow['classID'] ?? 0) : 0;
         $regNo = $studentRow ? ($studentRow['reg_no'] ?? '') : '';
+        $studentId = $studentRow ? ($studentRow['studentID'] ?? '') : '';
 
         if ($classId <= 0 && $fallbackClassId !== null) {
             $classId = (int) $fallbackClassId;
@@ -249,7 +309,72 @@ class StudentTimeTableModel
         $studentInfo = [
             'name' => $fullName !== '' ? $fullName : ('User ' . $userId),
             'class' => $classLabel !== '' ? $classLabel : '—',
-            'reg_no' => $regNo ?: '—',
+            // Used by studentAttendance template.
+            'reg_no' => ($regNo !== '' ? $regNo : ($studentId !== '' ? $studentId : '—')),
+            // Used by studentTimeTable template for the "ID" badge.
+            'stu_id' => ($studentId !== '' ? $studentId : ($regNo !== '' ? $regNo : '—')),
+            'classID' => $classId,
+        ];
+
+        return [
+            'studentInfo' => $studentInfo,
+            'timetable' => $timetable,
+            'stats' => $stats,
+        ];
+    }
+
+    public function getStudentTimetableContextByStudentId(int $studentId, ?int $fallbackClassId = null): array
+    {
+        $studentId = (int) $studentId;
+        if ($studentId <= 0) {
+            throw new InvalidArgumentException('Invalid studentID');
+        }
+
+        $studentRow = $this->getStudentRecordByStudentId($studentId);
+        if (!$studentRow) {
+            throw new RuntimeException('Student not found');
+        }
+
+        $userId = (int) ($studentRow['userID'] ?? 0);
+        $classId = (int) ($studentRow['classID'] ?? 0);
+        $regNo = (string) ($studentRow['reg_no'] ?? '');
+        $studentIdVal = (string) ($studentRow['studentID'] ?? $studentId);
+
+        if ($classId <= 0 && $fallbackClassId !== null) {
+            $classId = (int) $fallbackClassId;
+        }
+
+        $fullName = $userId > 0 ? $this->getUserFullName($userId) : '';
+        $classLabel = $classId > 0 ? $this->getClassLabel($classId) : '';
+        $timetable = $this->buildTimetableForClass($classId);
+
+        $uniqueSubjects = [];
+        $uniqueTeachers = [];
+        foreach ($timetable['schedule'] as $cells) {
+            foreach ($cells as $cell) {
+                if (!$cell) {
+                    continue;
+                }
+                if (isset($cell['subjectID'])) {
+                    $uniqueSubjects[(int) $cell['subjectID']] = true;
+                }
+                if (isset($cell['teacherID'])) {
+                    $uniqueTeachers[(int) $cell['teacherID']] = true;
+                }
+            }
+        }
+
+        $stats = [
+            'total_periods' => 40,
+            'subjects_count' => count($uniqueSubjects),
+            'teachers_count' => count($uniqueTeachers),
+        ];
+
+        $studentInfo = [
+            'name' => $fullName !== '' ? $fullName : ('Student ' . $studentId),
+            'class' => $classLabel !== '' ? $classLabel : '—',
+            'reg_no' => ($regNo !== '' ? $regNo : ($studentIdVal !== '' ? $studentIdVal : '—')),
+            'stu_id' => ($studentIdVal !== '' ? $studentIdVal : ($regNo !== '' ? $regNo : '—')),
             'classID' => $classId,
         ];
 

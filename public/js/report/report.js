@@ -26,7 +26,7 @@ let studentData = null;
 
 // Chart.js configuration
 let performanceChart = null;
-let currentChartType = "line";
+let currentChartType = "bar";
 let currentTerm = "term3";
 
 // Color scheme
@@ -60,6 +60,14 @@ function initChart() {
 
   const labels = studentData.subjects.map((s) => s.name);
 
+  function setRgbaAlpha(color, alpha) {
+    if (typeof color !== "string") return color;
+    return color.replace(
+      /rgba\((\s*\d+\s*),(\s*\d+\s*),(\s*\d+\s*),\s*[\d.]+\s*\)/i,
+      `rgba($1,$2,$3, ${alpha})`,
+    );
+  }
+
   // Define datasets for all three terms
   const termDatasets = [
     {
@@ -69,8 +77,8 @@ function initChart() {
       termKey: "term1",
       borderColor: "rgba(239, 68, 68, 0.8)",
       backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(239, 68, 68, 0.15)"
+        currentChartType === "bar"
+          ? "rgba(239, 68, 68, 0.55)"
           : "rgba(239, 68, 68, 0.1)",
     },
     {
@@ -80,8 +88,8 @@ function initChart() {
       termKey: "term2",
       borderColor: "rgba(245, 158, 11, 0.8)",
       backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(245, 158, 11, 0.15)"
+        currentChartType === "bar"
+          ? "rgba(245, 158, 11, 0.55)"
           : "rgba(245, 158, 11, 0.1)",
     },
     {
@@ -91,37 +99,32 @@ function initChart() {
       termKey: "term3",
       borderColor: "rgba(16, 185, 129, 0.8)",
       backgroundColor:
-        currentChartType === "radar"
-          ? "rgba(16, 185, 129, 0.15)"
+        currentChartType === "bar"
+          ? "rgba(16, 185, 129, 0.55)"
           : "rgba(16, 185, 129, 0.1)",
     },
   ];
 
   // Apply highlighting based on selected term
-  const datasets = termDatasets.map((dataset) => {
-    const isSelected = dataset.key === currentTerm;
-    return {
-      label: dataset.label,
-      data: dataset.data,
-      termKey: dataset.termKey,
-      borderColor: isSelected
-        ? dataset.borderColor
-        : dataset.borderColor.replace("0.8", "0.3"),
-      backgroundColor: isSelected
-        ? dataset.backgroundColor
-        : dataset.backgroundColor.replace(/0\.1\d?/, "0.05"),
-      borderWidth: isSelected ? 3 : 1,
-      pointBackgroundColor: isSelected
-        ? dataset.borderColor
-        : dataset.borderColor.replace("0.8", "0.3"),
-      pointBorderColor: "#fff",
-      pointHoverBackgroundColor: "#fff",
-      pointHoverBorderColor: dataset.borderColor,
-      pointRadius: isSelected ? 4 : 3,
-      tension: 0.4,
-      fill: currentChartType === "line",
-    };
-  });
+  const datasets = termDatasets
+    .filter((d) => d.key === currentTerm)
+    .map((dataset) => {
+      return {
+        label: dataset.label,
+        data: dataset.data,
+        termKey: dataset.termKey,
+        borderColor: dataset.borderColor,
+        backgroundColor: dataset.backgroundColor,
+        borderWidth: 2,
+        pointBackgroundColor: dataset.borderColor,
+        pointBorderColor: "#fff",
+        pointHoverBackgroundColor: "#fff",
+        pointHoverBorderColor: dataset.borderColor,
+        pointRadius: currentChartType === "line" ? 4 : 0,
+        tension: 0.4,
+        fill: currentChartType === "line",
+      };
+    });
 
   const config = {
     type: currentChartType,
@@ -135,7 +138,8 @@ function initChart() {
       aspectRatio: 2,
       plugins: {
         legend: {
-          display: true,
+          // Hide the color indicator above the chart
+          display: false,
           position: "top",
           labels: {
             usePointStyle: true,
@@ -161,11 +165,7 @@ function initChart() {
             label: function (context) {
               const parsed = context.parsed;
               const score =
-                parsed && typeof parsed.y !== "undefined"
-                  ? parsed.y
-                  : parsed && typeof parsed.r !== "undefined"
-                  ? parsed.r
-                  : null;
+                parsed && typeof parsed.y !== "undefined" ? parsed.y : null;
               const subject = studentData.subjects[context.dataIndex];
               const termKey = context.dataset.termKey;
               const grade =
@@ -177,37 +177,15 @@ function initChart() {
                 "-";
 
               if (score === null || typeof score === "undefined") {
-                return `${context.dataset.label}: No mark (Grade: ${grade})`;
+                return `No mark (Grade: ${grade})`;
               }
-              return `${context.dataset.label}: ${score}/100 (Grade: ${grade})`;
+              return `${score}/100 (Grade: ${grade})`;
             },
           },
         },
       },
       scales:
-        currentChartType === "radar"
-          ? {
-              r: {
-                beginAtZero: true,
-                max: 100,
-                ticks: {
-                  stepSize: 20,
-                  font: {
-                    size: 11,
-                  },
-                },
-                pointLabels: {
-                  font: {
-                    size: 11,
-                    weight: "600",
-                  },
-                },
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-              },
-            }
-          : currentChartType === "line"
+        currentChartType === "line" || currentChartType === "bar"
           ? {
               x: {
                 grid: {
@@ -267,7 +245,7 @@ async function loadMyMarksData() {
 
     studentData = buildStudentDataFromMarks(
       json.marks || [],
-      json.subjects || []
+      json.subjects || [],
     );
     return true;
   } catch (e) {
@@ -316,10 +294,10 @@ function buildStudentDataFromMarks(rows, allSubjects) {
       term === "1"
         ? "term1"
         : term === "2"
-        ? "term2"
-        : term === "3"
-        ? "term3"
-        : null;
+          ? "term2"
+          : term === "3"
+            ? "term3"
+            : null;
     if (!termKey) return;
 
     const markVal = row.marks;
@@ -333,20 +311,20 @@ function buildStudentDataFromMarks(rows, allSubjects) {
   });
 
   const subjects = Array.from(subjectMap.values()).sort((a, b) =>
-    String(a.name).localeCompare(String(b.name))
+    String(a.name).localeCompare(String(b.name)),
   );
 
   // Build term arrays aligned with subject order
   const terms = { term1: [], term2: [], term3: [] };
   subjects.forEach((s) => {
     terms.term1.push(
-      termScores.term1.has(s.id) ? termScores.term1.get(s.id) : 0
+      termScores.term1.has(s.id) ? termScores.term1.get(s.id) : 0,
     );
     terms.term2.push(
-      termScores.term2.has(s.id) ? termScores.term2.get(s.id) : 0
+      termScores.term2.has(s.id) ? termScores.term2.get(s.id) : 0,
     );
     terms.term3.push(
-      termScores.term3.has(s.id) ? termScores.term3.get(s.id) : 0
+      termScores.term3.has(s.id) ? termScores.term3.get(s.id) : 0,
     );
 
     s.grades = {
@@ -370,8 +348,6 @@ function buildStudentDataFromMarks(rows, allSubjects) {
 // Chart toggle functionality
 function setupChartToggle() {
   const toggleButtons = document.querySelectorAll(".toggle-btn");
-  // Term selector removed in My Marks view; keep null-safe code
-  const termSelector = document.getElementById("termSelector");
 
   toggleButtons.forEach((btn) => {
     btn.addEventListener("click", function () {
@@ -385,13 +361,24 @@ function setupChartToggle() {
 
 // Term selector functionality (retained for pages that still have it, safe no-op otherwise)
 function setupTermSelector() {
-  const termSelect = document.getElementById("term-select");
-  if (termSelect) {
-    termSelect.addEventListener("change", function (e) {
-      currentTerm = e.target.value;
+  const termButtons = document.querySelectorAll(".term-btn");
+  if (!termButtons || termButtons.length === 0) return;
+
+  // Sync UI with default term
+  termButtons.forEach((b) => {
+    b.classList.toggle("active", b.dataset.term === currentTerm);
+  });
+
+  termButtons.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const next = this.dataset.term;
+      if (!next) return;
+      currentTerm = next;
+      termButtons.forEach((b) => b.classList.remove("active"));
+      this.classList.add("active");
       initChart();
     });
-  }
+  });
 }
 
 // Search functionality
@@ -566,7 +553,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Check if Chart.js is loaded
   if (typeof Chart === "undefined") {
     console.error(
-      "Chart.js is not loaded. Please include Chart.js in your HTML."
+      "Chart.js is not loaded. Please include Chart.js in your HTML.",
     );
     setupSearch();
     setupBehaviorForm();

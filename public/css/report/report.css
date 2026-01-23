@@ -79,8 +79,6 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
 }
 
-
-
 .search-container input {
   flex: 1;
   border: none;
@@ -101,7 +99,9 @@
   border-radius: 50px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .search-btn:hover {
@@ -185,7 +185,9 @@
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
   display: flex;
   gap: 1rem;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .stat-card:hover {
@@ -284,11 +286,42 @@
   width: fit-content;
 }
 
-.term-selector label {
+.term-selector label,
+.term-selector .term-label {
   font-weight: 600;
   color: #1a1a2e;
   font-size: 0.95rem;
   white-space: nowrap;
+}
+
+.term-buttons {
+  display: flex;
+  gap: 0.5rem;
+  background: #e5e7eb;
+  padding: 0.25rem;
+  border-radius: 10px;
+}
+
+.term-btn {
+  padding: 0.5rem 0.9rem;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.term-btn:hover {
+  color: #374151;
+}
+
+.term-btn.active {
+  background: white;
+  color: #667eea;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .term-selector select {
@@ -720,7 +753,10 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
 }
 .update-behavior-btn:hover {
   transform: translateY(-2px);

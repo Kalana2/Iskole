@@ -3,7 +3,7 @@
 $studentInfo = $studentInfo ?? [
     'name' => '—',
     'class' => '—',
-    'reg_no' => '—',
+    'stu_id' => '—',
 ];
 
 $currentDay = date('l'); // Get current day name
@@ -44,8 +44,8 @@ $stats = $stats ?? [
                         <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Reg No</span>
-                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['reg_no'] ?? '—'); ?></span>
+                        <span class="info-label">ID</span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
                     </div>
                 </div>
             </div>

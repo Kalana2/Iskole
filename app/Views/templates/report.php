@@ -145,11 +145,18 @@ $student = $student ?? null;
         <div class="performance-report">
           <h3 class="report-title">
             <span>Performance Report</span>
-            <div class="chart-toggle">
-              <button class="toggle-btn active" data-chart="line">Trend</button>
-              <button class="toggle-btn" data-chart="radar">Radar Chart</button>
-            </div>
           </h3>
+
+          <div class="chart-controls">
+            <div class="term-selector">
+              <div class="term-buttons" role="group" aria-label="Select term">
+                <button type="button" class="term-btn" data-term="term1">Term 1</button>
+                <button type="button" class="term-btn" data-term="term2">Term 2</button>
+                <button type="button" class="term-btn active" data-term="term3">Term 3</button>
+              </div>
+            </div>
+          </div>
+
           <div class="chart-container">
             <canvas id="performanceChart"></canvas>
           </div>
