@@ -38,39 +38,33 @@
                     <small class="hint">Select the end date of your leave.</small>
                 </div>
 
+
                 <div class="field span-2">
                     <label>Type of Leave</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leaveType"
-                                id="medical-leave"
-                                value="medical"
-                                required>
-                            <label for="medical-leave">Medical Leave</label>
-                        </div>
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leaveType"
-                                id="personal-leave"
-                                value="personal"
-                                required>
-                            <label for="personal-leave">Personal Leave</label>
-                        </div>
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leaveType"
-                                id="duty-leave"
-                                value="duty"
-                                required>
-                            <label for="duty-leave">Duty Leave</label>
-                        </div>
+
+                    <div class="leave-type-group">
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="medical" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Medical Leave</span>
+                        </label>
+
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="personal" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Personal Leave</span>
+                        </label>
+
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="duty" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Duty Leave</span>
+                        </label>
                     </div>
+
                     <small class="hint">Choose the type of leave you are requesting.</small>
                 </div>
+
 
                 <div class="field span-2">
                     <label for="reason">Reason</label>

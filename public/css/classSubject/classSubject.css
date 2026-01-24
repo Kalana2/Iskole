@@ -1,25 +1,222 @@
-.cs-wrapper { padding: 24px; display: grid; gap: 18px; }
-.cs-card { background: #ffffff; border-radius: 18px; padding: 18px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-.cs-head h2 { margin: 0; font-size: 22px; }
-.cs-head p { margin: 6px 0 0; opacity: .75; }
+:root{
+  --text:#1f2543;
+  --muted:#6b7280;
+  --primary:#667eea;
+  --primary2:#764ba2;
+  --ring:rgba(102,126,234,.22);
+  --card:#ffffff;
+  --border:rgba(17,24,39,.08);
+  --shadow:0 12px 30px rgba(17,24,39,.10);
+  --shadow2:0 10px 28px rgba(0,0,0,.14);
+  --chip:#f5f6ff;
+  --chip-border:rgba(102,126,234,.22);
+  --danger:#ef4444;
+}
 
-.cs-grid { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 0; }
-.cs-chip { display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e6e6ee; border-radius: 999px; background:#f7f8ff; }
-.cs-chip span { font-weight: 700; }
+*{
+  box-sizing:border-box;
+}
 
-.cs-del { border:0; background: #ff4d4d; color:white; width:26px; height:26px; border-radius: 999px; cursor:pointer; }
-.cs-hr { border:0; border-top:1px solid #ececf5; margin: 14px 0; }
+/* Page wrapper */
+.cs-wrapper{
+  max-width:1400px;
+  margin:1.25rem auto;
+  padding:0.5rem 1rem 2rem;
+}
 
-.cs-form h3 { margin: 0 0 12px; }
-.cs-row { display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end; }
-.cs-field { display:flex; flex-direction:column; gap:6px; }
-.cs-field input, .cs-field select { padding:10px 12px; border-radius: 10px; border: 1px solid #ddd; min-width: 180px; }
+/* Flash message */
+.cs-flash{
+  margin:10px 0 16px;
+  padding:12px 14px;
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:#fff;
+  color:var(--text);
+  box-shadow:0 8px 20px rgba(17,24,39,.06);
+  font-weight:600;
+}
+.cs-flash.ok{ border-color:rgba(34,197,94,.35); }
+.cs-flash.err{ border-color:rgba(239,68,68,.35); }
 
-.cs-btn { padding: 10px 16px; border-radius: 12px; border: 0; background: #5b5bd6; color: white; font-weight: 700; cursor:pointer; }
-.cs-hint { display:block; margin-top: 8px; opacity: .75; }
+/* Card */
+.cs-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:18px;
+  box-shadow:var(--shadow);
+  margin-top:1rem;
+  overflow:hidden;
+}
 
-.cs-empty { padding: 12px; opacity: .7; }
-.cs-flash { margin-bottom: 10px; padding: 12px; border-radius: 12px; }
-.cs-flash.ok { background:#e8fff1; border:1px solid #17b26a; color:#0d7a47; }
-.cs-flash.err { background:#ffecec; border:1px solid #ff4d4d; color:#b00020; }
-.cs-grade h3 { margin: 12px 0 6px; }
+/* Card header (purple bar) */
+.cs-head{
+  padding:18px 22px;
+  background:linear-gradient(135deg,#1a1f3a 0%, #2d1b4e 100%);
+  color:#fff;
+  box-shadow:var(--shadow2);
+}
+.cs-head h2{
+  margin:0;
+  font-size:1.35rem;
+}
+.cs-head p{
+  margin:6px 0 0;
+  color:rgba(255,255,255,.86);
+  font-size:.95rem;
+}
+
+/* Card body padding */
+.cs-card > :not(.cs-head){
+  padding:18px 22px;
+}
+
+/* Chips grid */
+.cs-grid{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+}
+
+/* Chip */
+.cs-chip{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:999px;
+  background:var(--chip);
+  border:1px solid var(--chip-border);
+  color:var(--text);
+  font-weight:800;
+  box-shadow:0 8px 18px rgba(102,126,234,.10);
+}
+.cs-chip span{
+  white-space:nowrap;
+}
+
+/* Delete button */
+.cs-chip form{ margin:0; }
+.cs-del{
+  width:28px;
+  height:28px;
+  border-radius:999px;
+  border:0;
+  cursor:pointer;
+  background:rgba(239,68,68,.14);
+  color:var(--danger);
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:.15s ease;
+}
+.cs-del:hover{
+  background:rgba(239,68,68,.22);
+  transform:translateY(-1px);
+}
+
+/* Divider */
+.cs-hr{
+  border:0;
+  height:1px;
+  background:rgba(17,24,39,.08);
+  margin:18px 0;
+}
+
+/* Form */
+.cs-form h3{
+  margin:0 0 12px;
+  font-size:1.25rem;
+  color:var(--text);
+}
+
+/* 🔥 FIXED FORM ROW */
+.cs-row{
+  display:flex;
+  gap:14px;
+  align-items:flex-end;
+  flex-wrap:wrap;
+}
+
+/* Field */
+.cs-field{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.cs-field label{
+  font-weight:800;
+  color:var(--text);
+  font-size:.92rem;
+}
+
+/* INPUTS */
+.cs-field input,
+.cs-field select{
+  padding:12px 14px;
+  border-radius:14px;
+  border:1px solid rgba(17,24,39,.14);
+  background:#fff;
+  outline:none;
+  font-size:.95rem;
+  transition:.2s ease;
+}
+
+/* 🔥 HARD FORCE SMALL INPUT */
+.cs-form .cs-row .cs-field input{
+  width:450px !important;
+  max-width:450px !important;
+  min-width:450px !important;
+}
+
+/* Focus */
+.cs-field input:focus,
+.cs-field select:focus{
+  border-color:rgba(102,126,234,.5);
+  box-shadow:0 0 0 5px var(--ring);
+}
+
+/* 🔥 SMALL BUTTON */
+.cs-btn{
+  min-width:120px;
+  height:44px;
+  padding:0 18px;
+  border-radius:14px;
+  border:0;
+  cursor:pointer;
+  font-weight:900;
+  color:#fff;
+  background:linear-gradient(135deg,var(--primary),var(--primary2));
+  box-shadow:0 12px 26px rgba(102,126,234,.30);
+  transition:.15s ease;
+  white-space:nowrap;
+}
+.cs-btn:hover{
+  box-shadow:0 16px 32px rgba(102,126,234,.38);
+  transform:translateY(-1px);
+}
+
+/* Empty */
+.cs-empty{
+  color:var(--muted);
+  background:#fbfbff;
+  border:1px dashed rgba(102,126,234,.25);
+  border-radius:14px;
+  padding:16px;
+}
+
+/* Responsive */
+@media (max-width: 900px){
+  .cs-row{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  .cs-form .cs-row .cs-field input{
+    width:100% !important;
+    max-width:100% !important;
+    min-width:unset !important;
+  }
+  .cs-btn{
+    width:140px;
+  }
+}
