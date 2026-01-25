@@ -1,3 +1,7 @@
+<video class="video-background" autoplay muted loop playsinline>
+    <source src="/assets/background.mp4" type="video/mp4">
+</video>
+
 <div class="login-container">
     <div class="logo">
         <img src="/assets/logo.png" alt="Iskole Logo" height="100" width="100">
