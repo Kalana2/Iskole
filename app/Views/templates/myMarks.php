@@ -10,19 +10,19 @@
         <p class="subtitle">Your marks and progress across all subjects</p>
       </div>
       <div class="student-info-badge">
-        <div class="info-item">
-            <span class="info-label">Student</span>
-            <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">Class</span>
-            <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
-        </div>
-        <div class="info-item">
-            <span class="info-label">ID</span>
-            <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
-        </div>
-    </div>
+          <div class="info-item">
+              <span class="info-label">Student</span>
+              <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
+          </div>
+          <div class="info-item">
+              <span class="info-label">Class</span>
+              <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
+          </div>
+          <div class="info-item">
+              <span class="info-label">ID</span>
+              <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
+          </div>
+      </div>
     </header>
 
     <div class="center-container card">
