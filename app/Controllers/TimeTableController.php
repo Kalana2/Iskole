@@ -82,10 +82,30 @@ class TimeTableController extends Controller
 	{
 		$model = $this->model('TimeTableModel');
 		$subjectID = $_GET['subjectID'] ?? null;
-		$grade = $_GET['grade'] ?? null;
 		$classID = $_GET['classID'] ?? null;
+		$dayName = $_GET['day'] ?? null;
+		$rowIndex = $_GET['row'] ?? null;
 
-		$teachers = $model->getTeachersBySubject($subjectID, $grade, $classID);
+		$dayName = is_string($dayName) ? trim($dayName) : '';
+		$classID = is_numeric($classID) ? (int)$classID : 0;
+		$rowIndex = is_numeric($rowIndex) ? (int)$rowIndex : null;
+
+		if ($dayName !== '' && $classID > 0 && $rowIndex !== null) {
+			$dayMap = $model->getSchoolDayNameToIdMap();
+			$dayID = (int)($dayMap[$dayName] ?? 0);
+			$periodNumMap = $this->rowIndexToPeriodNumberMap();
+			$periodNum = (int)($periodNumMap[$rowIndex] ?? 0);
+			$periodIdMap = $model->getPeriodNumberToIdMap();
+			$periodID = (int)($periodIdMap[$periodNum] ?? 0);
+
+			if ($dayID > 0 && $periodID > 0) {
+				$teachers = $model->getAvailableTeachersBySubjectAndSlot($subjectID, $dayID, $periodID, $classID);
+			} else {
+				$teachers = $model->getTeachersBySubject($subjectID);
+			}
+		} else {
+			$teachers = $model->getTeachersBySubject($subjectID);
+		}
 		header('Content-Type: application/json');
 		echo json_encode($teachers);
 		exit;

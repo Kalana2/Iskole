@@ -41,12 +41,12 @@
                     </div>
                     <div class="teacher-info-badge">
                         <div class="info-item">
-                            <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
-                        </div>
-                        <div class="info-item">
                             <span class="info-label">Teacher:</span>
                             <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Subject:</span>
+                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
                         </div>
                     </div>
                 </div>
@@ -149,7 +149,7 @@
                         <span class="summary-text">
                             Showing: <strong>Grade <?php echo $selectedGrade; ?>-<?php echo $selectedClass; ?></strong> •
                             <strong><?php echo htmlspecialchars($termLabel); ?></strong>
-                            <!--<strong><?php echo htmlspecialchars($examTypeLabel); ?></strong>-->
+                            <!--<strong><?php echo htmlspecialchars($examTypeLabel); ?></strong>-->marks
                         </span>
                     </div>
                 </div>
@@ -199,13 +199,11 @@
                                 <thead>
                                     <tr>
                                         <th class="col-number">#</th>
-                                        <th class="col-reg">Reg Number</th>
+                                        <th class="col-reg">Student ID</th>
                                         <th class="col-name">Student Name</th>
-                                        <th class="col-prev">Previous</th>
+                                        <th class="col-prev">Previous marks</th>
                                         <th class="col-marks">Current Marks</th>
                                         <th class="col-grade">Grade</th>
-                                        <th class="col-attendance">Attendance</th>
-                                        <th class="col-status">Status</th>
                                         <th class="col-action">Action</th>
                                     </tr>
                                 </thead>
@@ -264,18 +262,10 @@
                                                     <?php echo $grade ?: '-'; ?>
                                                 </span>
                                             </td>
-                                            <td class="col-attendance">
-                                                <span class="attendance-badge"><?php echo $student['attendance']; ?>%</span>
-                                            </td>
-                                            <td class="col-status">
-                                                <span class="status-badge <?php echo $student['current_marks'] !== null ? 'status-entered' : 'status-pending'; ?>">
-                                                    <?php echo $student['current_marks'] !== null ? 'Entered' : 'Pending'; ?>
-                                                </span>
-                                            </td>
                                             <td class="col-action">
                                                 <?php if ($student['previous_marks'] !== null): ?>
-                                                    <button type="button" class="status-badge status-remove" onclick="removeMarks(<?php echo $student['id']; ?>, '<?php echo htmlspecialchars($student['name']); ?>')" title="Remove previous marks">
-                                                        Remove
+                                                    <button type="button" class="status-badge status-remove" onclick="removeMarks(<?php echo $student['id']; ?>, '<?php echo htmlspecialchars($student['name']); ?>')" title="Delete previous marks">
+                                                        Delete
                                                     </button>
                                                 <?php endif; ?>
                                             </td>
@@ -368,7 +358,7 @@
 
         // Remove marks from database
         function removeMarks(studentId, studentName) {
-            if (!confirm('Remove previous marks for ' + studentName + '? This action cannot be undone.')) {
+            if (!confirm('Delete previous marks for ' + studentName + '? This action cannot be undone.')) {
                 return;
             }
             
@@ -392,15 +382,26 @@
                 .then(r => r.json())
                 .then(data => {
                     if (!data.success) { alert('Error: ' + (data.error || 'Unknown error')); return; }
-                    // Remove the mark from the previous marks column and hide button
-                    const row = document.querySelector('button[onclick*="removeMarks('+studentId+'"]').closest('tr');
+                    // Update the row UI: clear previous/current marks + remove the Remove button
+                    const input = document.querySelector('.marks-input[data-student-id="' + studentId + '"]');
+                    const row = input ? input.closest('tr') : (document.querySelector('button.status-remove[onclick*="removeMarks(' + studentId + '"]')?.closest('tr') || null);
+
                     if (row) {
                         const prevMarksCell = row.querySelector('.prev-marks');
                         if (prevMarksCell) prevMarksCell.textContent = '-';
-                        const removeBtn = row.querySelector('.btn-remove');
-                        if (removeBtn) removeBtn.style.display = 'none';
+
+                        if (input) {
+                            input.value = '';
+                            calculateGrade(input);
+                        }
+
+                        const removeBtn = row.querySelector('button.status-remove');
+                        if (removeBtn) removeBtn.remove();
+
+                        row.classList.remove('completed');
+                        row.classList.add('pending');
                     }
-                    alert('Marks removed successfully');
+                    alert('Marks deleted successfully');
                 })
                 .catch(err => { console.error('Delete error:', err); alert('Delete failed: ' + err.message); });
         }
@@ -605,7 +606,7 @@ if (data.stats) {
                     tableContainer = document.createElement('div');
                     tableContainer.className = 'marks-table-container';
                     tableContainer.id = 'marksTableContainer';
-                    tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Reg Number</th><th>Student Name</th><th>Previous</th><th>Current Marks</th><th>Grade</th><th>Attendance</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
+                    tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Student ID</th><th>Student Name</th><th>Previous marks</th><th>Current Marks</th><th>Grade</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
                     document.querySelector('.box').appendChild(tableContainer);
                 }
                 const tbody = tableContainer.querySelector('.marks-table tbody');
@@ -628,15 +629,13 @@ if (data.stats) {
                     const tr = document.createElement('tr');
                     tr.className = 'student-row ' + (cm === null || cm === undefined || cm === '' ? 'pending' : 'completed');
                     const removeBtn = student.previous_marks !== null && student.previous_marks !== undefined && student.previous_marks !== '' ? 
-                        '<button type="button" class="status-badge status-remove" onclick="removeMarks('+escapeHtml(student.id)+', \''+escapeHtml(student.name)+'\')">Remove</button>' : '';
+                        '<button type="button" class="status-badge status-remove" onclick="removeMarks('+escapeHtml(student.id)+', \'"+escapeHtml(student.name)+"\')">Delete</button>' : '';
                     tr.innerHTML = '<td>'+(index+1)+'</td>'+
                         '<td><span class="reg-badge">'+escapeHtml(student.reg_number)+'</span></td>'+
                         '<td><strong>'+escapeHtml(student.name)+'</strong></td>'+
                         '<td><span class="prev-marks">'+escapeHtml(student.previous_marks || '-')+'</span></td>'+
                         '<td><div class="marks-input-wrapper"><input type="number" name="marks['+escapeHtml(student.id)+']" class="marks-input" min="0" max="100" value="'+(cm !== null && cm !== undefined ? escapeHtml(cm) : '')+'" placeholder="0-100" data-student-id="'+escapeHtml(student.id)+'" onchange="calculateGrade(this)"><span class="marks-total">/ 100</span></div></td>'+
                         '<td><span class="grade-badge '+gradeClass+'" id="grade-'+escapeHtml(student.id)+'">'+(grade||'-')+'</span></td>'+
-                        '<td><span class="attendance-badge">'+escapeHtml(student.attendance || '-')+'%</span></td>'+
-                        '<td><span class="status-badge '+(cm !== null && cm !== undefined && cm !== '' ? 'status-entered':'status-pending')+'">'+(cm !== null && cm !== undefined && cm !== '' ? 'Entered':'Pending')+'</span></td>'+
                         '<td>'+removeBtn+'</td>';
                     tbody.appendChild(tr);
                 });

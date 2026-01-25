@@ -28,6 +28,48 @@ class ParentController extends Controller
             return;
         }
 
+        // ✅ Parent Time Table -> show linked student's timetable
+        if ($tab === 'Time Table') {
+            $parentUserId = (int) ($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+            if ($parentUserId <= 0) {
+                header('Location: /login');
+                exit;
+            }
+
+            try {
+                $parentModel = $this->model('ParentModel');
+                $linkedStudentIds = $parentModel->getLinkedStudentIdsByUserId($parentUserId);
+
+                $requestedStudentId = isset($_GET['studentID']) ? (int) $_GET['studentID'] : 0;
+                $studentId = 0;
+                if ($requestedStudentId > 0 && in_array($requestedStudentId, $linkedStudentIds, true)) {
+                    $studentId = $requestedStudentId;
+                } elseif (!empty($linkedStudentIds)) {
+                    $studentId = (int) $linkedStudentIds[0];
+                }
+
+                if ($studentId <= 0) {
+                    $this->view('parent/index', [
+                        'tab' => $tab,
+                        'tt_error' => 'No student linked to this parent account.',
+                    ]);
+                    return;
+                }
+
+                $ttModel = $this->model('StudentTimeTableModel');
+                $ctx = $ttModel->getStudentTimetableContextByStudentId($studentId, null);
+
+                $this->view('parent/index', array_merge(['tab' => $tab], $ctx));
+                return;
+            } catch (Throwable $e) {
+                $this->view('parent/index', [
+                    'tab' => $tab,
+                    'tt_error' => $e->getMessage(),
+                ]);
+                return;
+            }
+        }
+
         // default
         $this->view('parent/index', ['tab' => $tab]);
     }

@@ -3,7 +3,7 @@
 $studentInfo = $studentInfo ?? [
     'name' => '—',
     'class' => '—',
-    'reg_no' => '—',
+    'stu_id' => '—',
 ];
 
 $currentDay = date('l'); // Get current day name
@@ -31,8 +31,8 @@ $stats = $stats ?? [
         <div class="timetable-header">
             <div class="header-content">
                 <div>
-                    <h1 class="header-title">My Weekly Timetable</h1>
-                    <p class="header-subtitle">View your complete class schedule for the week</p>
+                    <h1 class="header-title">Weekly Timetable</h1>
+                    <p class="header-subtitle">View complete class schedule for the week</p>
                 </div>
                 <div class="student-info-badge">
                     <div class="info-item">
@@ -44,8 +44,8 @@ $stats = $stats ?? [
                         <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Reg No</span>
-                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['reg_no'] ?? '—'); ?></span>
+                        <span class="info-label">ID</span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
                     </div>
                 </div>
             </div>

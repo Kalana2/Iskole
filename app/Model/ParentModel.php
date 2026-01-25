@@ -4,6 +4,27 @@ class ParentModel extends UserModel
 {
     private $parentTable = 'parents';
 
+    public function getLinkedStudentIdsByUserId(int $userId): array
+    {
+        $sql = "SELECT studentID FROM {$this->parentTable} WHERE userID = :userId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => (int) $userId]);
+            $rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+            $out = [];
+            foreach ($rows as $r) {
+                $sid = $r['studentID'] ?? null;
+                if ($sid === null || $sid === '') {
+                    continue;
+                }
+                $out[] = (int) $sid;
+            }
+            return $out;
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching linked students: " . $e->getMessage());
+        }
+    }
+
     public function createParent($data)
     {
         $data['role'] = $this->userRoleMap['parent'];

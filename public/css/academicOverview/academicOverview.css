@@ -9,7 +9,13 @@ body {
   max-width: 1200px;
   margin: 18px auto;
   padding: 24px;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    "Segoe UI",
+    Roboto,
+    Arial;
   color: var(--text-color);
   /* local theme aliases */
   --ao-muted: rgba(51, 51, 51, 0.58);
@@ -39,6 +45,74 @@ body {
   gap: 10px;
   margin: 14px 0 18px;
   flex-wrap: wrap;
+}
+
+.ao-loading {
+  color: var(--ao-muted);
+  font-size: 0.95rem;
+  padding: 6px 0;
+}
+
+.class-nav {
+  display: flex;
+  gap: 10px;
+  margin: -6px 0 18px;
+  flex-wrap: wrap;
+}
+
+.term-nav {
+  display: flex;
+  gap: 10px;
+  margin: -6px 0 18px;
+  flex-wrap: wrap;
+}
+
+.term-nav-btn {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-color);
+  box-shadow: none;
+  transition: all 0.18s ease;
+  font-weight: 600;
+}
+
+.term-nav-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--ao-shadow);
+}
+
+.term-nav-btn.active {
+  background: var(--primary-color);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.12);
+}
+
+.class-nav-btn {
+  background: transparent;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  padding: 8px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-color);
+  box-shadow: none;
+  transition: all 0.18s ease;
+  font-weight: 600;
+}
+
+.class-nav-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--ao-shadow);
+}
+
+.class-nav-btn.active {
+  background: var(--primary-color);
+  color: #fff;
+  border: 0;
+  box-shadow: 0 10px 30px rgba(74, 144, 226, 0.12);
 }
 .grade-nav-btn {
   background: transparent;

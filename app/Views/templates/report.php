@@ -145,11 +145,10 @@ $student = $student ?? null;
         <div class="performance-report">
           <h3 class="report-title">
             <span>Performance Report</span>
-            <div class="chart-toggle">
-              <button class="toggle-btn active" data-chart="line">Trend</button>
-              <button class="toggle-btn" data-chart="radar">Radar Chart</button>
-            </div>
           </h3>
+
+          <div class="chart-controls"></div>
+
           <div class="chart-container">
             <canvas id="performanceChart"></canvas>
           </div>
