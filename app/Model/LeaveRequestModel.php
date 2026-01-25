@@ -15,7 +15,7 @@ class LeaveRequestModel
 
     public function create(array $data): bool
     {
-        $sql = "INSERT INTO leave_requests
+        $sql = "INSERT INTO leaveRequests
                 (teacherUserID, dateFrom, dateTo, leaveType, reason)
                 VALUES (:teacherUserID, :dateFrom, :dateTo, :leaveType, :reason)";
         $stmt = $this->pdo->prepare($sql);
@@ -25,7 +25,7 @@ class LeaveRequestModel
     public function getByTeacher(int $teacherUserID, int $limit = 6): array
     {
         $sql = "SELECT *
-            FROM leave_requests
+            FROM leaveRequests
             WHERE teacherUserID = :tid
             ORDER BY createdAt DESC, id DESC
             LIMIT :lim";
@@ -40,7 +40,7 @@ class LeaveRequestModel
 
     public function cancel(int $leaveId, int $teacherUserID): bool
     {
-        $sql = "UPDATE leave_requests
+        $sql = "UPDATE leaveRequests
                 SET status = 'cancelled'
                 WHERE id = :id
                   AND teacherUserID = :tid
@@ -54,7 +54,7 @@ class LeaveRequestModel
     {
         $sql = "SELECT lr.*,
                        u.email AS teacher_email
-                FROM leave_requests lr
+                FROM leaveRequests lr
                 JOIN user u ON u.userID = lr.teacherUserID
                 ORDER BY lr.createdAt DESC";
         return $this->pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
@@ -62,7 +62,7 @@ class LeaveRequestModel
 
     public function decide(int $leaveId, int $managerUserID, string $status, ?string $comment): bool
     {
-        $sql = "UPDATE leave_requests
+        $sql = "UPDATE leaveRequests
                 SET status = :status,
                     managerUserID = :mid,
                     managerComment = :comment,
@@ -85,7 +85,7 @@ class LeaveRequestModel
         $sql = "SELECT lr.*,
                    lr.teacherUserID AS teacher_id,
                    CONCAT(un.firstName, ' ', un.lastName) AS teacher_name
-            FROM leave_requests lr
+            FROM leaveRequests lr
             JOIN userName un ON un.userID = lr.teacherUserID
             WHERE lr.status = 'pending'
             ORDER BY lr.createdAt DESC, lr.id DESC
@@ -102,7 +102,7 @@ class LeaveRequestModel
     // Manager: approve/reject (status update)
     public function updateStatus(int $id, int $managerUserID, string $status, ?string $comment = null): bool
     {
-        $sql = "UPDATE leave_requests
+        $sql = "UPDATE leaveRequests
             SET status = :status,
                 managerUserID = :mid,
                 managerComment = :comment,
