@@ -74,6 +74,18 @@ class TeacherController extends Controller
                     ];
                 }
             }
+
+			// Performance stats (overall average + ranks)
+			$performance = null;
+			$availableTerms = [];
+			$selectedTerm = null;
+			if ($student && !empty($student['studentID'])) {
+				$marksModel = $this->model('MarksReportModel');
+				$selectedTerm = isset($_GET['term']) ? trim((string)$_GET['term']) : null;
+				$availableTerms = $marksModel->getAvailableTermsForStudent((int)$student['studentID']);
+				$performance = $marksModel->getStudentPerformanceStats((int)$student['studentID'], $selectedTerm);
+				$selectedTerm = $performance['term'] ?? $selectedTerm;
+			}
         }
 
         if ($tab === 'Leave') {

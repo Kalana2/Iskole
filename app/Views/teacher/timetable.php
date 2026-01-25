@@ -1,8 +1,6 @@
     <?php
     // filepath: d:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\timetable.php
 
-    // Data is provided by TeacherController when the "Time Table" tab is active.
-    // Fall back to sample structures if not provided.
     $teacherInfo = $teacherInfo ?? [
         'name' => '—',
         'subject' => '—',
@@ -69,13 +67,13 @@
                         <div class="stat-label">Classes Today</div>
                     </div>
                 </div>
-                <div class="stat-card">
+                <!--<div class="stat-card">
                     <div class="stat-icon">🎯</div>
                     <div class="stat-content">
                         <div class="stat-value"><?php echo round($totalClasses / 5, 1); ?></div>
                         <div class="stat-label">Avg. Classes/Day</div>
                     </div>
-                </div>
+                </div>_-->
             </div>
 
             <!-- Current Day Indicator -->

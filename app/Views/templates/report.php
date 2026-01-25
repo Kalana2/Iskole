@@ -148,6 +148,9 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
               <button class="toggle-btn" type="button" data-chart="radar">Radar Chart</button>
             </div>
           </h3>
+
+          <div class="chart-controls"></div>
+
           <div class="chart-container">
             <canvas id="performanceChart"></canvas>
           </div>

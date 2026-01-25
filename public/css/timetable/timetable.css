@@ -92,22 +92,27 @@
 
 /* Stats Grid */
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+  gap: 1.35rem;
+  flex-wrap: wrap;
+  margin: 0 auto 1.5rem;
+  max-width: 900px;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
   gap: 1rem;
-  padding: 1.25rem 1.5rem;
+  padding: 1.35rem 1.6rem;
   background: var(--card);
   border-radius: 16px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   border: 1px solid var(--border);
+  flex: 1 1 320px;
+  min-width: 290px;
+  max-width: 420px;
 }
 
 .stat-card:hover {
@@ -548,8 +553,10 @@
   }
 
   .stats-grid {
-    grid-template-columns: 1fr;
+    flex-direction: column;
+    align-items: stretch;
     gap: 0.75rem;
+    max-width: 520px;
   }
 
   .stat-card {

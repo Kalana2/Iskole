@@ -87,16 +87,9 @@ class TimeTableModel
 			return [];
 		}
 
+		// Timetable assignment rule: eligible teachers are filtered by subject only.
 		$where = ['t.subjectID = :subjectID'];
 		$params = ['subjectID' => $subjectID];
-		if ($grade !== null && $grade !== '') {
-			$where[] = 't.grade = :grade';
-			$params['grade'] = (int)$grade;
-		}
-		if ($classID !== null && $classID !== '') {
-			$where[] = 't.classID = :classID';
-			$params['classID'] = (int)$classID;
-		}
 
 		$nameTable = $this->nameTable;
 		$first = $this->firstNameCol;
@@ -116,6 +109,55 @@ class TimeTableModel
 		$stmt->execute($params);
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		// If names are missing, fall back to teacherID
+		foreach ($rows as &$r) {
+			if (!isset($r['label']) || trim((string)$r['label']) === '') {
+				$r['label'] = 'Teacher ' . $r['value'];
+			}
+		}
+		unset($r);
+		return $rows;
+	}
+
+	public function getAvailableTeachersBySubjectAndSlot($subjectID, $dayID, $periodID, $classID)
+	{
+		$subjectID = (int)$subjectID;
+		$dayID = (int)$dayID;
+		$periodID = (int)$periodID;
+		$classID = (int)$classID;
+
+		if ($subjectID <= 0 || $dayID <= 0 || $periodID <= 0 || $classID <= 0) {
+			return [];
+		}
+
+		$nameTable = $this->nameTable;
+		$first = $this->firstNameCol;
+		$last = $this->lastNameCol;
+
+		$sql = "
+			SELECT
+				t.teacherID AS value,
+				TRIM(CONCAT(COALESCE(n.`{$first}`,''), ' ', COALESCE(n.`{$last}`,''))) AS label
+			FROM teachers t
+			LEFT JOIN `{$nameTable}` n ON n.userID = t.userID
+			WHERE t.subjectID = :subjectID
+			AND t.teacherID NOT IN (
+				SELECT ct.teacherID
+				FROM classTimetable ct
+				WHERE ct.dayID = :dayID
+				AND ct.periodID = :periodID
+				AND ct.classID <> :classID
+			)
+			ORDER BY label
+		";
+
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute([
+			'subjectID' => $subjectID,
+			'dayID' => $dayID,
+			'periodID' => $periodID,
+			'classID' => $classID,
+		]);
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		foreach ($rows as &$r) {
 			if (!isset($r['label']) || trim((string)$r['label']) === '') {
 				$r['label'] = 'Teacher ' . $r['value'];

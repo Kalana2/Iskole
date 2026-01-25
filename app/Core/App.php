@@ -27,7 +27,7 @@ class App
 
         $this->params = $url ? array_values($url) : [];
 
-        $public = ['LoginController'];
+        $public = ['LoginController', 'AcademicOverviewController'];
         if (!in_array($this->controller::class, $public) && !isset($_SESSION['user_id'])) {
             header('Location: /login');
             exit;

@@ -59,7 +59,7 @@ if ($demoMode) {
   <header class="mgmt-header">
     <div class="title-wrap">
       <h2 id="relief-assign-title">Relief Class Assignment</h2>
-      <p class="subtitle">Assign available teachers to uncovered periods (<?php echo htmlspecialchars($selectedDate); ?>)</p>
+      <p class="subtitle">Assign available teachers to uncovered periods <b>(<?php echo htmlspecialchars($selectedDate); ?>)</b></p>
     </div>
     <div class="relief-stats">
       <div class="relief-stat"><span class="relief-stat-val"><?php echo count($pendingRelief); ?></span><span class="relief-stat-label">Unassigned</span></div>
@@ -67,17 +67,6 @@ if ($demoMode) {
     </div>
   </header>
   <div class="card">
-    <form method="get" class="relief-form" style="margin-bottom: 12px;">
-      <input type="hidden" name="tab" value="Relief" />
-      <div class="form-actions" style="justify-content: flex-start; gap: 12px;">
-        <label style="display:flex; align-items:center; gap:8px;">
-          <span style="min-width: 90px;">Date</span>
-          <input class="input" type="date" name="date" value="<?php echo htmlspecialchars($selectedDate); ?>" />
-        </label>
-        <button type="submit" class="btn btn-ghost">Load</button>
-      </div>
-    </form>
-
     <?php if ($reliefError): ?>
       <div class="assign-log" aria-live="polite"><?php echo htmlspecialchars($reliefError); ?></div>
     <?php endif; ?>
