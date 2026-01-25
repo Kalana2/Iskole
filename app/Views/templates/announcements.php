@@ -11,8 +11,8 @@
         </div>
         <div class="ann-actions">
             <div class="chip-group" role="tablist" aria-label="Announcement filters">
-                <button class="chip active" role="tab" aria-selected="true" data-filter="all">All Announcements</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="my">My Announcements</button>
+                <button class="chip active" role="tab" aria-selected="true" data-filter="all">All</button>
+                <button class="chip" role="tab" aria-selected="false" data-filter="my">Published</button>
             </div>
         </div>
     </div>

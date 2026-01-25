@@ -208,4 +208,261 @@ class StudentAttendance extends StudentModel
             throw $e;
         }
     }
+
+    /**
+     * Get studentID from userID by joining user and students table
+     */
+    public function getStudentIDByUserID($userID)
+    {
+        try {
+            $sql = "SELECT s.studentID FROM students s 
+                    JOIN user u ON s.userID = u.userID 
+                    WHERE u.userID = ? AND u.active = 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$userID]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['studentID'] : null;
+        } catch (Exception $e) {
+            error_log("Error fetching studentID: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get student info including name, class, and registration number
+     */
+    public function getStudentInfo($studentID)
+    {
+        try {
+            $sql = "SELECT 
+                        s.studentID,
+                        CONCAT(COALESCE(un.firstName, ''), ' ', COALESCE(un.lastName, '')) as name,
+                        CONCAT('Grade ', c.grade, '-', c.class) as class,
+                        CONCAT('STU', YEAR(CURDATE()), '-', s.studentID) as reg_no,
+                        YEAR(CURDATE()) as year
+                    FROM students s
+                    JOIN user u ON s.userID = u.userID
+                    LEFT JOIN userName un ON u.userID = un.userID
+                    LEFT JOIN class c ON s.classID = c.classID
+                    WHERE s.studentID = ?";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$studentID]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error fetching student info: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get attendance statistics for a student from January 1st to today
+     */
+    public function getStudentAttendanceStats($studentID)
+    {
+        try {
+            $currentYear = date('Y');
+            $startDate = $currentYear . '-01-01';
+            $today = date('Y-m-d');
+
+            $sql = "SELECT 
+                        COUNT(*) as total_days,
+                        SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present_days,
+                        SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent_days
+                    FROM " . $this->table . "
+                    WHERE studentID = ? 
+                    AND attendance_date >= ? 
+                    AND attendance_date <= ?";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$studentID, $startDate, $today]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $totalDays = (int)$result['total_days'];
+            $presentDays = (int)$result['present_days'];
+            $absentDays = (int)$result['absent_days'];
+
+            $attendanceRate = $totalDays > 0 ? round(($presentDays / $totalDays) * 100, 2) : 0;
+
+            // Get this month's rate
+            $thisMonthStart = date('Y-m-01');
+            $thisMonthRate = $this->getMonthlyAttendanceRate($studentID, $thisMonthStart, $today);
+
+            // Get last month's rate
+            $lastMonthStart = date('Y-m-01', strtotime('first day of last month'));
+            $lastMonthEnd = date('Y-m-t', strtotime('last day of last month'));
+            $lastMonthRate = $this->getMonthlyAttendanceRate($studentID, $lastMonthStart, $lastMonthEnd);
+
+            return [
+                'total_days' => $totalDays,
+                'present_days' => $presentDays,
+                'absent_days' => $absentDays,
+                'attendance_rate' => $attendanceRate,
+                'this_month_rate' => $thisMonthRate,
+                'last_month_rate' => $lastMonthRate
+            ];
+        } catch (Exception $e) {
+            error_log("Error fetching student attendance stats: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get attendance rate for a specific month period
+     */
+    private function getMonthlyAttendanceRate($studentID, $startDate, $endDate)
+    {
+        try {
+            $sql = "SELECT 
+                        COUNT(*) as total,
+                        SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present
+                    FROM " . $this->table . "
+                    WHERE studentID = ? 
+                    AND attendance_date >= ? 
+                    AND attendance_date <= ?";
+
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$studentID, $startDate, $endDate]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            $total = (int)$result['total'];
+            $present = (int)$result['present'];
+
+            return $total > 0 ? round(($present / $total) * 100, 2) : 0;
+        } catch (Exception $e) {
+            error_log("Error calculating monthly attendance rate: " . $e->getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Get monthly attendance data from January 1st to current date
+     * Returns data for each month showing present and absent counts
+     */
+    public function getMonthlyAttendanceData($studentID)
+    {
+        try {
+            $currentYear = date('Y');
+            $currentMonth = (int)date('n');
+            $today = date('Y-m-d');
+            $monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            $monthlyData = [];
+
+            for ($month = 1; $month <= 12; $month++) {
+                $monthStart = sprintf('%s-%02d-01', $currentYear, $month);
+                $monthEnd = date('Y-m-t', strtotime($monthStart));
+
+                // For future months, set all counts to 0
+                if ($month > $currentMonth) {
+                    $monthlyData[] = [
+                        'month' => $monthNames[$month - 1],
+                        'present' => 0,
+                        'absent' => 0,
+                        'total' => 0
+                    ];
+                    continue;
+                }
+
+                // For current month, limit to today's date
+                if ($month == $currentMonth) {
+                    $monthEnd = $today;
+                }
+
+                $sql = "SELECT 
+                            SUM(CASE WHEN status = 'Present' THEN 1 ELSE 0 END) as present,
+                            SUM(CASE WHEN status = 'Absent' THEN 1 ELSE 0 END) as absent,
+                            COUNT(*) as total
+                        FROM " . $this->table . "
+                        WHERE studentID = ? 
+                        AND attendance_date >= ? 
+                        AND attendance_date <= ?";
+
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([$studentID, $monthStart, $monthEnd]);
+                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                $monthlyData[] = [
+                    'month' => $monthNames[$month - 1],
+                    'present' => (int)$result['present'],
+                    'absent' => (int)$result['absent'],
+                    'total' => (int)$result['total']
+                ];
+            }
+
+            return $monthlyData;
+        } catch (Exception $e) {
+            error_log("Error fetching monthly attendance data: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get studentID from parent's userID by joining user and parents table
+     * Parents table has a direct studentID column linking to their child
+     */
+    public function getStudentIDByParentUserID($userID)
+    {
+        try {
+            $sql = "SELECT p.studentID FROM parents p 
+                    JOIN user u ON p.userID = u.userID 
+                    WHERE u.userID = ? AND u.active = 1";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([$userID]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $result ? $result['studentID'] : null;
+        } catch (Exception $e) {
+            error_log("Error fetching studentID from parent: " . $e->getMessage());
+            throw $e;
+        }
+    }
+
+    /**
+     * Get complete attendance context for student view
+     * This combines all necessary data for the studentAttendance.php template
+     * Supports both student (role=3) and parent (role=4) users
+     * 
+     * @param int $userID The logged-in user's ID
+     * @param int $userRole The user's role (3=student, 4=parent)
+     * @return array Contains studentInfo, attendanceStats, and monthlyData
+     */
+    public function getStudentAttendanceContext($userID, $userRole = 3)
+    {
+        try {
+            // Get studentID based on user role
+            if ($userRole == 4) {
+                // Parent role - get studentID from parents table
+                $studentID = $this->getStudentIDByParentUserID($userID);
+                if (!$studentID) {
+                    throw new Exception("Student not found for parent user ID: " . $userID);
+                }
+            } else {
+                // Student role (default) - get studentID from students table
+                $studentID = $this->getStudentIDByUserID($userID);
+                if (!$studentID) {
+                    throw new Exception("Student not found for user ID: " . $userID);
+                }
+            }
+
+            // Get student info
+            $studentInfo = $this->getStudentInfo($studentID);
+            if (!$studentInfo) {
+                throw new Exception("Could not fetch student information");
+            }
+
+            // Get attendance statistics
+            $attendanceStats = $this->getStudentAttendanceStats($studentID);
+
+            // Get monthly attendance data
+            $monthlyData = $this->getMonthlyAttendanceData($studentID);
+
+            return [
+                'studentInfo' => $studentInfo,
+                'attendanceStats' => $attendanceStats,
+                'monthlyData' => $monthlyData
+            ];
+        } catch (Exception $e) {
+            error_log("Error building student attendance context: " . $e->getMessage());
+            throw $e;
+        }
+    }
 }

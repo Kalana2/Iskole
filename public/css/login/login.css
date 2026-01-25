@@ -185,7 +185,8 @@ h1 {
 }
 
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
   width: 100%;
   height: 56px;
   padding: 0 22px;
@@ -206,19 +207,22 @@ input[type="password"] {
 }
 
 input[type="email"]::placeholder,
-input[type="password"]::placeholder {
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
   color: rgba(255, 255, 255, 0.7);
   font-weight: 400;
 }
 
 input[type="email"]:hover,
-input[type="password"]:hover {
+input[type="password"]:hover,
+input[type="text"]:hover {
   background: rgba(255, 255, 255, 0.25);
   border-color: rgba(255, 255, 255, 0.5);
 }
 
 input[type="email"]:focus,
-input[type="password"]:focus {
+input[type="password"]:focus,
+input[type="text"]:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.3);
@@ -229,6 +233,7 @@ input[type="password"]:focus {
 /* Focus styles for accessibility */
 input[type="email"]:focus-visible,
 input[type="password"]:focus-visible,
+input[type="text"]:focus-visible,
 button[type="submit"]:focus-visible {
   outline: 3px solid rgba(102, 126, 234, 0.4);
   outline-offset: 2px;
@@ -425,28 +430,35 @@ select {
   flex-shrink: 0;
 }
 
-@keyframes shake {
-  0%,
-  100% {
-    transform: translateX(0);
-  }
-  25% {
-    transform: translateX(-8px);
-  }
-  75% {
-    transform: translateX(8px);
-  }
+/* Success message styling */
+.success {
+  background: linear-gradient(135deg, #26de81 0%, #20bf6b 100%);
+  color: white;
+  padding: 14px 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  box-shadow: 0 4px 15px rgba(38, 222, 129, 0.3);
+  animation: fadeIn 0.4s ease-out;
+  border-left: 4px solid #20bf6b;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+.success::before {
+  content: "✓";
+  font-size: 18px;
+  flex-shrink: 0;
+  font-weight: bold;
+}
+
+/* Link hover effect */
+a:hover {
+  color: rgba(255, 255, 255, 1) !important;
+  text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
 }
 
 /* Glass reflection effect */

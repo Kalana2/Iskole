@@ -22,6 +22,26 @@ class EmailService
         $this->configureSMTP();
     }
 
+    /**
+     * Load email configuration from config file
+     */
+    private function loadConfig()
+    {
+        $configPath = __DIR__ . '/../Config/email.php';
+
+        if (!file_exists($configPath)) {
+            throw new Exception("Email configuration file not found: $configPath");
+        }
+
+        $config = require $configPath;
+
+        if (!is_array($config)) {
+            throw new Exception("Email configuration must return an array");
+        }
+
+        return $config;
+    }
+
     private function configureSMTP()
     {
         try {
@@ -56,17 +76,13 @@ class EmailService
 
     /**
      * Send OTP email for password reset
-     * @param string $email Recipient email address
-     * @param string $otp The OTP code to send
-     * @param int $expiryMinutes OTP validity period in minutes
-     * @param string $userName Optional user name for personalization
      */
-    public function sendOTP($email, $otp, $expiryMinutes = 10, $userName = '')
+    public function sendOTP($email, $otp, $expiryMinutes = 10)
     {
         try {
             // Log to console in development mode
             if ($this->logEmails) {
-                $this->logToConsole($email, $otp, $userName);
+                $this->logToConsole($email, $otp);
             }
 
             // In development mode, only log (don't actually send)
@@ -82,8 +98,8 @@ class EmailService
             // Content
             $this->mailer->isHTML(true);
             $this->mailer->Subject = 'Password Reset OTP - ISKOLE';
-            $this->mailer->Body = $this->getOTPEmailTemplate($otp, $expiryMinutes, $userName);
-            $this->mailer->AltBody = $this->getOTPPlainText($otp, $expiryMinutes, $userName);
+            $this->mailer->Body = $this->getOTPEmailTemplate($otp, $expiryMinutes);
+            $this->mailer->AltBody = $this->getOTPPlainText($otp, $expiryMinutes);
 
             // Send email
             $result = $this->mailer->send();
@@ -104,15 +120,12 @@ class EmailService
     /**
      * Log OTP to console for development
      */
-    private function logToConsole($email, $otp, $userName = '')
+    private function logToConsole($email, $otp)
     {
         $border = str_repeat('=', 60);
         $message = "\n" . $border . "\n";
         $message .= "🔐 PASSWORD RESET OTP\n";
         $message .= $border . "\n";
-        if ($userName) {
-            $message .= "👤 User: $userName\n";
-        }
         $message .= "📧 Email: $email\n";
         $message .= "🔑 OTP Code: $otp\n";
         $message .= "⏰ Valid for: 10 minutes\n";
@@ -148,33 +161,7 @@ class EmailService
     /**
      * HTML email template for OTP
      */
-    private function getOTPEmailTemplate($otp, $expiryMinutes, $userName = '')
-    {
-        // Load template from file
-        $templatePath = __DIR__ . '/../../public/assets/email-templates/otp-template.html';
-
-        if (file_exists($templatePath)) {
-            $template = file_get_contents($templatePath);
-
-            // Replace placeholders
-            $replacements = [
-                '{{OTP_CODE}}' => $otp,
-                '{{EXPIRY_MINUTES}}' => $expiryMinutes,
-                '{{USER_NAME}}' => $userName ?: 'User',
-                '{{CURRENT_YEAR}}' => date('Y')
-            ];
-
-            return str_replace(array_keys($replacements), array_values($replacements), $template);
-        }
-
-        // Fallback to inline template if file not found
-        return $this->getOTPEmailTemplateFallback($otp, $expiryMinutes);
-    }
-
-    /**
-     * Fallback HTML email template for OTP (if template file is missing)
-     */
-    private function getOTPEmailTemplateFallback($otp, $expiryMinutes)
+    private function getOTPEmailTemplate($otp, $expiryMinutes)
     {
         return <<<HTML
 <!DOCTYPE html>
@@ -227,6 +214,40 @@ class EmailService
             margin: 10px 0;
             font-family: 'Courier New', monospace;
         }
+        .otp-label {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        .info-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .info-box p {
+            margin: 0;
+            color: #856404;
+            font-size: 14px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px 30px;
+            text-align: center;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
@@ -234,9 +255,37 @@ class EmailService
         <div class="header">
             <h1>🔐 Password Reset Request</h1>
         </div>
+        
         <div class="content">
-            <p>Your OTP Code: <strong style="font-size:24px; color:#667eea;">$otp</strong></p>
-            <p>Valid for $expiryMinutes minutes</p>
+            <p>Hello,</p>
+            <p>You have requested to reset your password for your ISKOLE account. Please use the One-Time Password (OTP) below to proceed:</p>
+            
+            <div class="otp-box">
+                <div class="otp-label">Your OTP Code:</div>
+                <div class="otp-code">$otp</div>
+                <div class="otp-label">Valid for $expiryMinutes minutes</div>
+            </div>
+            
+            <div class="info-box">
+                <p><strong>⚠️ Security Notice:</strong> Do not share this code with anyone. Our team will never ask for your OTP.</p>
+            </div>
+            
+            <p><strong>What to do next:</strong></p>
+            <ol>
+                <li>Return to the password reset page</li>
+                <li>Enter the 6-digit OTP code shown above</li>
+                <li>Create your new password</li>
+            </ol>
+            
+            <p>If you didn't request this password reset, please ignore this email and ensure your account is secure.</p>
+            
+            <p>Best regards,<br>
+            <strong>ISKOLE Team</strong></p>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated message. Please do not reply to this email.</p>
+            <p>&copy; 2025 ISKOLE School Management System. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -247,33 +296,7 @@ HTML;
     /**
      * Plain text version of OTP email
      */
-    private function getOTPPlainText($otp, $expiryMinutes, $userName = '')
-    {
-        // Load template from file
-        $templatePath = __DIR__ . '/../../public/assets/email-templates/otp-template.txt';
-
-        if (file_exists($templatePath)) {
-            $template = file_get_contents($templatePath);
-
-            // Replace placeholders
-            $replacements = [
-                '{{OTP_CODE}}' => $otp,
-                '{{EXPIRY_MINUTES}}' => $expiryMinutes,
-                '{{USER_NAME}}' => $userName ?: 'User',
-                '{{CURRENT_YEAR}}' => date('Y')
-            ];
-
-            return str_replace(array_keys($replacements), array_values($replacements), $template);
-        }
-
-        // Fallback to inline template if file not found
-        return $this->getOTPPlainTextFallback($otp, $expiryMinutes);
-    }
-
-    /**
-     * Fallback plain text version of OTP email
-     */
-    private function getOTPPlainTextFallback($otp, $expiryMinutes)
+    private function getOTPPlainText($otp, $expiryMinutes)
     {
         return <<<TEXT
 ISKOLE - Password Reset Request
@@ -299,7 +322,7 @@ ISKOLE Team
 
 ---
 This is an automated message. Please do not reply to this email.
-© 2026 ISKOLE School Management System. All rights reserved.
+© 2025 ISKOLE School Management System. All rights reserved.
 TEXT;
     }
 
@@ -319,27 +342,6 @@ TEXT;
         } catch (Exception $e) {
             error_log("Test Email Error: " . $this->mailer->ErrorInfo);
             return false;
-        }
-    }
-
-    public function loadConfig()
-    {
-        try {
-            $configFile = __DIR__ . '/../Config/email.php';
-            if (!file_exists($configFile)) {
-                return [];
-            }
-
-            $config = require $configFile;
-
-            if (!is_array($config)) {
-                throw new Exception('Invalid email config format.');
-            }
-
-            return $config;
-        } catch (Throwable $e) {
-            // Optionally log $e->getMessage()
-            return [];
         }
     }
 }

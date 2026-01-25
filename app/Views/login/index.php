@@ -10,8 +10,18 @@
 </head>
 
 <body>
-    <?php $error = isset($error) ? $error : null;
-    include __DIR__ . '/login.php'; ?>
+    <?php
+    $error = isset($error) ? $error : null;
+    $success = null;
+
+    // Check for password reset success message
+    if (isset($_SESSION['password_reset_success']) && $_SESSION['password_reset_success']) {
+        $success = 'Your password has been reset successfully! Please login with your new password.';
+        unset($_SESSION['password_reset_success']);
+    }
+
+    include __DIR__ . '/login.php';
+    ?>
 </body>
 
 </html>
