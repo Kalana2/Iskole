@@ -97,14 +97,44 @@ class ParentModel extends UserModel
      */
     public function getTeachersForClass($classID)
     {
-        // Query follows the relationship:
-        // classTimetable has teacherID for specific class
-        // Join with teachers table to get teacher details
-        // Join with user tables to get contact information
-        // Join with subject to get subject name
-        $sql = "SELECT DISTINCT
+        try {
+            $teachers = [];
+            $seenTeachers = []; // Track unique teachers by teacherID
+
+            // 1. First, get the CLASS TEACHER (from teachers table where classID matches)
+            $classTeacherSql = "SELECT DISTINCT
                     t.teacherID,
-                    t.classID,
+                    un.firstName,
+                    un.lastName,
+                    sub.subjectName,
+                    u.email,
+                    u.phone,
+                    1 as is_class_teacher
+                FROM teachers t
+                JOIN {$this->userTable} u ON t.userID = u.userID
+                JOIN {$this->userNameTable} un ON t.userID = un.userID
+                LEFT JOIN subject sub ON t.subjectID = sub.subjectID
+                WHERE t.classID = :classID
+                LIMIT 1";
+
+            $stmt = $this->pdo->prepare($classTeacherSql);
+            $stmt->execute(['classID' => $classID]);
+            $classTeacher = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($classTeacher) {
+                $teachers[] = [
+                    'name' => trim(($classTeacher['firstName'] ?? '') . ' ' . ($classTeacher['lastName'] ?? '')),
+                    'subject' => $classTeacher['subjectName'] ?? 'Class Teacher',
+                    'email' => $classTeacher['email'] ?? '',
+                    'phone' => $classTeacher['phone'] ?? 'N/A',
+                    'is_class_teacher' => true
+                ];
+                $seenTeachers[$classTeacher['teacherID']] = true;
+            }
+
+            // 2. Then, get SUBJECT TEACHERS (from classTimetable)
+            $subjectTeachersSql = "SELECT DISTINCT
+                    t.teacherID,
                     un.firstName,
                     un.lastName,
                     sub.subjectName,
@@ -116,23 +146,17 @@ class ParentModel extends UserModel
                 JOIN {$this->userNameTable} un ON t.userID = un.userID
                 LEFT JOIN subject sub ON ct.subjectID = sub.subjectID
                 WHERE ct.classID = :classID
-                ORDER BY 
-                    CASE WHEN t.classID = :classID THEN 0 ELSE 1 END,
-                    sub.subjectName ASC";
+                ORDER BY sub.subjectName ASC";
 
-        try {
-            $stmt = $this->pdo->prepare($sql);
+            $stmt = $this->pdo->prepare($subjectTeachersSql);
             $stmt->execute(['classID' => $classID]);
-            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $subjectTeachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-            $teachers = [];
-            $seenTeachers = []; // Track unique teacher-subject combinations
-
-            foreach ($results as $row) {
+            foreach ($subjectTeachers as $row) {
                 $teacherKey = $row['teacherID'] . '_' . ($row['subjectName'] ?? 'N/A');
 
-                // Skip if we've already added this teacher-subject combination
-                if (isset($seenTeachers[$teacherKey])) {
+                // Skip if this is the class teacher (already added above)
+                if (isset($seenTeachers[$row['teacherID']])) {
                     continue;
                 }
 
@@ -143,7 +167,7 @@ class ParentModel extends UserModel
                     'subject' => $row['subjectName'] ?? 'N/A',
                     'email' => $row['email'] ?? '',
                     'phone' => $row['phone'] ?? 'N/A',
-                    'is_class_teacher' => ((int) $row['classID'] === (int) $classID)
+                    'is_class_teacher' => false
                 ];
             }
 
