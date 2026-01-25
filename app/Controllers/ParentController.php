@@ -11,7 +11,6 @@ class ParentController extends Controller
             return;
         }
 
-
         $tab = $_GET['tab'] ?? 'Dashboard';
 
         // ✅ If Behavior tab -> load reports and view parentBehavior
@@ -19,7 +18,7 @@ class ParentController extends Controller
             $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
 
             $reportModel = $this->model('ReportModel');
-            $behaviorReports = $reportModel->getReportsForParent((int)$parentUserId);
+            $behaviorReports = $reportModel->getReportsForParent((int) $parentUserId);
 
             $this->view('parent/index', [
                 'tab' => $tab,
@@ -28,46 +27,37 @@ class ParentController extends Controller
             return;
         }
 
-        // ✅ Parent Time Table -> show linked student's timetable
-        if ($tab === 'Time Table') {
-            $parentUserId = (int) ($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
-            if ($parentUserId <= 0) {
+        // ✅ If Teachers tab -> load student info and teachers
+        if ($tab === 'Teachers') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            if (!$parentUserId) {
+                $_SESSION['mgmt_msg'] = 'User not authenticated.';
                 header('Location: /login');
                 exit;
             }
 
-            try {
-                $parentModel = $this->model('ParentModel');
-                $linkedStudentIds = $parentModel->getLinkedStudentIdsByUserId($parentUserId);
+            $parentModel = $this->model('ParentModel');
 
-                $requestedStudentId = isset($_GET['studentID']) ? (int) $_GET['studentID'] : 0;
-                $studentId = 0;
-                if ($requestedStudentId > 0 && in_array($requestedStudentId, $linkedStudentIds, true)) {
-                    $studentId = $requestedStudentId;
-                } elseif (!empty($linkedStudentIds)) {
-                    $studentId = (int) $linkedStudentIds[0];
-                }
+            // Get student information
+            $studentInfo = $parentModel->getStudentInfoByParentUserId((int) $parentUserId);
 
-                if ($studentId <= 0) {
-                    $this->view('parent/index', [
-                        'tab' => $tab,
-                        'tt_error' => 'No student linked to this parent account.',
-                    ]);
-                    return;
-                }
-
-                $ttModel = $this->model('StudentTimeTableModel');
-                $ctx = $ttModel->getStudentTimetableContextByStudentId($studentId, null);
-
-                $this->view('parent/index', array_merge(['tab' => $tab], $ctx));
-                return;
-            } catch (Throwable $e) {
-                $this->view('parent/index', [
-                    'tab' => $tab,
-                    'tt_error' => $e->getMessage(),
-                ]);
-                return;
+            // Get teachers for the student's class
+            $teachers = [];
+            if ($studentInfo && isset($studentInfo['classID'])) {
+                $teachers = $parentModel->getTeachersForClass((int) $studentInfo['classID']);
             }
+
+            $this->view('parent/index', [
+                'tab' => $tab,
+                'studentInfo' => $studentInfo ?? [
+                    'student_name' => 'N/A',
+                    'class' => 'N/A',
+                    'class_teacher' => 'N/A'
+                ],
+                'teachers' => $teachers
+            ]);
+            return;
         }
 
         // default
@@ -147,13 +137,9 @@ class ParentController extends Controller
         return $diff->days + 1; // +1 to include both start and end dates
     }
 
-
-
     public function behavior()
     {
         $parentUserId = $_SESSION['userId'] ?? 0;
-
-
 
         if (!$parentUserId) {
             header('Location: /login');
@@ -161,7 +147,7 @@ class ParentController extends Controller
         }
 
         $reportModel = $this->model('ReportModel');
-        $behaviorReports = $reportModel->getReportsForParent((int)$parentUserId);
+        $behaviorReports = $reportModel->getReportsForParent((int) $parentUserId);
 
         $this->view('parent/parentBehavior', [
             'behaviorReports' => $behaviorReports
