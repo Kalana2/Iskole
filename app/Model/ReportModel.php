@@ -41,13 +41,34 @@ class ReportModel
         }
     }
 
-    public function getAllReports()
+    public function getAllReports(): array
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY report_date DESC, id DESC LIMIT 3";
+        $sql = "
+        SELECT
+            r.*,
+            r.id AS report_id,
+            TRIM(
+                CONCAT(
+                    IFNULL(un.firstName,''),' ',
+                    IFNULL(un.lastName,'')
+                )
+            ) AS teacher_name
+        FROM report r
+        LEFT JOIN teachers t
+            ON t.id = r.teacherID         
+        LEFT JOIN userName un
+            ON un.userID = t.userID       
+        ORDER BY r.report_date DESC, r.id DESC
+        LIMIT 50
+    ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+
 
 
     public function getReportsForParent(int $parentUserId): array

@@ -219,16 +219,24 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
                 <?php
                 $reportDate = !empty($report['report_date']) ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
                 $reportType = $report['report_type'] ?? 'neutral';
-                $teacherName = $report['teacher_name'] ?? 'Unknown Teacher';
+                $teacherName = trim($report['teacher_name'] ?? '');
+
+                if ($teacherName === '') {
+                  $teacherName = 'Unknown Teacher';
+                }
+
                 $teacherSubject = $report['teacher_subject'] ?? '';
                 $category = $report['category'] ?? 'General';
                 $typeIcons = ['positive' => '✓', 'neutral' => '◉', 'concern' => '⚠'];
-                $rid = $report['id'] ?? $report['report_id'] ?? '';
+                $rid = $report['report_id'] ?? $report['id'] ?? '';
+                $teacherName = trim($report['teacher_name'] ?? '');
+                if ($teacherName === '') $teacherName = 'Unknown Teacher';
+
                 ?>
 
                 <div class="behavior-report <?= htmlspecialchars($reportType) ?>"
-                     data-report-id="<?= htmlspecialchars($rid) ?>"
-                     data-type="<?= htmlspecialchars($reportType) ?>">
+                  data-report-id="<?= htmlspecialchars($rid) ?>"
+                  data-type="<?= htmlspecialchars($reportType) ?>">
 
                   <div class="report-header">
                     <div class="report-info">
@@ -255,14 +263,14 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
                     <!-- ✅ NO RELOAD buttons -->
                     <div class="report-actions">
                       <button type="button"
-                              class="edit-btn js-edit"
-                              data-report-id="<?= htmlspecialchars($rid) ?>">
+                        class="edit-btn js-edit"
+                        data-report-id="<?= htmlspecialchars($rid) ?>">
                         ✏️ Edit
                       </button>
 
                       <button type="button"
-                              class="delete-btn js-delete"
-                              data-report-id="<?= htmlspecialchars($rid) ?>">
+                        class="delete-btn js-delete"
+                        data-report-id="<?= htmlspecialchars($rid) ?>">
                         🗑 Delete
                       </button>
                     </div>
@@ -336,19 +344,38 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 </div>
 
 <style>
-  .report-modal{ position:fixed; inset:0; display:none; z-index:9999; }
-  .report-modal.show{ display:block; }
-  .report-modal-backdrop{ position:absolute; inset:0; background:rgba(0,0,0,.35); }
-  .report-modal-card{
-    position:relative;
-    width:min(640px, 92vw);
-    margin: 6vh auto 0;
-    background:#fff;
-    border-radius:16px;
-    padding:16px;
-    box-shadow:0 18px 60px rgba(0,0,0,.25);
+  .report-modal {
+    position: fixed;
+    inset: 0;
+    display: none;
+    z-index: 9999;
   }
-  .cancel-btn{ text-decoration:none; border:none; cursor:pointer; }
+
+  .report-modal.show {
+    display: block;
+  }
+
+  .report-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, .35);
+  }
+
+  .report-modal-card {
+    position: relative;
+    width: min(640px, 92vw);
+    margin: 6vh auto 0;
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, .25);
+  }
+
+  .cancel-btn {
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+  }
 </style>
 
 <script>
@@ -370,20 +397,30 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
   }
 
   // AJAX helpers
-  (function () {
+  (function() {
     const modal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
 
-    const openModal = () => { modal.classList.add('show'); modal.setAttribute('aria-hidden','false'); };
-    const closeModal = () => { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); };
+    const openModal = () => {
+      modal.classList.add('show');
+      modal.setAttribute('aria-hidden', 'false');
+    };
+    const closeModal = () => {
+      modal.classList.remove('show');
+      modal.setAttribute('aria-hidden', 'true');
+    };
 
-    modal.addEventListener('click', (e) => { if (e.target?.dataset?.close === "1") closeModal(); });
+    modal.addEventListener('click', (e) => {
+      if (e.target?.dataset?.close === "1") closeModal();
+    });
     document.getElementById('editCancelBtn').addEventListener('click', closeModal);
 
     async function postJSON(url, formDataObj) {
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
         body: formDataObj
       });
       return res.json();
@@ -464,11 +501,11 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
         if (descEl) descEl.textContent = r.description || '';
         if (catEl) catEl.textContent = r.category || 'General';
 
-        card.classList.remove('positive','neutral','concern');
+        card.classList.remove('positive', 'neutral', 'concern');
         card.classList.add(r.report_type);
 
         if (typeBadge) {
-          typeBadge.classList.remove('positive','neutral','concern');
+          typeBadge.classList.remove('positive', 'neutral', 'concern');
           typeBadge.classList.add(r.report_type);
         }
         if (typeText) {

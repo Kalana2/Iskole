@@ -2,9 +2,6 @@
 
 class ReportController extends Controller
 {
-
-
-
     private function isAjax(): bool
     {
         return isset($_SERVER['HTTP_X_REQUESTED_WITH'])
@@ -18,33 +15,40 @@ class ReportController extends Controller
         exit;
     }
 
+    // ✅ ONE SAFE WAY to get teacher userID from session
+    private function teacherUserId(): int
+    {
+        return (int)($_SESSION['userID']
+            ?? $_SESSION['userId']
+            ?? $_SESSION['user_id']
+            ?? 0);
+    }
+
     public function index()
     {
         $tab = $_GET['tab'] ?? 'Dashboard';
 
         $behaviorReports = [];
-        $student = null; // ✅ NEW
+        $student = null;
         $flash = $_SESSION['report_msg'] ?? null;
         unset($_SESSION['report_msg']);
 
-        // ✅ NEW: read search query
+        // (optional) edit mode from session
+        $editReport = $_SESSION['edit_report'] ?? null;
+
         $q = trim($_GET['q'] ?? '');
 
         if ($tab === 'Reports') {
             /** @var ReportModel $reportModel */
             $reportModel = $this->model('ReportModel');
 
-            // your existing reports list
+            // ✅ NOW includes teacher_name + teacher_subject (from your SQL)
             $behaviorReports = $reportModel->getAllReports();
 
-            // ✅ NEW: teacher class id from session (change key if yours differs)
             $teacherClassId = $_SESSION['classID'] ?? null;
 
-            // ✅ NEW: if user searched, load student details
             if ($teacherClassId && $q !== '') {
-                $student = $reportModel->findStudentInClass($teacherClassId, $q);
-
-                // optional: flash if not found
+                $student = $reportModel->findStudentInClass((int)$teacherClassId, $q);
                 if (!$student) {
                     $flash = ['type' => 'error', 'text' => 'Student not found in your class.'];
                 }
@@ -54,104 +58,75 @@ class ReportController extends Controller
         $this->view('teacher/index', [
             'tab'             => $tab,
             'behaviorReports' => $behaviorReports,
-            'student'         => $student, // ✅ NEW: pass to view
+            'student'         => $student,
             'flash'           => $flash,
+            'editReport'      => $editReport, // ✅ IMPORTANT for your $isEdit
         ]);
     }
 
     public function submit()
     {
-
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-
-
-
-        $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? null);
-
-        if (!$teacherUserId) {
-            $_SESSION['report_msg'] = [
-                'type' => 'error',
-                'text' => 'Teacher not logged in.'
-            ];
+        $teacherUserId = $this->teacherUserId();
+        if ($teacherUserId <= 0) {
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Teacher not logged in.'];
             header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-
-        $studentID = $_POST['studentID'] ?? null;
-
-        if (!$studentID) {
-            $_SESSION['report_msg'] = [
-                'type' => 'error',
-                'text' => 'Please search and select a student before adding a report.'
-            ];
+        $studentID = (int)($_POST['studentID'] ?? 0);
+        if ($studentID <= 0) {
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Please select a student.'];
             header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-        $reportType  = $_POST['report_type'] ?? null;
+        $reportType  = $_POST['report_type'] ?? '';
         $category    = trim($_POST['category'] ?? '');
         $title       = trim($_POST['title'] ?? '');
         $description = trim($_POST['description'] ?? '');
 
-        if (!$reportType || !$category || !$title || !$description) {
-            $_SESSION['report_msg'] = [
-                'type' => 'error',
-                'text' => 'Missing required fields.',
-            ];
+        if ($reportType === '' || $category === '' || $title === '' || $description === '') {
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'All fields are required.'];
             header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-        try {
-            /** @var ReportModel $model */
-            $model = $this->model('ReportModel');
+        /** @var ReportModel $model */
+        $model = $this->model('ReportModel');
 
-            $model->createReport([
-                'studentID'   => (int)$studentID,
-                'teacherID'   => (int)$teacherUserId,
-                'report_type' => $reportType,
-                'category'    => $category,
-                'title'       => $title,
-                'description' => $description,
-            ]);
+        $model->createReport([
+            'studentID'   => $studentID,
+            'teacherID'   => $teacherUserId, // ✅ saves correct userID
+            'report_type' => $reportType,
+            'category'    => $category,
+            'title'       => $title,
+            'description' => $description,
+        ]);
 
-            $_SESSION['report_msg'] = [
-                'type' => 'success',
-                'text' => 'Report added successfully.',
-            ];
-        } catch (Exception $e) {
-            $_SESSION['report_msg'] = [
-                'type' => 'error',
-                'text' => 'Database error: ' . $e->getMessage(),
-            ];
-        }
-
-        // ✅ always go back to the styled teacher page
+        $_SESSION['report_msg'] = ['type' => 'success', 'text' => 'Report added successfully.'];
         header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
 
-
-
-        public function delete()
+    public function delete()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid request']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
         $reportId = (int)($_POST['report_id'] ?? 0);
-        $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+        $teacherUserId = $this->teacherUserId(); // ✅ FIXED
 
         if ($reportId <= 0 || $teacherUserId <= 0) {
-            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid report ID']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid request']);
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
@@ -160,24 +135,15 @@ class ReportController extends Controller
 
         $deleted = $reportModel->deleteReportByIdAndTeacher($reportId, $teacherUserId);
 
-        // ✅ AJAX response: NO reload, NO flash
         if ($this->isAjax()) {
-            $this->json([
-                'ok' => $deleted ? true : false,
-                'message' => $deleted ? 'Deleted' : 'Delete failed (not found or not allowed)'
-            ]);
+            $this->json(['ok' => (bool)$deleted, 'message' => $deleted ? 'Deleted' : 'Delete failed']);
         }
 
-        // fallback redirect mode
         $_SESSION['report_msg'] = $deleted
             ? ['type' => 'success', 'text' => 'Report deleted successfully.']
-            : ['type' => 'error', 'text' => 'Delete failed (not found or not allowed).'];
+            : ['type' => 'error', 'text' => 'Delete failed.'];
 
-        $q = trim($_POST['q'] ?? '');
-        $redirect = "/index.php?url=teacher&tab=Reports";
-        if ($q !== '') $redirect .= "&q=" . urlencode($q);
-
-        header("Location: $redirect");
+        header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
 
@@ -185,16 +151,16 @@ class ReportController extends Controller
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid request']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
         $reportId = (int)($_POST['report_id'] ?? 0);
-        $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+        $teacherUserId = $this->teacherUserId(); // ✅ FIXED
 
         if ($reportId <= 0 || $teacherUserId <= 0) {
-            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid edit request']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid request']);
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
@@ -203,33 +169,30 @@ class ReportController extends Controller
 
         $report = $reportModel->getReportByIdAndTeacher($reportId, $teacherUserId);
         if (!$report) {
-            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Report not found or not allowed']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Not allowed']);
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-        // AJAX response: send report data to popup
         if ($this->isAjax()) {
             $this->json(['ok' => true, 'report' => $report]);
         }
 
-        // fallback: 
         $_SESSION['edit_report'] = $report;
-        header("Location: /index.php?url=teacher&tab=Reports");
+        header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
 
-
-       public function update()
+    public function update()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Invalid request']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
         $reportId = (int)($_POST['report_id'] ?? 0);
-        $teacherUserId = (int)($_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0));
+        $teacherUserId = $this->teacherUserId(); // ✅ FIXED
 
         $reportType  = $_POST['report_type'] ?? '';
         $category    = trim($_POST['category'] ?? '');
@@ -237,8 +200,8 @@ class ReportController extends Controller
         $description = trim($_POST['description'] ?? '');
 
         if ($reportId <= 0 || $teacherUserId <= 0 || $reportType === '' || $category === '' || $title === '' || $description === '') {
-            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Missing/invalid fields']);
-            header("Location: /index.php?url=teacher&tab=Reports");
+            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Missing fields']);
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
@@ -253,13 +216,12 @@ class ReportController extends Controller
         ]);
 
         if (!$ok) {
-            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Update failed (not found or not allowed)']);
-            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Update failed (not found or not allowed).'];
-            header("Location: /index.php?url=teacher&tab=Reports");
+            if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Update failed']);
+            $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'Update failed.'];
+            header('Location: /index.php?url=teacher&tab=Reports');
             exit;
         }
 
-        // return updated data for UI refresh
         $updated = $reportModel->getReportByIdAndTeacher($reportId, $teacherUserId);
 
         if ($this->isAjax()) {
@@ -267,7 +229,7 @@ class ReportController extends Controller
         }
 
         $_SESSION['report_msg'] = ['type' => 'success', 'text' => 'Report updated successfully.'];
-        header("Location: /index.php?url=teacher&tab=Reports");
+        header('Location: /index.php?url=teacher&tab=Reports');
         exit;
     }
 }
