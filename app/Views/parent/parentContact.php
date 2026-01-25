@@ -1,150 +1,17 @@
 <?php
-// Sample teacher contact data
-$studentInfo = [
-    'student_name' => 'Kasun Perera',
-    'class' => 'Grade 10-A',
-    'class_teacher' => 'Mrs. Samanthi Fernando'
+// Get data from controller - if not set, use defaults
+$studentInfo = $studentInfo ?? [
+    'student_name' => 'N/A',
+    'class' => 'N/A',
+    'class_teacher' => 'N/A'
 ];
 
-$teachers = [
-    [
-        'name' => 'Mr. Ravindu Silva',
-        'subject' => 'Mathematics',
-        'room' => '203',
-        'email' => 'ravindu.silva@iskole.lk',
-        'phone' => '+94 77 234 5601',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Pure Mathematics',
-        'experience' => '12 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mrs. Samanthi Fernando',
-        'subject' => 'English Language',
-        'room' => '105',
-        'email' => 'samanthi.fernando@iskole.lk',
-        'phone' => '+94 71 345 6702',
-        'availability' => 'Mon-Fri: 7:30 AM - 1:30 PM',
-        'specialization' => 'English Literature & Grammar',
-        'experience' => '15 years',
-        'is_class_teacher' => true
-    ],
-    [
-        'name' => 'Mrs. Nilmini Perera',
-        'subject' => 'Science',
-        'room' => 'Lab-1',
-        'email' => 'nilmini.perera@iskole.lk',
-        'phone' => '+94 76 456 7803',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Physics & Chemistry',
-        'experience' => '10 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mrs. Kumari Wijesinghe',
-        'subject' => 'Geography',
-        'room' => '201',
-        'email' => 'kumari.wijesinghe@iskole.lk',
-        'phone' => '+94 75 567 8904',
-        'availability' => 'Mon-Fri: 7:45 AM - 1:45 PM',
-        'specialization' => 'Human & Physical Geography',
-        'experience' => '8 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mr. Prasad Gunawardena',
-        'subject' => 'History',
-        'room' => '204',
-        'email' => 'prasad.gunawardena@iskole.lk',
-        'phone' => '+94 77 678 9105',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Sri Lankan & World History',
-        'experience' => '14 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mrs. Nadeeka Kumari',
-        'subject' => 'Sinhala Language',
-        'room' => '112',
-        'email' => 'nadeeka.kumari@iskole.lk',
-        'phone' => '+94 71 789 0206',
-        'availability' => 'Mon-Fri: 7:30 AM - 1:30 PM',
-        'specialization' => 'Sinhala Literature',
-        'experience' => '11 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mrs. Priya Rajendran',
-        'subject' => 'Tamil Language',
-        'room' => '110',
-        'email' => 'priya.rajendran@iskole.lk',
-        'phone' => '+94 76 890 1307',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Tamil Literature & Grammar',
-        'experience' => '9 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mr. Chandana Samaraweera',
-        'subject' => 'Religion (Buddhism)',
-        'room' => '115',
-        'email' => 'chandana.samaraweera@iskole.lk',
-        'phone' => '+94 75 901 2408',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Buddhist Philosophy',
-        'experience' => '13 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mrs. Thilini Bandara',
-        'subject' => 'P.T.S.',
-        'room' => '307',
-        'email' => 'thilini.bandara@iskole.lk',
-        'phone' => '+94 77 012 3509',
-        'availability' => 'Mon-Fri: 7:45 AM - 1:45 PM',
-        'specialization' => 'Practical & Technical Skills',
-        'experience' => '7 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mr. Asanka De Silva',
-        'subject' => 'ICT',
-        'room' => 'Comp-Lab',
-        'email' => 'asanka.desilva@iskole.lk',
-        'phone' => '+94 71 123 4610',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Computer Science & Programming',
-        'experience' => '6 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Ms. Dilini Rodrigo',
-        'subject' => 'Aesthetics',
-        'room' => 'Art Room',
-        'email' => 'dilini.rodrigo@iskole.lk',
-        'phone' => '+94 76 234 5711',
-        'availability' => 'Mon-Fri: 8:00 AM - 2:00 PM',
-        'specialization' => 'Art & Music',
-        'experience' => '10 years',
-        'is_class_teacher' => false
-    ],
-    [
-        'name' => 'Mr. Mahinda Rathnayake',
-        'subject' => 'Citizenship Education',
-        'room' => '308',
-        'email' => 'mahinda.rathnayake@iskole.lk',
-        'phone' => '+94 75 345 6812',
-        'availability' => 'Mon-Fri: 7:30 AM - 1:30 PM',
-        'specialization' => 'Civic Education & Social Studies',
-        'experience' => '16 years',
-        'is_class_teacher' => false
-    ]
-];
+$teachers = $teachers ?? [];
 
 // Statistics
 $stats = [
     'total_teachers' => count($teachers),
-    'class_teacher' => array_filter($teachers, fn($t) => $t['is_class_teacher'])[1]['name'] ?? 'N/A',
+    'class_teacher' => $studentInfo['class_teacher'] ?? 'N/A',
     'subjects' => count(array_unique(array_column($teachers, 'subject')))
 ];
 ?>
@@ -161,7 +28,8 @@ $stats = [
                         <i class="fas fa-address-book"></i>
                         Teachers Directory
                     </h1>
-                    <p class="header-subtitle">Contact information for <?php echo $studentInfo['student_name']; ?>'s teachers - <?php echo $studentInfo['class']; ?></p>
+                    <p class="header-subtitle">Contact information for <?php echo $studentInfo['student_name']; ?>'s
+                        teachers - <?php echo $studentInfo['class']; ?></p>
                 </div>
                 <div class="student-info-badge">
                     <div class="info-item">
@@ -194,44 +62,54 @@ $stats = [
 
         <!-- Teachers Grid -->
         <div class="teachers-grid" id="teachersGrid">
-            <?php foreach ($teachers as $teacher): ?>
-                <div class="teacher-card <?php echo $teacher['is_class_teacher'] ? 'class-teacher-card' : ''; ?>"
-                    data-subject="<?php echo strtolower($teacher['subject']); ?>"
-                    data-name="<?php echo strtolower($teacher['name']); ?>">
+            <?php if (!empty($teachers)): ?>
+                <?php foreach ($teachers as $teacher): ?>
+                    <div class="teacher-card <?php echo $teacher['is_class_teacher'] ? 'class-teacher-card' : ''; ?>"
+                        data-subject="<?php echo strtolower($teacher['subject']); ?>"
+                        data-name="<?php echo strtolower($teacher['name']); ?>">
 
-                    <?php if ($teacher['is_class_teacher']): ?>
-                        <div class="class-teacher-badge">
-                            <i class="fas fa-star"></i>
-                            <span>Class Teacher</span>
+                        <?php if ($teacher['is_class_teacher']): ?>
+                            <div class="class-teacher-badge">
+                                <i class="fas fa-star"></i>
+                                <span>Class Teacher</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="teacher-avatar">
+                            <i class="fas fa-user-tie"></i>
                         </div>
-                    <?php endif; ?>
 
-                    <div class="teacher-avatar">
-                        <i class="fas fa-user-tie"></i>
+                        <div class="teacher-main-info">
+                            <h3 class="teacher-name"><?php echo htmlspecialchars($teacher['name']); ?></h3>
+                            <div class="subject-badge"><?php echo htmlspecialchars($teacher['subject']); ?></div>
+                        </div>
+
+                        <!-- specialization and availability removed per UI update -->
+
+                        <div class="contact-methods">
+                            <a href="mailto:<?php echo htmlspecialchars($teacher['email']); ?>"
+                                class="contact-method email-method" title="Send Email">
+                                <i class="fas fa-envelope"></i>
+                                <span><?php echo htmlspecialchars($teacher['email']); ?></span>
+                            </a>
+
+                            <a href="tel:<?php echo htmlspecialchars($teacher['phone']); ?>" class="contact-method phone-method"
+                                title="Call">
+                                <i class="fas fa-phone"></i>
+                                <span><?php echo htmlspecialchars($teacher['phone']); ?></span>
+                            </a>
+                        </div>
+
+                        <!-- message and schedule buttons removed per request -->
                     </div>
-
-                    <div class="teacher-main-info">
-                        <h3 class="teacher-name"><?php echo $teacher['name']; ?></h3>
-                        <div class="subject-badge"><?php echo $teacher['subject']; ?></div>
-                    </div>
-
-                    <!-- specialization and availability removed per UI update -->
-
-                    <div class="contact-methods">
-                        <a href="mailto:<?php echo $teacher['email']; ?>" class="contact-method email-method" title="Send Email">
-                            <i class="fas fa-envelope"></i>
-                            <span><?php echo $teacher['email']; ?></span>
-                        </a>
-
-                        <a href="tel:<?php echo $teacher['phone']; ?>" class="contact-method phone-method" title="Call">
-                            <i class="fas fa-phone"></i>
-                            <span><?php echo $teacher['phone']; ?></span>
-                        </a>
-                    </div>
-
-                    <!-- message and schedule buttons removed per request -->
+                <?php endforeach; ?>
+            <?php else: ?>
+                <div class="no-results" style="display: flex;">
+                    <i class="fas fa-info-circle"></i>
+                    <h3>No Teachers Found</h3>
+                    <p>No teacher information is available for this class at the moment.</p>
                 </div>
-            <?php endforeach; ?>
+            <?php endif; ?>
         </div>
 
         <!-- No Results Message -->
@@ -244,7 +122,7 @@ $stats = [
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const searchInput = document.getElementById('teacherSearch');
         const teacherCards = document.querySelectorAll('.teacher-card');
         const filterButtons = document.querySelectorAll('.filter-btn');
@@ -254,14 +132,14 @@ $stats = [
         let currentFilter = 'all';
 
         // Search functionality
-        searchInput.addEventListener('input', function(e) {
+        searchInput.addEventListener('input', function (e) {
             const searchTerm = e.target.value.toLowerCase();
             filterTeachers(searchTerm, currentFilter);
         });
 
         // Filter functionality
         filterButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function () {
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
                 currentFilter = this.getAttribute('data-filter');

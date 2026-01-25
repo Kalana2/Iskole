@@ -40,4 +40,97 @@ class ParentModel extends UserModel
             throw new Exception("Error fetching parent by user ID: " . $e->getMessage());
         }
     }
+
+    /**
+     * Get student information for a parent's child
+     * @param int $userId - The parent's user ID
+     * @return array|null - Student information including name, class, and class teacher
+     */
+    public function getStudentInfoByParentUserId($userId)
+    {
+        $sql = "SELECT 
+                    s.studentID,
+                    un.firstName AS student_firstName,
+                    un.lastName AS student_lastName,
+                    c.grade,
+                    c.class,
+                    c.classID,
+                    ct_un.firstName AS teacher_firstName,
+                    ct_un.lastName AS teacher_lastName
+                FROM {$this->parentTable} p
+                JOIN students s ON p.studentID = s.studentID
+                JOIN {$this->userNameTable} un ON s.userID = un.userID
+                LEFT JOIN class c ON s.classID = c.classID
+                LEFT JOIN teachers ct ON s.classID = ct.classID
+                LEFT JOIN {$this->userNameTable} ct_un ON ct.userID = ct_un.userID
+                WHERE p.userID = :userId
+                LIMIT 1";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+            $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($result) {
+                // Format the data for the view
+                return [
+                    'student_name' => trim(($result['student_firstName'] ?? '') . ' ' . ($result['student_lastName'] ?? '')),
+                    'class' => 'Grade ' . ($result['grade'] ?? 'N/A') . '-' . ($result['class'] ?? 'N/A'),
+                    'class_teacher' => $result['teacher_firstName'] && $result['teacher_lastName']
+                        ? trim(($result['teacher_firstName'] ?? '') . ' ' . ($result['teacher_lastName'] ?? ''))
+                        : 'N/A',
+                    'classID' => $result['classID'] ?? null,
+                    'studentID' => $result['studentID'] ?? null
+                ];
+            }
+
+            return null;
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching student info by parent user ID: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get all teachers for a student's class
+     * @param int $classID - The class ID
+     * @return array - Array of teachers with their contact information
+     */
+    public function getTeachersForClass($classID)
+    {
+        $sql = "SELECT DISTINCT
+                    t.teacherID,
+                    un.firstName,
+                    un.lastName,
+                    sub.subjectName,
+                    u.email,
+                    u.phone,
+                    t.classID
+                FROM classTimetable ct
+                JOIN teachers t ON ct.teacherID = t.teacherID
+                JOIN {$this->userTable} u ON t.userID = u.userID
+                JOIN {$this->userNameTable} un ON t.userID = un.userID
+                LEFT JOIN subject sub ON ct.subjectID = sub.subjectID
+                WHERE ct.classID = :classID
+                ORDER BY sub.subjectName ASC";
+
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['classID' => $classID]);
+            $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            $teachers = [];
+            foreach ($results as $row) {
+                $teachers[] = [
+                    'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? '')),
+                    'subject' => $row['subjectName'] ?? 'N/A',
+                    'email' => $row['email'] ?? '',
+                    'phone' => $row['phone'] ?? 'N/A',
+                    'is_class_teacher' => ($row['classID'] == $classID)
+                ];
+            }
+
+            return $teachers;
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching teachers for class: " . $e->getMessage());
+        }
+    }
 }
