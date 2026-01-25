@@ -41,13 +41,34 @@ class ReportModel
         }
     }
 
-    public function getAllReports()
+    public function getAllReports(): array
     {
-        $sql = "SELECT * FROM {$this->table} ORDER BY report_date DESC, id DESC LIMIT 3";
+        $sql = "
+        SELECT
+            r.*,
+            r.id AS report_id,
+            TRIM(
+                CONCAT(
+                    IFNULL(un.firstName,''),' ',
+                    IFNULL(un.lastName,'')
+                )
+            ) AS teacher_name
+        FROM report r
+        LEFT JOIN teachers t
+            ON t.id = r.teacherID         
+        LEFT JOIN userName un
+            ON un.userID = t.userID       
+        ORDER BY r.report_date DESC, r.id DESC
+        LIMIT 50
+    ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+
+
 
 
     public function getReportsForParent(int $parentUserId): array
@@ -83,20 +104,20 @@ class ReportModel
         SELECT
             s.studentID,
             s.classID,
-            s.gradeID,
+            c.class AS className, 
+            c.grade AS grade,      
             u.email,
             u.phone,
             u.dateOfBirth,
             un.firstName,
             un.lastName
         FROM students s
+        INNER JOIN class c ON c.classID = s.classID
         INNER JOIN user u ON u.userID = s.userID
         LEFT JOIN userName un ON un.userID = s.userID
         WHERE s.classID = :class_id
           AND (
                 s.studentID = :exact
-             OR u.email LIKE :like
-             OR u.phone LIKE :like
              OR CONCAT(IFNULL(un.firstName,''),' ',IFNULL(un.lastName,'')) LIKE :like
              OR un.firstName LIKE :like
              OR un.lastName LIKE :like
@@ -105,16 +126,15 @@ class ReportModel
     ";
 
         $stmt = $this->pdo->prepare($sql);
-
         $stmt->execute([
             ':class_id' => $classId,
             ':exact'    => $q,
             ':like'     => "%$q%",
         ]);
 
-        $row = $stmt->fetch(PDO::FETCH_ASSOC);
-        return $row ?: null;
+        return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
     }
+
 
 
     public function getReportsByTeacher(int $teacherId): array
@@ -125,5 +145,58 @@ class ReportModel
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':tid' => $teacherId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+
+
+    public function deleteReportByIdAndTeacher(int $reportId, int $teacherId): bool
+    {
+        $sql = "DELETE FROM report 
+            WHERE id = :id AND teacherID = :teacherID";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $reportId,
+            ':teacherID' => $teacherId
+        ]);
+    }
+
+
+
+    public function getReportByIdAndTeacher(int $reportId, int $teacherId)
+    {
+        $sql = "SELECT * FROM report WHERE id = :id AND teacherID = :tid";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':id' => $reportId,
+            ':tid' => $teacherId
+        ]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
+
+
+
+
+
+    public function updateReportByTeacher(int $reportId, int $teacherId, array $data): bool
+    {
+        $sql = "UPDATE report SET
+              report_type = :type,
+              category = :cat,
+              title = :title,
+              description = :desc
+            WHERE id = :id AND teacherID = :tid";
+
+        $stmt = $this->pdo->prepare($sql);
+
+        return $stmt->execute([
+            ':type'  => $data['report_type'],
+            ':cat'   => $data['category'],
+            ':title' => $data['title'],
+            ':desc'  => $data['description'],
+            ':id'    => $reportId,
+            ':tid'   => $teacherId
+        ]);
     }
 }
