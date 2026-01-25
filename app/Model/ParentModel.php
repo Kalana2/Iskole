@@ -141,7 +141,7 @@ class ParentModel extends UserModel
                 $seenTeacherSubject[$teacherKey] = true;
 
                 // Only TRUE if this teacher's classID matches the student's classID
-                $isClassTeacher = ((int)$row['teacher_classID'] === (int)$classID);
+                $isClassTeacher = ((int) $row['teacher_classID'] === (int) $classID);
 
                 $teachers[] = [
                     'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? '')),
