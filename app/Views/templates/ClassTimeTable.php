@@ -229,15 +229,14 @@ $periods = [
     }
   }
 
-  async function loadTeachersForCell(subjectID, teacherSelect){
-    const grade = gradeSel?.value || '';
+  async function loadTeachersForCell(subjectID, teacherSelect, dayName, rowIndex){
     const classID = sectionSel?.value || '';
     if(!teacherSelect) return;
     teacherSelect.innerHTML = '<option value="">Select Teacher</option>';
     teacherSelect.disabled = true;
-    if(!subjectID || !grade || !classID) return;
+    if(!subjectID || !classID || !dayName || (rowIndex === undefined || rowIndex === null || rowIndex === '')) return;
 
-    const cacheKey = `${grade}|${classID}|${subjectID}`;
+    const cacheKey = `${classID}|${dayName}|${rowIndex}|${subjectID}`;
     if(teachersCache.has(cacheKey)){
       const cached = teachersCache.get(cacheKey);
       cached.forEach(t => {
@@ -251,7 +250,7 @@ $periods = [
     }
 
     try{
-      const res = await fetch(`/timetable/getTeachers?subjectID=${encodeURIComponent(subjectID)}&grade=${encodeURIComponent(grade)}&classID=${encodeURIComponent(classID)}`);
+      const res = await fetch(`/timetable/getTeachers?subjectID=${encodeURIComponent(subjectID)}&classID=${encodeURIComponent(classID)}&day=${encodeURIComponent(dayName)}&row=${encodeURIComponent(rowIndex)}`);
       const rows = await res.json();
       teachersCache.set(cacheKey, rows);
       rows.forEach(t => {
@@ -316,7 +315,7 @@ $periods = [
           const tid = String(entry.teacherID || '');
           const teacherSel = document.querySelector(`.teacher-select[data-day="${CSS.escape(day)}"][data-row="${CSS.escape(row)}"]`);
           if(teacherSel instanceof HTMLSelectElement && subj){
-            const p = loadTeachersForCell(subj, teacherSel).then(() => {
+            const p = loadTeachersForCell(subj, teacherSel, day, row).then(() => {
               if(tid) teacherSel.value = tid;
             });
             tasks.push(p);
@@ -360,7 +359,7 @@ $periods = [
     const cell = target.closest('.class-card');
     const teacherSel = cell ? cell.querySelector('.teacher-select') : null;
     if(teacherSel instanceof HTMLSelectElement){
-      loadTeachersForCell(target.value, teacherSel);
+      loadTeachersForCell(target.value, teacherSel, target.dataset.day || '', target.dataset.row || '');
     }
   });
 

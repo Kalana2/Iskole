@@ -27,7 +27,6 @@ let studentData = null;
 // Chart.js configuration
 let performanceChart = null;
 let currentChartType = "bar";
-let currentTerm = "term3";
 
 // Color scheme
 const colorScheme = {
@@ -105,26 +104,22 @@ function initChart() {
     },
   ];
 
-  // Apply highlighting based on selected term
-  const datasets = termDatasets
-    .filter((d) => d.key === currentTerm)
-    .map((dataset) => {
-      return {
-        label: dataset.label,
-        data: dataset.data,
-        termKey: dataset.termKey,
-        borderColor: dataset.borderColor,
-        backgroundColor: dataset.backgroundColor,
-        borderWidth: 2,
-        pointBackgroundColor: dataset.borderColor,
-        pointBorderColor: "#fff",
-        pointHoverBackgroundColor: "#fff",
-        pointHoverBorderColor: dataset.borderColor,
-        pointRadius: currentChartType === "line" ? 4 : 0,
-        tension: 0.4,
-        fill: currentChartType === "line",
-      };
-    });
+  // Always show datasets for all three terms
+  const datasets = termDatasets.map((dataset) => ({
+    label: dataset.label,
+    data: dataset.data,
+    termKey: dataset.termKey,
+    borderColor: dataset.borderColor,
+    backgroundColor: dataset.backgroundColor,
+    borderWidth: 2,
+    pointBackgroundColor: dataset.borderColor,
+    pointBorderColor: "#fff",
+    pointHoverBackgroundColor: "#fff",
+    pointHoverBorderColor: dataset.borderColor,
+    pointRadius: currentChartType === "line" ? 4 : 0,
+    tension: 0.4,
+    fill: currentChartType === "line",
+  }));
 
   const config = {
     type: currentChartType,
@@ -138,8 +133,8 @@ function initChart() {
       aspectRatio: 2,
       plugins: {
         legend: {
-          // Hide the color indicator above the chart
-          display: false,
+          // Show legend so users can map colors -> terms
+          display: true,
           position: "top",
           labels: {
             usePointStyle: true,
@@ -163,6 +158,7 @@ function initChart() {
           },
           callbacks: {
             label: function (context) {
+              const termLabel = context?.dataset?.label || "";
               const parsed = context.parsed;
               const score =
                 parsed && typeof parsed.y !== "undefined" ? parsed.y : null;
@@ -177,9 +173,9 @@ function initChart() {
                 "-";
 
               if (score === null || typeof score === "undefined") {
-                return `No mark (Grade: ${grade})`;
+                return `${termLabel}: No mark (Grade: ${grade})`;
               }
-              return `${score}/100 (Grade: ${grade})`;
+              return `${termLabel}: ${score}/100 (Grade: ${grade})`;
             },
           },
         },
@@ -334,12 +330,7 @@ function buildStudentDataFromMarks(rows, allSubjects) {
     };
 
     // keep a default grade for any legacy UI usage
-    s.grade =
-      s.grades[currentTerm] ||
-      s.grades.term3 ||
-      s.grades.term2 ||
-      s.grades.term1 ||
-      "-";
+    s.grade = s.grades.term3 || s.grades.term2 || s.grades.term1 || "-";
   });
 
   return { subjects, terms };
@@ -354,28 +345,6 @@ function setupChartToggle() {
       toggleButtons.forEach((b) => b.classList.remove("active"));
       this.classList.add("active");
       currentChartType = this.dataset.chart;
-      initChart();
-    });
-  });
-}
-
-// Term selector functionality (retained for pages that still have it, safe no-op otherwise)
-function setupTermSelector() {
-  const termButtons = document.querySelectorAll(".term-btn");
-  if (!termButtons || termButtons.length === 0) return;
-
-  // Sync UI with default term
-  termButtons.forEach((b) => {
-    b.classList.toggle("active", b.dataset.term === currentTerm);
-  });
-
-  termButtons.forEach((btn) => {
-    btn.addEventListener("click", function () {
-      const next = this.dataset.term;
-      if (!next) return;
-      currentTerm = next;
-      termButtons.forEach((b) => b.classList.remove("active"));
-      this.classList.add("active");
       initChart();
     });
   });
@@ -564,7 +533,6 @@ document.addEventListener("DOMContentLoaded", function () {
   loadMyMarksData().finally(() => {
     initChart();
     setupChartToggle();
-    setupTermSelector();
   });
 
   setupSearch();

@@ -79,10 +79,29 @@ class TeacherTimeTableModel
             // ignore
         }
 
-        $stmt = $this->pdo->prepare("SELECT teacherID, {$employeeExpr} FROM teachers WHERE userID = :userID LIMIT 1");
+        // Subject column is known in this project: teachers.subjectID
+        $stmt = $this->pdo->prepare("SELECT teacherID, {$employeeExpr}, subjectID as subject_id FROM teachers WHERE userID = :userID LIMIT 1");
         $stmt->execute(['userID' => $userId]);
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
+    }
+
+    private function getSubjectNameById(int $subjectId): string
+    {
+        $subjectId = (int) $subjectId;
+        if ($subjectId <= 0) {
+            return '';
+        }
+
+        // Expected schema: subject(subjectID, subjectName)
+        $subjectTable = $this->tableExists('subject') ? 'subject' : ($this->pickExistingTable(['subjects']) ?? null);
+        if (!$subjectTable) {
+            return '';
+        }
+
+        $stmt = $this->pdo->prepare("SELECT subjectName FROM `{$subjectTable}` WHERE subjectID = :subjectID LIMIT 1");
+        $stmt->execute(['subjectID' => $subjectId]);
+        return trim((string) $stmt->fetchColumn());
     }
 
     private function getUserFullName(int $userId): string
@@ -346,7 +365,19 @@ class TeacherTimeTableModel
             }
         }
 
-        $subjectLabel = count($uniqueSubjects) === 1 ? '1 Subject' : (count($uniqueSubjects) > 1 ? 'Multiple' : '—');
+        $teacherSubjectId = (int) ($teacher['subject_id'] ?? 0);
+        $teacherSubjectName = $teacherSubjectId > 0 ? $this->getSubjectNameById($teacherSubjectId) : '';
+
+        // Prefer the teacher's assigned subject (even if timetable is empty).
+        // Fallback: if timetable implies exactly one subject, show that name.
+        $subjectLabel = $teacherSubjectName;
+        if ($subjectLabel === '' && count($uniqueSubjects) === 1) {
+            $onlyId = (int) array_key_first($uniqueSubjects);
+            $subjectLabel = $onlyId > 0 ? $this->getSubjectNameById($onlyId) : '';
+        }
+        if ($subjectLabel === '') {
+            $subjectLabel = '—';
+        }
 
         $teacherInfo = [
             'name' => $fullName !== '' ? $fullName : ('Teacher ' . $teacherId),

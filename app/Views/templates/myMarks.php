@@ -9,18 +9,25 @@
         <h2 id="mymarks-title">My Marks</h2>
         <p class="subtitle">Your marks and progress across all subjects</p>
       </div>
+      <div class="student-info-badge">
+        <div class="info-item">
+            <span class="info-label">Student</span>
+            <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">Class</span>
+            <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
+        </div>
+        <div class="info-item">
+            <span class="info-label">ID</span>
+            <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
+        </div>
+    </div>
     </header>
 
     <div class="center-container card">
       <!-- Stats Overview -->
       <div class="stats-overview">
-        <div class="stat-card">
-          <div class="stat-icon">📊</div>
-          <div class="stat-content">
-            <h4>Overall Average</h4>
-            <p class="stat-value">72.3%</p>
-          </div>
-        </div>
         <div class="stat-card">
           <div class="stat-icon">🏆</div>
           <div class="stat-content">
@@ -43,15 +50,7 @@
           <span>Performance Report</span>
         </h3>
 
-        <div class="chart-controls">
-          <div class="term-selector">
-            <div class="term-buttons" role="group" aria-label="Select term">
-              <button type="button" class="term-btn" data-term="term1">Term 1</button>
-              <button type="button" class="term-btn" data-term="term2">Term 2</button>
-              <button type="button" class="term-btn active" data-term="term3">Term 3</button>
-            </div>
-          </div>
-        </div>
+        <div class="chart-controls"></div>
 
         <div class="chart-container">
           <canvas id="performanceChart"></canvas>

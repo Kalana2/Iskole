@@ -323,6 +323,41 @@ class StudentTimeTableModel
         ];
     }
 
+    public function getStudentInfoForUserId(int $userId, ?int $fallbackClassId = null): array
+    {
+        $userId = (int) $userId;
+        if ($userId <= 0) {
+            return [
+                'name' => '—',
+                'class' => '—',
+                'reg_no' => '—',
+                'stu_id' => '—',
+                'classID' => 0,
+            ];
+        }
+
+        $fullName = $this->getUserFullName($userId);
+
+        $studentRow = $this->getStudentRecordByUserId($userId);
+        $classId = $studentRow ? (int) ($studentRow['classID'] ?? 0) : 0;
+        $regNo = $studentRow ? ($studentRow['reg_no'] ?? '') : '';
+        $studentId = $studentRow ? ($studentRow['studentID'] ?? '') : '';
+
+        if ($classId <= 0 && $fallbackClassId !== null) {
+            $classId = (int) $fallbackClassId;
+        }
+
+        $classLabel = $classId > 0 ? $this->getClassLabel($classId) : '';
+
+        return [
+            'name' => $fullName !== '' ? $fullName : ('User ' . $userId),
+            'class' => $classLabel !== '' ? $classLabel : '—',
+            'reg_no' => ($regNo !== '' ? $regNo : ($studentId !== '' ? $studentId : '—')),
+            'stu_id' => ($studentId !== '' ? $studentId : ($regNo !== '' ? $regNo : '—')),
+            'classID' => $classId,
+        ];
+    }
+
     public function getStudentTimetableContextByStudentId(int $studentId, ?int $fallbackClassId = null): array
     {
         $studentId = (int) $studentId;

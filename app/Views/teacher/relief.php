@@ -29,12 +29,22 @@ foreach ($reliefPeriods as $p) {
     <div class="box">
         <!-- Header Section -->
         <div class="heading-section">
-            <h1 class="heading-text" id="relief-title">Relief Periods</h1>
-            <p class="sub-heding-text">Your relief teaching periods for
-                <?php echo htmlspecialchars($selectedDate); ?></p>
+            <div class="header-content">
+                <div>
+                    <h1 class="heading-text" id="relief-title">Relief Periods</h1>
+                    <p class="sub-heding-text">Your relief teaching periods for <b><?php echo htmlspecialchars($selectedDate); ?></b></p>
+                </div>
+
+                <div class="relief-info-badge">
+                    <div class="info-item">
+                        <span class="info-label">Total Relief Periods</span>
+                        <span class="info-value"><?php echo count($reliefPeriods); ?></span>
+                    </div>        
+                </div>
+            </div>
         </div>
 
-        <form method="get" class="relief-form" style="margin-bottom: 12px;">
+        <!--<form method="get" class="relief-form" style="margin-bottom: 12px;">
             <div class="form-actions" style="justify-content: flex-start; gap: 12px;">
                 <label style="display:flex; align-items:center; gap:8px;">
                     <span style="min-width: 90px;">Date</span>
@@ -42,14 +52,14 @@ foreach ($reliefPeriods as $p) {
                 </label>
                 <button type="submit" class="btn btn-ghost">Load</button>
             </div>
-        </form>
+        </form>-->
 
         <?php if ($error): ?>
             <div class="assign-log" aria-live="polite"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
 
         <!-- Summary Stats -->
-        <div class="stats-grid">
+        <!--<div class="stats-grid">
             <div class="stat-card">
                 <div class="stat-icon">📅</div>
                 <div class="stat-content">
@@ -71,7 +81,7 @@ foreach ($reliefPeriods as $p) {
                     <div class="stat-label">Total Students</div>
                 </div>
             </div>
-        </div>
+        </div>-->
 
         <!-- Relief Periods Table -->
         <?php if (!empty($reliefPeriods)): ?>

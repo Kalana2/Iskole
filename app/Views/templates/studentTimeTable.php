@@ -31,8 +31,8 @@ $stats = $stats ?? [
         <div class="timetable-header">
             <div class="header-content">
                 <div>
-                    <h1 class="header-title">My Weekly Timetable</h1>
-                    <p class="header-subtitle">View your complete class schedule for the week</p>
+                    <h1 class="header-title">Weekly Timetable</h1>
+                    <p class="header-subtitle">View complete class schedule for the week</p>
                 </div>
                 <div class="student-info-badge">
                     <div class="info-item">

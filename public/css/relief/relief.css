@@ -43,6 +43,14 @@
   margin-bottom: 1.5rem;
 }
 
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
 .heading-text {
   margin: 0;
   font-size: 1.35rem;
@@ -56,6 +64,33 @@
   color: rgba(255, 255, 255, 0.85);
   font-size: 0.95rem;
   font-weight: 400;
+}
+
+.relief-info-badge {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.info-label {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.info-value {
+  font-size: 1.5rem;
+  color: #ffffff;
+  font-weight: 700;
+  text-align: right;
 }
 
 /* Stats Grid */
@@ -318,7 +353,9 @@
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.3);
   transform: translate(-50%, -50%);
-  transition: width 0.4s ease, height 0.4s ease;
+  transition:
+    width 0.4s ease,
+    height 0.4s ease;
 }
 
 .btn:hover::before {
