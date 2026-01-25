@@ -240,17 +240,6 @@ $stats = [
             <h3>No Teachers Found</h3>
             <p>Try adjusting your search or filter criteria</p>
         </div>
-
-        <!-- Help Section -->
-        <div class="help-section">
-            <div class="help-card">
-                <i class="fas fa-info-circle"></i>
-                <div>
-                    <h4>Need Assistance?</h4>
-                    <p>For urgent matters, please contact the school office at <strong>+94 11 234 5678</strong> or email <strong>office@iskole.lk</strong></p>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
 
