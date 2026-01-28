@@ -1,28 +1,24 @@
 <?php
 // filepath: /home/snake/Projects/Iskole/app/Views/templates/myMarks.php
+$userRole = $this->session->get('userRole') ?? $this->session->get('user_role') ?? 3;
+$isParent = ($userRole == 4);
 ?>
 <section class="reports-entry tab-panel mp-management">
   <input type="hidden" id="studentId" value="<?= $this->session->get('user_id') ?>">
+  <input type="hidden" id="isParentView" value="<?= $isParent ? '1' : '0' ?>">
   <div class="reports-section">
     <header class="mgmt-header">
       <div class="title-wrap">
-        <h2 id="mymarks-title">My Marks</h2>
-        <p class="subtitle">Your marks and progress across all subjects</p>
+        <h2 id="mymarks-title"><?= $isParent ? "Child's Marks & Performance Report" : "My Marks & Performance Report" ?></h2>
+        <p class="subtitle"><?= $isParent ? "Your child's marks and progress across all subjects" : "marks and progress across all subjects" ?></p>
       </div>
-      <!-- <div class="student-info-badge">
-          <div class="info-item">
-              <span class="info-label">Student</span>
-              <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
-          </div>
-          <div class="info-item">
-              <span class="info-label">Class</span>
-              <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
-          </div>
-          <div class="info-item">
-              <span class="info-label">ID</span>
-              <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
-          </div>
-      </div> -->
+      <!-- Child info badge - shown for parents -->
+      <div class="student-info-badge" id="childInfoBadge" style="display: <?= $isParent ? 'flex' : 'none' ?>;">
+        <div class="info-item">
+          <span class="info-label">Student name</span>
+          <span class="info-value" id="childName">—</span>
+        </div>
+      </div>
     </header>
 
     <div class="center-container card">

@@ -60,6 +60,32 @@ class ParentController extends Controller
             return;
         }
 
+        // ✅ If Time Table tab -> load child's timetable for parent
+        if ($tab === 'Time Table') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            if (!$parentUserId) {
+                $_SESSION['mgmt_msg'] = 'User not authenticated.';
+                header('Location: /login');
+                exit;
+            }
+
+            try {
+                $ttModel = $this->model('StudentTimeTableModel');
+                $ctx = $ttModel->getChildTimetableContextForParent((int) $parentUserId);
+                $ctx['tab'] = $tab;
+                $this->view('parent/index', $ctx);
+                return;
+            } catch (Throwable $e) {
+                // Fall back to rendering without data; template will show placeholders
+                $this->view('parent/index', [
+                    'tab' => $tab,
+                    'tt_error' => $e->getMessage()
+                ]);
+                return;
+            }
+        }
+
         // default
         $this->view('parent/index', ['tab' => $tab]);
     }

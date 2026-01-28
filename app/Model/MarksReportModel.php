@@ -100,6 +100,35 @@ class MarksReportModel
     }
 
     /**
+     * Get the child's student record for a parent user
+     * Uses the parents table which links parentUserID -> studentID
+     */
+    public function getChildStudentByParentUserId($parentUserId)
+    {
+        $sql = "SELECT st.studentID, st.userID, st.classID, st.gradeID,
+                       un.firstName, un.lastName
+                FROM parents p
+                JOIN students st ON p.studentID = st.studentID
+                LEFT JOIN userName un ON un.userID = st.userID
+                WHERE p.userID = :parentUserId
+                LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['parentUserId' => $parentUserId]);
+        $row = $stmt->fetch();
+        if (!$row) return null;
+
+        return [
+            'studentID' => $row['studentID'],
+            'userID' => $row['userID'],
+            'classID' => $row['classID'],
+            'gradeID' => $row['gradeID'],
+            'firstName' => $row['firstName'] ?? '',
+            'lastName' => $row['lastName'] ?? '',
+            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? ''))
+        ];
+    }
+
+    /**
      * NEW METHOD: Get student's performance stats
      * Includes marks, average per term, and overall info
      */

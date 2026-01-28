@@ -4,5 +4,6 @@
             <p><?php echo htmlspecialchars((string) $tt_error); ?></p>
         </div>
     <?php endif; ?>
+
     <?php include_once __DIR__ . '/../templates/studentTimeTable.php'; ?>
 </section>

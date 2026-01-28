@@ -239,6 +239,18 @@ async function loadMyMarksData() {
       return false;
     }
 
+    // If parent view, update the child's name display
+    if (json.isParentView && json.student) {
+      const childNameEl = document.getElementById("childName");
+      if (childNameEl) {
+        childNameEl.textContent = json.student.name || "—";
+      }
+      const childInfoBadge = document.getElementById("childInfoBadge");
+      if (childInfoBadge) {
+        childInfoBadge.style.display = "flex";
+      }
+    }
+
     studentData = buildStudentDataFromMarks(
       json.marks || [],
       json.subjects || [],

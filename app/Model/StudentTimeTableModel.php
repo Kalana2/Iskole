@@ -510,4 +510,74 @@ class StudentTimeTableModel
 
         return ['periods' => $periods, 'schedule' => $schedule];
     }
+
+    /**
+     * Get the child's timetable context for a parent user.
+     * Uses the parents table to find the linked student.
+     */
+    public function getChildTimetableContextForParent(int $parentUserId): array
+    {
+        $parentUserId = (int) $parentUserId;
+        if ($parentUserId <= 0) {
+            throw new InvalidArgumentException('Invalid parent userID');
+        }
+
+        // Get the child's studentID from the parents table
+        $sql = "SELECT p.studentID, s.userID, s.classID, s.gradeID
+                FROM parents p
+                JOIN students s ON p.studentID = s.studentID
+                WHERE p.userID = :parentUserId
+                LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['parentUserId' => $parentUserId]);
+        $childRow = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$childRow) {
+            throw new RuntimeException('Child student record not found for this parent');
+        }
+
+        $studentId = (int) ($childRow['studentID'] ?? 0);
+        $childUserId = (int) ($childRow['userID'] ?? 0);
+        $classId = (int) ($childRow['classID'] ?? 0);
+
+        $fullName = $childUserId > 0 ? $this->getUserFullName($childUserId) : '';
+        $classLabel = $classId > 0 ? $this->getClassLabel($classId) : '';
+        $timetable = $this->buildTimetableForClass($classId);
+
+        $uniqueSubjects = [];
+        $uniqueTeachers = [];
+        foreach ($timetable['schedule'] as $cells) {
+            foreach ($cells as $cell) {
+                if (!$cell) {
+                    continue;
+                }
+                if (isset($cell['subjectID'])) {
+                    $uniqueSubjects[(int) $cell['subjectID']] = true;
+                }
+                if (isset($cell['teacherID'])) {
+                    $uniqueTeachers[(int) $cell['teacherID']] = true;
+                }
+            }
+        }
+
+        $stats = [
+            'total_periods' => 40,
+            'subjects_count' => count($uniqueSubjects),
+            'teachers_count' => count($uniqueTeachers),
+        ];
+
+        $studentInfo = [
+            'name' => $fullName !== '' ? $fullName : ('Student ' . $studentId),
+            'class' => $classLabel !== '' ? $classLabel : '—',
+            'stu_id' => (string) $studentId,
+            'classID' => $classId,
+        ];
+
+        return [
+            'studentInfo' => $studentInfo,
+            'timetable' => $timetable,
+            'stats' => $stats,
+            'isParentView' => true,
+        ];
+    }
 }
