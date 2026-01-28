@@ -34,7 +34,7 @@ $stats = $stats ?? [
                     <h1 class="header-title">Weekly Timetable</h1>
                     <p class="header-subtitle">View complete class schedule for the week</p>
                 </div>
-                <div class="student-info-badge">
+                <!-- <div class="student-info-badge">
                     <div class="info-item">
                         <span class="info-label">Student</span>
                         <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
@@ -47,7 +47,7 @@ $stats = $stats ?? [
                         <span class="info-label">ID</span>
                         <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
 
@@ -190,10 +190,6 @@ $stats = $stats ?? [
                     <div class="legend-color interval-indicator"></div>
                     <span>Break Time</span>
                 </div>
-                <div class="legend-item">
-                    <i class="fas fa-user-tie"></i>
-                    <span>Teacher Name</span>
-                </div>
             </div>
         </div>
     </div>
@@ -214,14 +210,26 @@ $stats = $stats ?? [
 
         const ranges = (timeSlots || []).map((p, index) => {
             const t = String(p.time || '');
-            if (!t.includes('-')) return { start: null, end: null, index };
+            if (!t.includes('-')) return {
+                start: null,
+                end: null,
+                index
+            };
             const parts = t.split('-').map(s => s.trim());
             let start = toMinutes(parts[0]);
             let end = toMinutes(parts[1]);
-            if (start === null || end === null) return { start: null, end: null, index };
+            if (start === null || end === null) return {
+                start: null,
+                end: null,
+                index
+            };
             // Handle 12:50 - 01:30 style (treat as afternoon if end <= start)
             if (end <= start) end += 12 * 60;
-            return { start, end, index };
+            return {
+                start,
+                end,
+                index
+            };
         }).filter(r => r.start !== null && r.end !== null);
 
         const current = ranges.find(r => timeInMinutes >= r.start && timeInMinutes <= r.end);

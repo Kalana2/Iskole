@@ -11,8 +11,11 @@
         </div>
         <div class="ann-actions">
             <div class="chip-group" role="tablist" aria-label="Announcement filters">
-                <button class="chip active" role="tab" aria-selected="true" data-filter="all">All</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="my">Published</button>
+                <?php if ($_SESSION['user_role'] < 3): ?>
+                    <button class="chip active" role="tab" aria-selected="true" data-filter="all">All</button>
+
+                    <button class="chip" role="tab" aria-selected="false" data-filter="my">Published</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>

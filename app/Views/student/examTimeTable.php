@@ -47,7 +47,7 @@ $hidden = isset($entry['visibility']) ? !(bool) $entry['visibility'] : true; // 
     <article class="ann-card" role="listitem" aria-label="Current timetable preview">
       <div class="ann-card-header">
         <div class="ann-badges">
-          <span class="badge">Preview</span>
+          <!-- <span class="badge">Preview</span> -->
           <span class="badge"><?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></span>
         </div>
       </div>

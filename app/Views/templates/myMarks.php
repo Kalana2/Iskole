@@ -9,7 +9,7 @@
         <h2 id="mymarks-title">My Marks</h2>
         <p class="subtitle">Your marks and progress across all subjects</p>
       </div>
-      <div class="student-info-badge">
+      <!-- <div class="student-info-badge">
           <div class="info-item">
               <span class="info-label">Student</span>
               <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
@@ -22,7 +22,7 @@
               <span class="info-label">ID</span>
               <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
           </div>
-      </div>
+      </div> -->
     </header>
 
     <div class="center-container card">

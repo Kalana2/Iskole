@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Student Attendance View Template
  * 
@@ -37,7 +38,8 @@ if ($hasError) {
                         <i class="fas fa-calendar-check"></i>
                         Attendance Record
                     </h1>
-                    <p class="header-subtitle"><?php echo $studentInfo['name']; ?> - <?php echo $studentInfo['class']; ?> (<?php echo $studentInfo['reg_no']; ?>)</p>
+                    <p class="header-subtitle">Attendance distribution across the academic year</p>
+                    <!-- <p class="header-subtitle"><?php echo $studentInfo['name']; ?> - <?php echo $studentInfo['class']; ?> (<?php echo $studentInfo['reg_no']; ?>)</p> -->
                 </div>
                 <div class="header-badge">
                     <div class="badge-item">
@@ -111,11 +113,11 @@ if ($hasError) {
                 <div class="chart-legend">
                     <div class="legend-item">
                         <span class="legend-color present-color"></span>
-                        <span class="legend-label">Present (<?php echo $attendanceStats['present_days']; ?>)</span>
+                        <span class="legend-label">Present</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color absent-color"></span>
-                        <span class="legend-label">Absent (<?php echo $attendanceStats['absent_days']; ?>)</span>
+                        <span class="legend-label">Absent</span>
                     </div>
                 </div>
             </div>
