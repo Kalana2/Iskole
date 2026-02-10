@@ -1,7 +1,7 @@
 <div class="admin-container">
     <?php
     // Provide navigation items and active label for MP
-    $items = ['Announcements', 'Management', 'Attendance', 'Time Tables', 'Class & Subjects', 'Exam Time Table', "Relief"];
+    $items = ['Announcements', 'Management', 'Attendance', 'Time Tables', 'Class & Subjects', 'Assign Class Teacher', 'Exam Time Table', "Relief"];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
     $active = in_array($tab, $items) ? $tab : 'Announcements';
     include_once __DIR__ . '/../templates/navigation.php';
@@ -34,6 +34,9 @@
             break;
         case 'Class & Subjects':
             include __DIR__ . '/classSubjects.php';
+            break;
+        case 'Assign Class Teacher':
+            include __DIR__ . '/assignClassTeacher.php';
             break;
         case 'Exam Time Table':
             include __DIR__ . '/examTimeTable.php';
