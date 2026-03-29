@@ -30,6 +30,12 @@ class AddNewUserController extends Controller
             exit;
         }
 
+        if (!isset($this->userRoleMap[$role])) {
+            $_SESSION['mgmt_msg'] = 'AddNewUserController: Invalid role submitted.';
+            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/admin?tab=Management'));
+            exit;
+        }
+
         $now = date('Y-m-d H:i:s');
 
         // Map posted fields to UserModel::createUser expected keys
@@ -38,7 +44,7 @@ class AddNewUserController extends Controller
             'email' => $email,
             'phone' => trim($_POST['phone'] ?? ''),
             'createDate' => $now,
-            'role' => $role,
+            'role' => $this->userRoleMap[$role],
             'active' => 1,
             'dateOfBirth' => $_POST['dateOfBirth'] ?? null,
             'password' => password_hash($fName, PASSWORD_BCRYPT), // initial password; update later
@@ -54,8 +60,6 @@ class AddNewUserController extends Controller
             switch ($role) {
                 case 'mp': {
                     $model = $this->model('MpModel');
-                    // $data['role'] = $this->userRoleMap['mp'];
-                    $data['role'] = 1;
                     $data = $base + [
                         'nic' => $_POST['nic'] ?? null,
                     ];
@@ -64,8 +68,6 @@ class AddNewUserController extends Controller
                 }
                 case 'teacher': {
                     $model = $this->model('TeacherModel');
-                    // $data['role'] = $this->userRoleMap['teacher'];
-                    $data['role'] = 2;
                     $data = $base + [
                         'nic' => $_POST['nic'] ?? null,
                         'grade' => $_POST['grade'] ?? null,
@@ -77,8 +79,6 @@ class AddNewUserController extends Controller
                 }
                 case 'student': {
                     $model = $this->model('StudentModel');
-                    // $data['role'] = $this->userRoleMap['student'];
-                    $data['role'] = 3;
                     $data = $base + [
                         'grade' => $_POST['grade'] ?? null,
                         'classId' => $_POST['class'] ?? null, // optional/unknown in form
@@ -88,8 +88,6 @@ class AddNewUserController extends Controller
                 }
                 case 'parent': {
                     $model = $this->model('ParentModel');
-                    $data['role'] = $this->userRoleMap['parent'];
-                    // $data['role'] = 4;
                     $data = $base + [
                         'relationshipType' => $_POST['relationship'] ?? null,
                         'studentId' => $_POST['studentIndex'] ?? null, // assuming index is id or will be resolved in model

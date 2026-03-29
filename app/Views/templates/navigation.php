@@ -19,13 +19,17 @@ $active = $active ?? null; // string label or integer index
         <ul class="nav-links" role="menubar">
             <?php foreach ($items as $index => $label): ?>
                 <?php
-                    $isActive = false;
-                    if (is_string($active)) {
-                        $isActive = ($active === $label);
-                    } elseif (is_int($active)) {
-                        $isActive = ($active === $index);
-                    }
-                    $href = '?tab=' . urlencode($label);
+                $isActive = false;
+
+                if (is_string($active)) {
+                    $isActive = ($active === $label);
+                } elseif (is_int($active)) {
+                    $isActive = ($active === $index);
+                }
+
+                $currentUrl = $_GET['url'] ?? 'teacher'; // teacher / parent / managementPanel
+                $href = '/index.php?url=' . urlencode($currentUrl) . '&tab=' . urlencode($label);
+
                 ?>
                 <li role="none">
                     <a role="menuitem" href="<?php echo $href; ?>" class="<?php echo $isActive ? 'active' : ''; ?>" <?php echo $isActive ? 'aria-current="page"' : ''; ?>>

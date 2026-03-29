@@ -11,7 +11,83 @@ class ParentController extends Controller
             return;
         }
 
-        $this->view('parent/index');
+        $tab = $_GET['tab'] ?? 'Dashboard';
+
+        // ✅ If Behavior tab -> load reports and view parentBehavior
+        if ($tab === 'Behavior') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            $reportModel = $this->model('ReportModel');
+            $behaviorReports = $reportModel->getReportsForParent((int) $parentUserId);
+
+            $this->view('parent/index', [
+                'tab' => $tab,
+                'behaviorReports' => $behaviorReports
+            ]);
+            return;
+        }
+
+        // ✅ If Teachers tab -> load student info and teachers
+        if ($tab === 'Teachers') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            if (!$parentUserId) {
+                $_SESSION['mgmt_msg'] = 'User not authenticated.';
+                header('Location: /login');
+                exit;
+            }
+
+            $parentModel = $this->model('ParentModel');
+
+            // Get student information
+            $studentInfo = $parentModel->getStudentInfoByParentUserId((int) $parentUserId);
+
+            // Get teachers for the student's class
+            $teachers = [];
+            if ($studentInfo && isset($studentInfo['classID'])) {
+                $teachers = $parentModel->getTeachersForClass((int) $studentInfo['classID']);
+            }
+
+            $this->view('parent/index', [
+                'tab' => $tab,
+                'studentInfo' => $studentInfo ?? [
+                    'student_name' => 'N/A',
+                    'class' => 'N/A',
+                    'class_teacher' => 'N/A'
+                ],
+                'teachers' => $teachers
+            ]);
+            return;
+        }
+
+        // ✅ If Time Table tab -> load child's timetable for parent
+        if ($tab === 'Time Table') {
+            $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+            if (!$parentUserId) {
+                $_SESSION['mgmt_msg'] = 'User not authenticated.';
+                header('Location: /login');
+                exit;
+            }
+
+            try {
+                $ttModel = $this->model('StudentTimeTableModel');
+                $ctx = $ttModel->getChildTimetableContextForParent((int) $parentUserId);
+                $ctx['tab'] = $tab;
+                $this->view('parent/index', $ctx);
+                return;
+            } catch (Throwable $e) {
+                // Fall back to rendering without data; template will show placeholders
+                $this->view('parent/index', [
+                    'tab' => $tab,
+                    'tt_error' => $e->getMessage()
+                ]);
+                return;
+            }
+        }
+
+        // default
+        $this->view('parent/index', ['tab' => $tab]);
     }
 
     private function handleAnnouncementAction($action)
@@ -85,5 +161,22 @@ class ParentController extends Controller
         $diff = $from->diff($to);
 
         return $diff->days + 1; // +1 to include both start and end dates
+    }
+
+    public function behavior()
+    {
+        $parentUserId = $_SESSION['userId'] ?? 0;
+
+        if (!$parentUserId) {
+            header('Location: /login');
+            exit;
+        }
+
+        $reportModel = $this->model('ReportModel');
+        $behaviorReports = $reportModel->getReportsForParent((int) $parentUserId);
+
+        $this->view('parent/parentBehavior', [
+            'behaviorReports' => $behaviorReports
+        ]);
     }
 }

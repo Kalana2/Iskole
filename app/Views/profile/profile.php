@@ -15,12 +15,7 @@
         </div>
     </header>
 
-    <header class="mgmt-header">
-        <div class="title-wrap">
-            <h2 id="mgmt-form-title">Add New User</h2>
-            <p class="subtitle">Create a user account and assign the correct role</p>
-        </div>
-    </header>
+
 
     <?php
     // Your existing PHP logic (unchanged - just cleaner variable names)

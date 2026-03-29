@@ -168,7 +168,43 @@
   color: #cfd4f8;
   line-height: 1.45;
   font-size: 0.92rem;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 2;   /* lines ගණන */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #fff;
+    padding: 20px;
+    border-radius: 12px;
+    max-width: 500px;
+    width: 90%;
+}
+#modalReason {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-height: 250px;
+  overflow-y: auto;
+}
+
 
 .ann-meta {
   display: flex;

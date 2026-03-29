@@ -20,132 +20,205 @@
     </div>
 
     <div class="ann-grid" role="list">
+
+
+
+
         <?php
         // Expecting: $leaveRequests = [ [ 'type' => '', 'dateFrom' => '', 'dateTo' => '', 'reason' => '', 'requestedDate' => '', 'status' => 'pending|approved|rejected' ], ... ]
         $now = date('Y-m-d');
-        $sample = [
-            [
-                'type' => 'Medical Leave',
-                'dateFrom' => '2025-01-15',
-                'dateTo' => '2025-01-17',
-                'reason' => 'Medical checkup and recovery period as advised by doctor.',
-                'requestedDate' => '2025-01-10',
-                'status' => 'approved',
-                'duration' => 3,
-            ],
-            [
-                'type' => 'Personal Leave',
-                'dateFrom' => '2025-02-20',
-                'dateTo' => '2025-02-21',
-                'reason' => 'Family event requiring my presence.',
-                'requestedDate' => '2025-02-15',
-                'status' => 'pending',
-                'duration' => 2,
-            ],
-            [
-                'type' => 'Duty Leave',
-                'dateFrom' => '2025-01-05',
-                'dateTo' => '2025-01-05',
-                'reason' => 'Attending educational workshop at the district office.',
-                'requestedDate' => '2025-01-02',
-                'status' => 'approved',
-                'duration' => 1,
-            ],
-            [
-                'type' => 'Medical Leave',
-                'dateFrom' => '2024-12-10',
-                'dateTo' => '2024-12-12',
-                'reason' => 'Flu and fever, doctor recommended rest.',
-                'requestedDate' => '2024-12-08',
-                'status' => 'rejected',
-                'duration' => 3,
-            ],
-        ];
-        $list = isset($leaveRequests) && is_array($leaveRequests) ? $leaveRequests : $sample;
+
+        $list = isset($leaveRequests) && is_array($leaveRequests) ? $leaveRequests : [];
+
         ?>
 
-        <?php foreach ($list as $i => $req): ?>
-            <?php
-            $status = strtolower($req['status'] ?? 'pending');
-            $classes = ['ann-card', 'status-' . $status];
-            $statusLabel = ucfirst($status);
-            $statusColor = [
-                'pending' => 'badge',
-                'approved' => 'badge badge-pin',
-                'rejected' => 'badge',
-            ][$status] ?? 'badge';
-            ?>
-            <article role="listitem" class="<?php echo implode(' ', $classes); ?>" tabindex="0"
-                aria-label="Leave Request: <?php echo htmlspecialchars($req['type'] ?? ''); ?>">
-                <div class="ann-card-header">
-                    <div class="ann-badges">
-                        <span class="<?php echo $statusColor; ?>"
-                            aria-label="<?php echo $statusLabel; ?>"><?php echo $statusLabel; ?></span>
-                        <span class="badge"><?php echo htmlspecialchars($req['type'] ?? ''); ?></span>
+        <?php if (empty($list)): ?>
+            <div class="empty-state">
+                <div class="empty-icon">📋</div>
+                <h3>No Leave Requests</h3>
+                <p>You haven’t submitted any leave requests yet.</p>
+            </div>
+        <?php else: ?>
+
+
+
+
+
+            <?php foreach ($list as $i => $req): ?>
+                <?php
+                $status = strtolower($req['status'] ?? 'pending');
+                $classes = ['ann-card', 'status-' . $status];
+                $statusLabel = ucfirst($status);
+                $statusColor = [
+                    'pending' => 'badge',
+                    'approved' => 'badge badge-pin',
+                    'rejected' => 'badge',
+                ][$status] ?? 'badge';
+                ?>
+
+                <?php
+                $type = ucfirst($req['leaveType'] ?? '');
+
+                $requestedDate = !empty($req['createdAt'])
+                    ? date('Y-m-d', strtotime($req['createdAt']))
+                    : '';
+
+                $duration = 1;
+                if (!empty($req['dateFrom']) && !empty($req['dateTo'])) {
+                    $from = new DateTime($req['dateFrom']);
+                    $to   = new DateTime($req['dateTo']);
+                    $duration = $from->diff($to)->days + 1;
+                }
+                ?>
+
+                <article role="listitem" class="<?php echo implode(' ', $classes); ?>" tabindex="0"
+                    aria-label="Leave Request: <?php echo htmlspecialchars($type ?? ''); ?>">
+                    <div class="ann-card-header">
+                        <div class="ann-badges">
+                            <span class="<?php echo $statusColor; ?>"
+                                aria-label="<?php echo $statusLabel; ?>"><?php echo $statusLabel; ?></span>
+                            <span class="badge"><?php echo htmlspecialchars($type ?? ''); ?></span>
+                        </div>
+                        <time class="ann-date"
+                            datetime="<?php echo htmlspecialchars($requestedDate ?? ''); ?>">Requested: <?php echo htmlspecialchars($requestedDate ?? ''); ?></time>
                     </div>
-                    <time class="ann-date"
-                        datetime="<?php echo htmlspecialchars($req['requestedDate'] ?? ''); ?>">Requested: <?php echo htmlspecialchars($req['requestedDate'] ?? ''); ?></time>
-                </div>
 
-                <h3 class="ann-title-text"><?php echo htmlspecialchars($req['type'] ?? ''); ?> - <?php echo htmlspecialchars($req['duration'] ?? ''); ?> Day(s)</h3>
-                <p class="ann-body"><?php echo htmlspecialchars($req['reason'] ?? ''); ?></p>
+                    <h3 class="ann-title-text"><?php echo htmlspecialchars($type ?? ''); ?> - <?php echo htmlspecialchars($duration ?? ''); ?> Day(s)</h3>
+                    <p class="ann-body"><?php echo htmlspecialchars($req['reason'] ?? ''); ?></p>
 
-                <div class="ann-meta">
-                    <span class="author">From: <?php echo htmlspecialchars($req['dateFrom'] ?? ''); ?></span>
-                    <span class="author">To: <?php echo htmlspecialchars($req['dateTo'] ?? ''); ?></span>
-                </div>
+                    <div class="ann-meta">
+                        <span class="author">From: <?php echo htmlspecialchars($req['dateFrom'] ?? ''); ?></span>
+                        <span class="author">To: <?php echo htmlspecialchars($req['dateTo'] ?? ''); ?></span>
+                    </div>
 
-                <div class="ann-actions-row">
-                    <button class="btn ghost" type="button">View Details</button>
-                    <div class="spacer"></div>
-                    <?php if ($status === 'pending'): ?>
-                        <button class="btn" type="button">Cancel Request</button>
-                    <?php endif; ?>
-                </div>
-            </article>
-        <?php endforeach; ?>
+                    <div class="ann-actions-row">
+                        <button class="btn ghost view-details-btn"
+                            type="button"
+                            data-reason="<?= htmlspecialchars($req['reason'] ?? '') ?>"
+                            data-type="<?= htmlspecialchars($type ?? '') ?>"
+                            data-from="<?= htmlspecialchars($req['dateFrom'] ?? '') ?>"
+                            data-to="<?= htmlspecialchars($req['dateTo'] ?? '') ?>">
+                            View Details
+                        </button>
+
+                        <div class="spacer"></div>
+                        <?php if ($status === 'pending'): ?>
+                            <form action="/index.php?url=leave/cancel" method="post" style="display:inline;">
+                                <input type="hidden" name="leave_id" value="<?= (int)$req['id'] ?>">
+                                <button class="btn" type="submit"
+                                    onclick="return confirm('Cancel this leave request?')">
+                                    Cancel Request
+                                </button>
+                            </form>
+                        <?php endif; ?>
+
+                    </div>
+                </article>
+            <?php endforeach; ?>
+        <?php endif; ?>
     </div>
 </section>
 
+
+<div id="leaveModal" class="modal hidden">
+    <div class="modal-content">
+        <h3 id="modalTitle"></h3>
+        <p id="modalDates"></p>
+        <hr>
+        <p id="modalReason"></p>
+
+        <button class="btn" id="closeModal">Close</button>
+    </div>
+</div>
+
 <script>
-    (function() {
-        const container = document.currentScript.previousElementSibling; // section.mp-announcements
-        if (!container) return;
-        const grid = container.querySelector('.ann-grid');
-        const chips = container.querySelectorAll('.chip-group .chip');
+(function () {
+    // ✅ Leave page section
+    const section = document.querySelector('section.mp-announcements');
+    if (!section) return;
 
-        const applyFilter = (key) => {
-            const cards = grid.querySelectorAll('.ann-card');
-            cards.forEach(card => {
-                let show = true;
-                switch (key) {
-                    case 'all':
-                        show = true;
-                        break;
-                    case 'pending':
-                        show = card.classList.contains('status-pending');
-                        break;
-                    case 'approved':
-                        show = card.classList.contains('status-approved');
-                        break;
-                    case 'rejected':
-                        show = card.classList.contains('status-rejected');
-                        break;
-                }
-                card.style.display = show ? '' : 'none';
-            });
-        };
+    // =========================
+    // ✅ FILTER (All / Pending / Approved / Rejected)
+    // =========================
+    const grid  = section.querySelector('.ann-grid');
+    const chips = section.querySelectorAll('.chip-group .chip');
 
-        chips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                chips.forEach(c => {
-                    c.classList.remove('active');
-                    c.setAttribute('aria-selected', 'false');
-                });
-                chip.classList.add('active');
-                chip.setAttribute('aria-selected', 'true');
-                applyFilter(chip.dataset.filter);
-            });
+    const applyFilter = (key) => {
+        const cards = grid.querySelectorAll('.ann-card');
+        cards.forEach(card => {
+            let show = true;
+
+            switch (key) {
+                case 'all':
+                    show = true;
+                    break;
+                case 'pending':
+                    show = card.classList.contains('status-pending');
+                    break;
+                case 'approved':
+                    show = card.classList.contains('status-approved');
+                    break;
+                case 'rejected':
+                    show = card.classList.contains('status-rejected');
+                    break;
+            }
+
+            card.style.display = show ? '' : 'none';
         });
-    })();
+    };
+
+    chips.forEach(chip => {
+        chip.addEventListener('click', () => {
+            chips.forEach(c => {
+                c.classList.remove('active');
+                c.setAttribute('aria-selected', 'false');
+            });
+            chip.classList.add('active');
+            chip.setAttribute('aria-selected', 'true');
+
+            applyFilter(chip.dataset.filter);
+        });
+    });
+
+    // =========================
+    // ✅ MODAL (View Details)
+    // =========================
+    const modal = document.getElementById('leaveModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalDates = document.getElementById('modalDates');
+    const modalReason = document.getElementById('modalReason');
+    const closeBtn = document.getElementById('closeModal');
+
+    // Safety check
+    if (!modal || !modalTitle || !modalDates || !modalReason || !closeBtn) return;
+
+    document.querySelectorAll('.view-details-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            modalTitle.textContent = (btn.dataset.type || '') + ' Leave';
+            modalDates.textContent = `From ${btn.dataset.from || ''} To ${btn.dataset.to || ''}`;
+            modalReason.textContent = btn.dataset.reason || '';
+
+            modal.classList.remove('hidden');
+        });
+    });
+
+    closeBtn.addEventListener('click', () => {
+        modal.classList.add('hidden');
+    });
+
+    // ✅ click outside modal-content -> close
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.classList.add('hidden');
+        }
+    });
+
+    // ✅ ESC key -> close
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            modal.classList.add('hidden');
+        }
+    });
+
+})();
 </script>

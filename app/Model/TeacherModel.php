@@ -7,10 +7,11 @@ class TeacherModel extends UserModel
     public function createTeacher($data)
     {
         $data['role'] = $this->userRoleMap['teacher'];
-        $userId = $this->createUser($data);
-
-        $sql = "INSERT INTO $this->teacherTable (userID, subjectID, nic, classID, grade) VALUES (:userId, :subject, :nic, :classId, :grade)";
+        $this->pdo->beginTransaction();
         try {
+            $userId = $this->createUser($data);
+
+            $sql = "INSERT INTO $this->teacherTable (userID, subjectID, nic, classID, grade) VALUES (:userId, :subject, :nic, :classId, :grade)";
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([
                 'userId' => $userId,
@@ -19,11 +20,15 @@ class TeacherModel extends UserModel
                 'classId' => $data['classId'],
                 'grade' => $data['grade']
             ]);
+
+            $this->pdo->commit();
+            return true;
         } catch (PDOException $e) {
+            if ($this->pdo->inTransaction()) {
+                $this->pdo->rollBack();
+            }
             throw new Exception("Error Processing Request to teacher table: " . $e->getMessage());
         }
-
-        return true;
     }
 
     public function getTeacherIDByUserID($userID)
@@ -64,6 +69,30 @@ class TeacherModel extends UserModel
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Error fetching teacher by user ID: " . $e->getMessage());
+        }
+    }
+
+    public function getAllTeachers()
+    {
+        $sql = "SELECT t.*, u.*, s.* FROM `{$this->teacherTable}` t JOIN `{$this->userTable}` u ON t.`userID` = u.`userID` JOIN `subject` s ON t.`subjectID` = s.`subjectID`";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching all teachers: " . $e->getMessage());
+        }
+    }
+
+    public function getGradeByUserID($userId)
+    {
+        $sql = "SELECT grade FROM {$this->teacherTable} WHERE userID = :uid LIMIT 1";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':uid' => $userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching teacher grade: " . $e->getMessage());
         }
     }
 }

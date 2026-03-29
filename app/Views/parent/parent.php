@@ -1,7 +1,7 @@
 <div class="parent-container">
     <?php
     // Provide navigation items and active label for Parent
-    $items = ['Announcements', 'Acedemics', 'Attendance', 'Time Table', 'Behavior', 'Teachers', 'Requests'];
+    $items = ['Announcements', 'Acedemics', 'Attendance', 'Time Table', 'Exam Time Table', 'Behavior', 'Teachers', 'Requests'];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
     $active = in_array($tab, $items) ? $tab : 'Announcements';
     include_once __DIR__ . '/../templates/navigation.php';
@@ -23,6 +23,9 @@
     } else if ($active === 'Time Table') {
         // No dedicated timetable template — use report placeholder for now
         include __DIR__ . '/parentTimeTable.php';
+    } else if ($active === 'Exam Time Table') {
+        // Exam Time Table view for parents
+        include __DIR__ . '/parentExamTimeTable.php';
     } else if ($active === 'Behavior') {
         // No dedicated behavior view yet — use report placeholder
         include __DIR__ . '/parentBehavior.php';

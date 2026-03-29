@@ -417,7 +417,7 @@
   font-weight: 600;
   color: var(--text);
   transition: all 0.25s ease;
-  width: 100px;
+  width: 50px;
 }
 
 .marks-input:hover {
