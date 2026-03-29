@@ -16,11 +16,11 @@ class Database
         $this->loadEnv();
 
         // Load database credentials from .env file
-        $this->host = getenv('MYSQL_HOST') ?: 'localhost';
-        $this->port = getenv('MYSQL_PORT') ?: '3306';
-        $this->dbname = getenv('MYSQL_DB') ?: 'default_db';
-        $this->username = getenv('MYSQL_USER') ?: 'root';
-        $this->password = getenv('MYSQL_PASSWORD') ?: '';
+        $this->host = getenv('MYSQL_HOST');
+        $this->port = getenv('MYSQL_PORT');
+        $this->dbname = getenv('MYSQL_DB');
+        $this->username = getenv('MYSQL_USER');
+        $this->password = getenv('MYSQL_PASSWORD');
 
         $charset = 'utf8mb4';
         $dsn = "mysql:host={$this->host};port={$this->port};dbname={$this->dbname};charset={$charset}";
