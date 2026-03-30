@@ -13,9 +13,54 @@ class ProfileController extends Controller
         }
 
         $userModel = $this->model('UserModel');
+        $teacherModel = $this->model('TeacherModel');
+        $subjectModel = $this->model('SubjectModel');
+        $studentModel = $this->model('StudentModel');
+        $parentModel = $this->model('ParentModel');
+        $classModel = $this->model('ClassModel');
+
         $user = $userModel->getUserDetailsById((int) $userId);
+
+        $managerModel = $this->model('MpModel');
+        // $manager = $managerModel->getManagerByUserId((int) $userId);
+        // $user['manager'] = $manager;
+
+
+
+
+        $teacher = $teacherModel->getTeacherByUserId((int) $userId);
+        $user['teacher'] = $teacher;
+
+        $student = $studentModel->getStudentByUserId((int) $userId);
+        $user['student'] = $student;
+
+        if ($user['role'] === 2 /* teacher */) {
+
+            $subject = $subjectModel->getSubjectById((int) ($teacher['subjectID'] ?? 0));
+        } elseif ($user['role'] === 3 /* student */) {
+            $subject = $subjectModel->getSubjectById((int) ($student['subjectID'] ?? 0));
+        } else {
+            $subject = null;
+        }
+        $user['subject'] = $subject['subjectName'] ?? '';
+
+        if ($user['role'] === 2 /* teacher */) {
+            $class = $classModel->getClassById((int) ($teacher['classID'] ?? 0));
+        } elseif ($user['role'] === 3 /* student */) {
+            $class = $classModel->getClassById((int) ($student['classID'] ?? 0));
+            print_r($class);
+
+        }
+        $user['class'] = $class['class'] ?? '';
+        $user['grade'] = $class['grade'] ?? '';
+
+
+        $parent = $parentModel->getParentByUserId((int) $userId);
+        $user['parent'] = $parent;
 
         // Render the profile view and pass user data
         $this->view('profile/profile', ['user' => $user]);
     }
+
+
 }
