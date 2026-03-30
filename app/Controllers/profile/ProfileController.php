@@ -44,7 +44,6 @@ class ProfileController extends Controller
         }
         $user['subject'] = $subject['subjectName'] ?? '';
 
-
         if ($user['role'] === 2 /* teacher */) {
             $class = $classModel->getClassById((int) ($teacher['classID'] ?? 0));
         } elseif ($user['role'] === 3 /* student */) {
@@ -55,7 +54,9 @@ class ProfileController extends Controller
         $user['grade'] = $class['grade'] ?? '';
 
         $parent = $parentModel->getParentByUserId((int) $userId);
+        $student = $studentModel->getStudentById((int) ($parent['studentID'] ?? 0));
         $user['parent'] = $parent;
+        $user['student'] = $student;
 
         // Render the profile view and pass user data
         $this->view('profile/profile', ['user' => $user]);

@@ -22,7 +22,7 @@ $subject = $user['subject'] ?? '';
 $studentIndex = $user['student']['studentID'] ?? '';
 $nic = $user['nic'] ?? '';
 $relationship = ucfirst($user['relationship'] ?? '');
-
+$studentName = trim(($user['student']['firstName'] ?? '') . ' ' . ($user['student']['lastName'] ?? '')) ?: '';
 $roleLabels = ['admin' => 'Administrator', 'manager' => 'Manager', 'teacher' => 'Teacher', 'student' => 'Student', 'parent' => 'Parent'];
 $roleLabel = $roleLabels[$role] ?? 'User';
 
@@ -156,12 +156,19 @@ echo '</pre>';
                         <span class="detail-value"><?php echo htmlspecialchars($relationship); ?></span>
                     </div>
                 <?php endif; ?>
+                <div class="detail-card">
+                    <span class="detail-label">Child's Name</span>
+                    <span class="detail-value">
+                        <?php echo htmlspecialchars($studentName ?? '—'); ?>
+                    </span>
+                </div>
                 <?php if ($studentIndex): ?>
-                    <div class="detail-card highlight">
+                    <div class="detail-card ">
                         <span class="detail-label">Child's Index</span>
                         <span class="detail-value"><?php echo htmlspecialchars($studentIndex); ?></span>
                     </div>
                 <?php endif; ?>
+
 
 
             <?php elseif ($nic): ?>
