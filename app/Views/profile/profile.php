@@ -28,26 +28,26 @@ $roleLabel = $roleLabels[$role] ?? 'User';
 
 
 // Debug: List all variables
-echo '<pre style="background: #f4f4f4; padding: 15px; border: 1px solid #ddd; margin: 20px 0;">';
-echo '<strong>Debug - All Variables:</strong>' . "\n\n";
-echo '$user array: ';
-var_dump($user);
-echo "\n\n";
-echo '$fullName: ' . var_export($fullName, true) . "\n";
-echo '$role: ' . var_export($role, true) . "\n";
-echo '$roleLabel: ' . var_export($roleLabel, true) . "\n";
-echo '$email: ' . var_export($email, true) . "\n";
-echo '$phone: ' . var_export($phone, true) . "\n";
-echo '$dob: ' . var_export($dob, true) . "\n";
-echo '$gender: ' . var_export($gender, true) . "\n";
-echo '$address: ' . var_export($address, true) . "\n";
-echo '$grade: ' . var_export($grade, true) . "\n";
-echo '$class: ' . var_export($class, true) . "\n";
-echo '$subject: ' . var_export($subject, true) . "\n";
-echo '$studentIndex: ' . var_export($studentIndex, true) . "\n";
-echo '$nic: ' . var_export($nic, true) . "\n";
-echo '$relationship: ' . var_export($relationship, true) . "\n";
-echo '</pre>';
+// echo '<pre style="background: #f4f4f4; padding: 15px; border: 1px solid #ddd; margin: 20px 0;">';
+// echo '<strong>Debug - All Variables:</strong>' . "\n\n";
+// echo '$user array: ';
+// var_dump($user);
+// echo "\n\n";
+// echo '$fullName: ' . var_export($fullName, true) . "\n";
+// echo '$role: ' . var_export($role, true) . "\n";
+// echo '$roleLabel: ' . var_export($roleLabel, true) . "\n";
+// echo '$email: ' . var_export($email, true) . "\n";
+// echo '$phone: ' . var_export($phone, true) . "\n";
+// echo '$dob: ' . var_export($dob, true) . "\n";
+// echo '$gender: ' . var_export($gender, true) . "\n";
+// echo '$address: ' . var_export($address, true) . "\n";
+// echo '$grade: ' . var_export($grade, true) . "\n";
+// echo '$class: ' . var_export($class, true) . "\n";
+// echo '$subject: ' . var_export($subject, true) . "\n";
+// echo '$studentIndex: ' . var_export($studentIndex, true) . "\n";
+// echo '$nic: ' . var_export($nic, true) . "\n";
+// echo '$relationship: ' . var_export($relationship, true) . "\n";
+// echo '</pre>';
 ?>
 
 <section class="profile-clean" aria-labelledby="profile-title">
