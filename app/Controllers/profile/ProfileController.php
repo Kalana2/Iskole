@@ -44,16 +44,15 @@ class ProfileController extends Controller
         }
         $user['subject'] = $subject['subjectName'] ?? '';
 
+
         if ($user['role'] === 2 /* teacher */) {
             $class = $classModel->getClassById((int) ($teacher['classID'] ?? 0));
         } elseif ($user['role'] === 3 /* student */) {
             $class = $classModel->getClassById((int) ($student['classID'] ?? 0));
-            print_r($class);
 
         }
         $user['class'] = $class['class'] ?? '';
         $user['grade'] = $class['grade'] ?? '';
-
 
         $parent = $parentModel->getParentByUserId((int) $userId);
         $user['parent'] = $parent;

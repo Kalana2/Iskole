@@ -19,7 +19,7 @@ $address = trim(implode("\n", array_filter([$user['address_line1'] ?? '', $user[
 $grade = $user['grade'] ?? '';
 $class = $user['class'] ?? '';
 $subject = $user['subject'] ?? '';
-$studentIndex = $user['studentIndex'] ?? '';
+$studentIndex = $user['student']['studentID'] ?? '';
 $nic = $user['nic'] ?? '';
 $relationship = ucfirst($user['relationship'] ?? '');
 
@@ -36,17 +36,17 @@ echo "\n\n";
 echo '$fullName: ' . var_export($fullName, true) . "\n";
 echo '$role: ' . var_export($role, true) . "\n";
 echo '$roleLabel: ' . var_export($roleLabel, true) . "\n";
-// echo '$email: ' . var_export($email, true) . "\n";
-// echo '$phone: ' . var_export($phone, true) . "\n";
-// echo '$dob: ' . var_export($dob, true) . "\n";
-// echo '$gender: ' . var_export($gender, true) . "\n";
-// echo '$address: ' . var_export($address, true) . "\n";
+echo '$email: ' . var_export($email, true) . "\n";
+echo '$phone: ' . var_export($phone, true) . "\n";
+echo '$dob: ' . var_export($dob, true) . "\n";
+echo '$gender: ' . var_export($gender, true) . "\n";
+echo '$address: ' . var_export($address, true) . "\n";
 echo '$grade: ' . var_export($grade, true) . "\n";
 echo '$class: ' . var_export($class, true) . "\n";
 echo '$subject: ' . var_export($subject, true) . "\n";
-// echo '$studentIndex: ' . var_export($studentIndex, true) . "\n";
+echo '$studentIndex: ' . var_export($studentIndex, true) . "\n";
 echo '$nic: ' . var_export($nic, true) . "\n";
-// echo '$relationship: ' . var_export($relationship, true) . "\n";
+echo '$relationship: ' . var_export($relationship, true) . "\n";
 echo '</pre>';
 ?>
 
@@ -120,39 +120,23 @@ echo '</pre>';
 
         <!-- Details Grid -->
         <div class="details-grid">
-            <?php if ($dob): ?>
-                <div class="detail-card">
-                    <span class="detail-label">Date of Birth</span>
-                    <span class="detail-value"><?php echo htmlspecialchars(date('d F Y', strtotime($dob))); ?></span>
-                </div>
-            <?php endif; ?>
 
-            <?php if ($gender): ?>
-                <div class="detail-card">
-                    <span class="detail-label">Gender</span>
-                    <span class="detail-value"><?php echo htmlspecialchars($gender); ?></span>
-                </div>
-            <?php endif; ?>
-
-            <?php if ($address): ?>
-                <div class="detail-card full">
-                    <span class="detail-label">Address</span>
-                    <span class="detail-value address"><?php echo nl2br(htmlspecialchars($address)); ?></span>
-                </div>
-            <?php endif; ?>
 
             <!-- Role-specific fields -->
             <?php if ($role === 'student'): ?>
+                <?php if ($studentIndex): ?>
+                    <div class="detail-card ">
+                        <span class="detail-label">Index Number</span>
+                        <span class="detail-value">
+                            <?php echo htmlspecialchars($studentIndex); ?>
+                        </span>
+                    </div>
+                <?php endif; ?>
                 <div class="detail-card">
                     <span class="detail-label">Class</span>
                     <span class="detail-value"><?php echo htmlspecialchars($grade . ' - ' . $class); ?></span>
                 </div>
-                <?php if ($studentIndex): ?>
-                    <div class="detail-card highlight">
-                        <span class="detail-label">Index Number</span>
-                        <span class="detail-value"><?php echo htmlspecialchars($studentIndex); ?></span>
-                    </div>
-                <?php endif; ?>
+
 
             <?php elseif ($role === 'teacher'): ?>
                 <div class="detail-card">
@@ -179,10 +163,39 @@ echo '</pre>';
                     </div>
                 <?php endif; ?>
 
+
             <?php elseif ($nic): ?>
                 <div class="detail-card">
                     <span class="detail-label">NIC</span>
                     <span class="detail-value"><?php echo htmlspecialchars($nic); ?></span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($dob): ?>
+                <div class="detail-card">
+                    <span class="detail-label">Date of Birth</span>
+                    <span class="detail-value">
+                        <?php echo htmlspecialchars(date('d F Y', strtotime($dob))); ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+
+            <?php if ($gender): ?>
+                <div class="detail-card">
+                    <span class="detail-label">Gender</span>
+                    <span class="detail-value">
+                        <?php echo htmlspecialchars($gender); ?>
+                    </span>
+                </div>
+            <?php endif; ?>
+
+
+            <?php if ($address): ?>
+                <div class="detail-card full">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value address">
+                        <?php echo nl2br(htmlspecialchars($address)); ?>
+                    </span>
                 </div>
             <?php endif; ?>
         </div>
