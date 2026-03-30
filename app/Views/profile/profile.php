@@ -1,70 +1,73 @@
 <link rel="stylesheet" href="/css/profile/profile.css">
+<?php include_once __DIR__ . '/../header/index.php'; ?>
+
+
+<?php
+$user = $user ?? [];
+$fullName = trim(($user['firstName'] ?? $user['fName'] ?? '') . ' ' . ($user['lastName'] ?? $user['lName'] ?? '')) ?: 'User';
+$role = strtolower($user['role'] ?? $user['userType'] ?? 'student');
+$roleMap = [0 => 'admin', 1 => 'manager', 2 => 'teacher', 3 => 'student', 4 => 'parent'];
+if (is_numeric($role))
+    $role = $roleMap[(int) $role] ?? 'student';
+$role = $role ?: 'student';
+
+$email = $user['email'] ?? '';
+$phone = $user['phone'] ?? '';
+$dob = $user['dateOfBirth'] ?? $user['dob'] ?? '';
+$gender = ucfirst($user['gender'] ?? '');
+$address = trim(implode("\n", array_filter([$user['address_line1'] ?? '', $user['address_line2'] ?? '', $user['address_line3'] ?? ''])));
+$grade = $user['grade'] ?? '';
+$class = $user['class'] ?? '';
+$subject = $user['subject'] ?? '';
+$studentIndex = $user['studentIndex'] ?? '';
+$nic = $user['nic'] ?? '';
+$relationship = ucfirst($user['relationship'] ?? '');
+
+$roleLabels = ['admin' => 'Administrator', 'manager' => 'Manager', 'teacher' => 'Teacher', 'student' => 'Student', 'parent' => 'Parent'];
+$roleLabel = $roleLabels[$role] ?? 'User';
+?>
+
 <section class="profile-clean" aria-labelledby="profile-title">
 
     <header class="profile-header">
-        <button onclick="history.back()" class="back-btn">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-            </svg>
-            <span>Back</span>
-        </button>
-        <div class="header-content">
+        <div class="profile-title-wrap">
             <h1 id="profile-title">Profile</h1>
             <p class="subtitle">Your personal information</p>
         </div>
+        <div class="profile-actions">
+            <button onclick="history.back()" class="back-btn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M19 12H5M12 19l-7-7 7-7" />
+                </svg>
+                <span>Back</span>
+            </button>
+        </div>
     </header>
 
-
-
-    <?php
-    // Your existing PHP logic (unchanged - just cleaner variable names)
-    $user = $user ?? [];
-    $fullName = trim(($user['firstName'] ?? $user['fName'] ?? '') . ' ' . ($user['lastName'] ?? $user['lName'] ?? '')) ?: 'User';
-    $role = strtolower($user['role'] ?? $user['userType'] ?? 'student');
-    $roleMap = [0 => 'admin', 1 => 'manager', 2 => 'teacher', 3 => 'student', 4 => 'parent'];
-    if (is_numeric($role))
-        $role = $roleMap[(int) $role] ?? 'student';
-    $role = $role ?: 'student';
-
-    $email = $user['email'] ?? '';
-    $phone = $user['phone'] ?? '';
-    $dob = $user['dateOfBirth'] ?? $user['dob'] ?? '';
-    $gender = ucfirst($user['gender'] ?? '');
-    $address = trim(implode("\n", array_filter([$user['address_line1'] ?? '', $user['address_line2'] ?? '', $user['address_line3'] ?? ''])));
-    $grade = $user['grade'] ?? '';
-    $class = $user['class'] ?? '';
-    $subject = $user['subject'] ?? '';
-    $studentIndex = $user['studentIndex'] ?? '';
-    $nic = $user['nic'] ?? '';
-    $relationship = ucfirst($user['relationship'] ?? '');
-
-    $roleLabels = ['admin' => 'Administrator', 'manager' => 'Manager', 'teacher' => 'Teacher', 'student' => 'Student', 'parent' => 'Parent'];
-    $roleLabel = $roleLabels[$role] ?? 'User';
-    ?>
-
-    <div class="profile-container">
+    <div class="card">
 
         <!-- Avatar + Core Info -->
         <div class="profile-main">
             <div class="avatar-wrapper">
                 <div class="avatar">
-                    <svg viewBox="0 0 120 120" class="avatar-svg">
-                        <circle cx="60" cy="60" r="58" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="3" />
-                        <circle cx="60" cy="42" r="18" fill="#64748b" />
-                        <path d="M35 85 Q60 105 85 85 Q85 75 60 75 Q35 75 35 85" fill="#64748b" />
-                    </svg>
+                    <?php
+                    $name = $_SESSION['name'] ?? 'User';
+                    echo strtoupper(substr($name, 0, 2));
+                    ?>
                 </div>
                 <?php if ($role === 'student' || $role === 'teacher'): ?>
                     <div class="status-dot"></div>
                 <?php endif; ?>
             </div>
 
-            <div class="user-info">
-                <h2 class="user-name"><?php echo htmlspecialchars($fullName); ?></h2>
-                <span class="user-role"><?php echo htmlspecialchars($roleLabel); ?></span>
+            <div class="profile-user-info">
+                <div>
+                    <h2 class="profile-user-name"><?php echo htmlspecialchars($fullName); ?></h2>
+                    <span class="profile-user-role"><?php echo htmlspecialchars($roleLabel); ?></span>
 
-                <div class="contact-info">
+                </div>
+                <div>
                     <?php if ($email): ?>
                         <div class="contact-line">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
@@ -74,7 +77,10 @@
                             </svg>
                             <a
                                 href="mailto:<?php echo htmlspecialchars($email); ?>"><?php echo htmlspecialchars($email); ?></a>
-                            </div835 <?php endif; ?> <?php if ($phone): ?> <div class="contact-line">
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($phone): ?>
+                        <div class="contact-line">
                             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
                                 <path
@@ -86,6 +92,7 @@
                     <?php endif; ?>
                 </div>
             </div>
+
         </div>
 
         <!-- Details Grid -->
@@ -156,5 +163,7 @@
                 </div>
             <?php endif; ?>
         </div>
+
     </div>
+
 </section>
