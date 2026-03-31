@@ -8,36 +8,36 @@
     </header>
 
     <div class="card">
-        <form action="/addNewUser/submit" method="post" >
-              <div class="form-grid">
+        <form action="/addNewUser/submit" method="post">
+            <div class="form-grid">
                 <div class="field">
-                    <label for="fName">First Name</label>
+                    <label for="fName">First Name <span class="required-mark">*</span></label>
                     <input type="text" id="fName" name="fName" placeholder="Kalana" title="Enter first name" required>
                 </div>
                 <div class="field">
-                    <label for="lName">Last Name</label>
+                    <label for="lName">Last Name <span class="required-mark">*</span></label>
                     <input type="text" id="lName" name="lName" placeholder="Jinendra" title="Enter last name" required>
                 </div>
 
                 <div class="field span-2">
-                    <label for="email">Email</label>
+                    <label for="email">Email <span class="required-mark">*</span></label>
                     <input type="email" id="email" name="email" placeholder="name@example.com" title="Enter email"
                         required>
                 </div>
 
                 <div class="field">
-                    <label for="phone">Phone</label>
+                    <label for="phone">Phone <span class="required-mark">*</span></label>
                     <input type="tel" id="phone" name="phone" placeholder="07xxxxxxxx"
                         title="Enter phone number (07xxxxxxxx)" pattern="^07\d{8}$" inputmode="numeric" required>
                     <small class="hint">Format: 07XXXXXXXX</small>
                 </div>
                 <div class="field">
-                    <label for="dob">Date of birth</label>
+                    <label for="dob">Date of birth <span class="required-mark">*</span></label>
                     <input type="date" id="dob" name="dateOfBirth" title="Enter date of birth" required>
                 </div>
 
                 <div class="field span-2">
-                    <label for="addressL1">Address line 1</label>
+                    <label for="addressL1">Address line 1 <span class="required-mark">*</span></label>
                     <input type="text" id="addressL1" name="addressLine1" placeholder="Street address"
                         title="Enter address line 1" required>
                 </div>
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="field">
-                    <label for="gender">Gender</label>
+                    <label for="gender">Gender <span class="required-mark">*</span></label>
                     <select name="gender" id="gender" required>
                         <option value="" selected disabled>Gender</option>
                         <option value="Male">Male</option>
@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="field">
-                    <label for="userType">User Type</label>
+                    <label for="userType">User Type <span class="required-mark">*</span></label>
                     <select name="role" id="userType" required>
                         <option value="" selected disabled>Select user type</option>
                         <option value="mp">Management</option>
@@ -74,34 +74,28 @@
 
                 <!-- NIC (Management / Teacher / Parent) -->
                 <div class="field role role-mp role-teacher role-parent span-2 hidden" data-role="nic">
-                    <label for="nic">NIC number</label>
+                    <label for="nic">NIC number <span class="required-mark">*</span></label>
                     <input type="text" id="nic" name="nic" placeholder="xxxxxxxxxxxx"
                         title="Enter NIC number (xxxxxxxxxxxx)">
                 </div>
 
                 <!-- Grade & Class (Teacher / Student) -->
                 <div class="field role role-teacher role-student hidden" data-role="grade">
-                    <label for="grade">Grade</label>
+                    <label for="grade">Grade <span class="required-mark">*</span></label>
                     <select name="grade" id="grade">
                         <option value="" selected disabled>Select grade</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
                     </select>
                 </div>
                 <div class="field role role-teacher role-student hidden" data-role="class">
-                    <label for="class">Class</label>
+                    <label for="class">Class <span class="required-mark">*</span></label>
                     <select name="class" id="class">
                         <option value="" selected disabled>Select class</option>
-                        <option value="1">A</option>
-                        <option value="2">B</option>
                     </select>
                 </div>
 
                 <!-- Subject (Teacher) -->
                 <div class="field role role-teacher span-2 hidden" data-role="subject">
-                    <label for="subject">Subject</label>
+                    <label for="subject">Subject <span class="required-mark">*</span></label>
                     <select name="subject" id="subject">
                         <option value="" selected disabled>Select subject</option>
                         <option value="1">Maths</option>
@@ -121,11 +115,11 @@
 
                 <!-- Parent fields -->
                 <div class="field role role-parent hidden" data-role="studentIndex">
-                    <label for="studentIndex">Student index</label>
+                    <label for="studentIndex">Student index <span class="required-mark">*</span></label>
                     <input type="number" id="studentIndex" name="studentIndex" placeholder="e.g. 10234">
                 </div>
                 <div class="field role role-parent hidden" data-role="relationship">
-                    <label for="relationship">Relationship type</label>
+                    <label for="relationship">Relationship type <span class="required-mark">*</span></label>
                     <select id="relationship" name="relationship">
                         <option value="" selected disabled>Select relationship</option>
                         <option value="father">Father</option>
@@ -215,6 +209,51 @@
             };
             dobInput.addEventListener('input', validateDob);
             validateDob();
+        }
+
+        // --- Dynamic Grade/Class Logic ---
+        const gradeSelect = document.getElementById('grade');
+        const classSelect = document.getElementById('class');
+        let allClassData = [];
+
+        async function initDynamicSelection() {
+            try {
+                const response = await fetch('/addNewUser/getGradesAndClasses');
+                allClassData = await response.json();
+                
+                // Get unique grades
+                const grades = [...new Set(allClassData.map(item => item.grade))].sort((a, b) => a - b);
+                
+                // Populate Grade select
+                grades.forEach(grade => {
+                    const opt = document.createElement('option');
+                    opt.value = grade;
+                    opt.textContent = grade;
+                    gradeSelect.appendChild(opt);
+                });
+            } catch (err) {
+                console.error('Error fetching grades/classes:', err);
+            }
+        }
+
+        function updateClassOptions() {
+            const selectedGrade = gradeSelect.value;
+            classSelect.innerHTML = '<option value="" selected disabled>Select class</option>';
+            
+            if (selectedGrade) {
+                const filtered = allClassData.filter(item => item.grade == selectedGrade);
+                filtered.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.classID; // Use classID as value
+                    opt.textContent = item.class;
+                    classSelect.appendChild(opt);
+                });
+            }
+        }
+
+        if (gradeSelect && classSelect) {
+            initDynamicSelection();
+            gradeSelect.addEventListener('change', updateClassOptions);
         }
     })();
 </script>
