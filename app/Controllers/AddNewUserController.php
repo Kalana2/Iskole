@@ -13,9 +13,16 @@ class AddNewUserController extends Controller
     public function getGradesAndClasses()
     {
         $classModel = $this->model('ClassModel');
-        $classes = $classModel->getAllClasses();
+        $subjectModel = $this->model('SubjectModel');
+
+        $classes = $classModel->getGradesWithClasses();
+        $subjects = $subjectModel->getAllSubjects();
+
         header('Content-Type: application/json');
-        echo json_encode($classes);
+        echo json_encode([
+            'classes' => $classes,
+            'subjects' => $subjects
+        ]);
         exit;
     }
 

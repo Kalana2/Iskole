@@ -98,18 +98,6 @@
                     <label for="subject">Subject <span class="required-mark">*</span></label>
                     <select name="subject" id="subject">
                         <option value="" selected disabled>Select subject</option>
-                        <option value="1">Maths</option>
-                        <option value="2">Science</option>
-                        <option value="3">English</option>
-                        <option value="4">History</option>
-                        <option value="5">Geography</option>
-                        <option value="6">Aesthetics</option>
-                        <option value="7">PTS</option>
-                        <option value="8">Religion</option>
-                        <option value="9">Health and Physical Education</option>
-                        <option value="10">Tamil</option>
-                        <option value="11">Citizenship Education</option>
-                        <option value="12">Sinhala</option>
                     </select>
                 </div>
 
@@ -211,28 +199,41 @@
             validateDob();
         }
 
-        // --- Dynamic Grade/Class Logic ---
+        // --- Dynamic Grade/Class/Subject Logic ---
         const gradeSelect = document.getElementById('grade');
         const classSelect = document.getElementById('class');
+        const subjectSelect = document.getElementById('subject');
         let allClassData = [];
 
         async function initDynamicSelection() {
             try {
                 const response = await fetch('/addNewUser/getGradesAndClasses');
-                allClassData = await response.json();
+                const data = await response.json();
                 
-                // Get unique grades
+                allClassData = data.classes || [];
+                const subjects = data.subjects || [];
+                
+                // --- Populate Grades ---
                 const grades = [...new Set(allClassData.map(item => item.grade))].sort((a, b) => a - b);
-                
-                // Populate Grade select
                 grades.forEach(grade => {
                     const opt = document.createElement('option');
                     opt.value = grade;
                     opt.textContent = grade;
                     gradeSelect.appendChild(opt);
                 });
+
+                // --- Populate Subjects ---
+                if (subjectSelect) {
+                    subjects.forEach(subject => {
+                        const opt = document.createElement('option');
+                        opt.value = subject.subjectID;
+                        opt.textContent = subject.subjectName;
+                        subjectSelect.appendChild(opt);
+                    });
+                }
+
             } catch (err) {
-                console.error('Error fetching grades/classes:', err);
+                console.error('Error fetching dynamic form data:', err);
             }
         }
 
@@ -244,7 +245,7 @@
                 const filtered = allClassData.filter(item => item.grade == selectedGrade);
                 filtered.forEach(item => {
                     const opt = document.createElement('option');
-                    opt.value = item.classID; // Use classID as value
+                    opt.value = item.classID;
                     opt.textContent = item.class;
                     classSelect.appendChild(opt);
                 });
