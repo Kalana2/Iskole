@@ -19,39 +19,27 @@ $totalStudents = 0;
 $attendancePercentage = 0;
 $classID = null;
 
-// Get available grades from database
+// Get available dimensions from database
 $grades = [];
+$classes = [];
 try {
-    $gradeList = $studentAttendanceModel->getGrades();
-    foreach ($gradeList as $g) {
-        $grades[] = ['value' => $g, 'label' => str_pad($g, 2, '0', STR_PAD_LEFT)];
+    $rawGrades = $studentAttendanceModel->getGrades();
+    foreach ($rawGrades as $g) {
+        if ($g !== null && $g !== '') {
+            $grades[] = ['value' => $g, 'label' => str_pad($g, 2, '0', STR_PAD_LEFT)];
+        }
+    }
+    
+    if (!empty($selectedGrade)) {
+        $classData = $studentAttendanceModel->getClassesByGrade($selectedGrade);
+        foreach ($classData as $row) {
+            $classes[] = $row['section'];
+        }
     }
 } catch (Exception $e) {
-    error_log("Error loading grades: " . $e->getMessage());
-    $grades = [
-        ['value' => '6', 'label' => '06'],
-        ['value' => '7', 'label' => '07'],
-        ['value' => '8', 'label' => '08'],
-        ['value' => '9', 'label' => '09'],
-        ['value' => '10', 'label' => '10'],
-        ['value' => '11', 'label' => '11']
-    ];
-}
-
-// Get classes for selected grade
-$classes = [];
-if (!empty($selectedGrade)) {
-    try {
-        $classList = $studentAttendanceModel->getClassesByGrade($selectedGrade);
-        foreach ($classList as $c) {
-            $classes[] = $c['section'];
-        }
-    } catch (Exception $e) {
-        error_log("Error loading classes: " . $e->getMessage());
-        $classes = ['A', 'B', 'C'];
-    }
-} else {
-    $classes = ['A', 'B', 'C'];
+    error_log("Error loading DB dimensions: " . $e->getMessage());
+    $grades = [];
+    $classes = [];
 }
 
 // Teacher information (from session if available)
@@ -363,6 +351,48 @@ try {
 </section>
 
 <script>
+    const gradeSelect = document.getElementById('grade');
+    const classSelect = document.getElementById('class');
+
+    if (gradeSelect && classSelect) {
+        gradeSelect.addEventListener('change', function() {
+            const selectedGrade = String(this.value);
+            classSelect.innerHTML = '<option value="">Loading...</option>';
+            classSelect.disabled = true;
+
+            if (!selectedGrade) {
+                classSelect.innerHTML = '<option value="">Select Class</option>';
+                classSelect.disabled = false;
+                return;
+            }
+
+            // Fetch classes from database
+            fetch('/api/getClasses?grade=' + selectedGrade)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    classSelect.innerHTML = '<option value="">Select Class</option>';
+                    if (data.success && data.classes) {
+                        data.classes.forEach(cls => {
+                            const opt = document.createElement('option');
+                            opt.value = cls;
+                            opt.textContent = 'Class ' + cls;
+                            classSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching classes:', error);
+                    classSelect.innerHTML = '<option value="">Error loading classes</option>';
+                })
+                .finally(() => {
+                    classSelect.disabled = false;
+                });
+        });
+    }
+
     // Mark attendance status
     function markStatus(studentId, status) {
         const row = document.querySelector(`tr[data-student-id="${studentId}"]`);

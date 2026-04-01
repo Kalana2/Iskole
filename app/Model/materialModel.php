@@ -39,6 +39,28 @@ class Material extends TeacherModel
         return $this->pdo !== null;
     }
 
+    public function getAllClasses()
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT grade, class FROM class ORDER BY grade, class");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error fetching classes: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getAllSubjects()
+    {
+        try {
+            $stmt = $this->pdo->query("SELECT subjectID, subjectName FROM subject ORDER BY subjectName");
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error fetching all subjects: " . $e->getMessage());
+            return [];
+        }
+    }
+
     public function addMaterial($grade, $class, $subject, $title, $description, $filePath)
     {
         try {
