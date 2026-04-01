@@ -193,6 +193,21 @@ class StudentAttendance extends StudentModel
     }
 
     /**
+     * Get all classes combining robust matching
+     */
+    public function getAllClasses()
+    {
+        try {
+            $sql = "SELECT grade, class FROM class ORDER BY grade, class";
+            $stmt = $this->pdo->query($sql);
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            error_log("Error fetching all classes: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    /**
      * Get class ID by grade and section
      */
     public function getClassID($grade, $section)
