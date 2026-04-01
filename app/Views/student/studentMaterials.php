@@ -121,16 +121,6 @@ if (empty($materials)) {
             <h2 id="materials-title">Study Materials</h2>
             <p class="ann-subtitle">Access lesson plans, worksheets, and assignments</p>
         </div>
-        <div class="ann-actions">
-            <div class="chip-group" role="tablist" aria-label="Material filters">
-                <button class="chip active" role="tab" aria-selected="true" data-filter="all">All</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="maths">Maths</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="science">Science</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="english">English</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="history">History</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="other">Other</button>
-            </div>
-        </div>
     </div>
 
     <?php if (empty($materials)): ?>
@@ -175,53 +165,6 @@ if (empty($materials)) {
 </section>
 
 <script>
-    (function() {
-        const container = document.currentScript.previousElementSibling; // section.mp-announcements
-        if (!container) return;
-        const grid = container.querySelector('.ann-grid');
-        const chips = container.querySelectorAll('.chip-group .chip');
-
-        const applyFilter = (key) => {
-            const cards = grid.querySelectorAll('.ann-card');
-            cards.forEach(card => {
-                let show = true;
-
-                if (key === 'all') {
-                    show = true;
-                } else if (key === 'maths') {
-                    show = card.classList.contains('subject-maths');
-                } else if (key === 'science') {
-                    show = card.classList.contains('subject-science');
-                } else if (key === 'english') {
-                    show = card.classList.contains('subject-english');
-                } else if (key === 'history') {
-                    show = card.classList.contains('subject-history');
-                } else if (key === 'other') {
-                    show = !card.classList.contains('subject-maths') &&
-                        !card.classList.contains('subject-science') &&
-                        !card.classList.contains('subject-english') &&
-                        !card.classList.contains('subject-history');
-                } else {
-                    show = true;
-                }
-
-                card.style.display = show ? '' : 'none';
-            });
-        };
-
-        chips.forEach(chip => {
-            chip.addEventListener('click', () => {
-                chips.forEach(c => {
-                    c.classList.remove('active');
-                    c.setAttribute('aria-selected', 'false');
-                });
-                chip.classList.add('active');
-                chip.setAttribute('aria-selected', 'true');
-                applyFilter(chip.dataset.filter);
-            });
-        });
-    })();
-
     function downloadMaterial(event) {
         event.preventDefault();
 

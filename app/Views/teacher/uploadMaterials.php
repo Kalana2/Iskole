@@ -3,6 +3,24 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Fallback logic in case the view is rendered directly without variables passed
+if (!isset($dbClasses) || !isset($dbSubjects)) {
+    require_once __DIR__ . '/../../Model/materialModel.php';
+    try {
+        $model = new Material();
+        $dbClasses = $model->getAllClasses() ?? [];
+        $dbSubjects = $model->getAllSubjects() ?? [];
+    } catch (Exception $e) {
+        error_log("Failed to load dimensions using the Material model: " . $e->getMessage());
+        $dbClasses = [];
+        $dbSubjects = [];
+    }
+}
+
+// Map unique grades dynamically from the combined dbClasses rows
+$dbGrades = array_unique(array_column($dbClasses, 'grade'));
+sort($dbGrades);
 ?>
 
 <link rel="stylesheet" href="/css/addNewUser/addNewUser.css">
@@ -22,10 +40,9 @@ if (session_status() === PHP_SESSION_NONE) {
                     <label for="Grade">Select Grade</label>
                     <select name="grade" id="Grade" required>
                         <option value="" selected disabled>Select Grade</option>
-                        <option value="6">Grade 06</option>
-                        <option value="7">Grade 07</option>
-                        <option value="8">Grade 08</option>
-                        <option value="9">Grade 09</option>
+                        <?php foreach ($dbGrades as $g): ?>
+                            <option value="<?= htmlspecialchars($g) ?>">Grade <?= htmlspecialchars(str_pad($g, 2, '0', STR_PAD_LEFT)) ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <small class="hint">Choose the grade level.</small>
                 </div>
@@ -34,8 +51,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <label for="Class">Select Class</label>
                     <select name="class" id="Class" required>
                         <option value="" selected disabled>Select Class</option>
-                        <option value="A">Class A</option>
-                        <option value="B">Class B</option>
+                        <!-- Options dynamically populated by JS based on Grade selection -->
                     </select>
                     <small class="hint">Choose the class section.</small>
                 </div>
@@ -44,18 +60,9 @@ if (session_status() === PHP_SESSION_NONE) {
                     <label for="subject">Select Subject</label>
                     <select name="subject" id="subject" required>
                         <option value="" selected disabled>Select Subject</option>
-                        <option value="1">Maths</option>
-                        <option value="2">Science</option>
-                        <option value="3">English</option>
-                        <option value="4">History</option>
-                        <option value="5">Geography</option>
-                        <option value="6">Aesthetics</option>
-                        <option value="7">PTS</option>
-                        <option value="8">Religion</option>
-                        <option value="9">Health and Physical Education</option>
-                        <option value="10">Tamil</option>
-                        <option value="11">Citizenship Education</option>
-                        <option value="12">Sinhala</option>
+                        <?php foreach ($dbSubjects as $s): ?>
+                            <option value="<?= htmlspecialchars($s['subjectID']) ?>"><?= htmlspecialchars($s['subjectName']) ?></option>
+                        <?php endforeach; ?>
                     </select>
                     <small class="hint">Choose the subject area.</small>
                 </div>
@@ -89,6 +96,25 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <script>
     (function() {
+        const allClasses = <?= json_encode($dbClasses) ?>;
+        const gradeSelect = document.getElementById('Grade');
+        const classSelect = document.getElementById('Class');
+
+        if (gradeSelect && classSelect) {
+            gradeSelect.addEventListener('change', function() {
+                const selectedGrade = String(this.value);
+                classSelect.innerHTML = '<option value="" selected disabled>Select Class</option>';
+                allClasses.forEach(item => {
+                    if (String(item.grade) === selectedGrade) {
+                        const opt = document.createElement('option');
+                        opt.value = item.class;
+                        opt.textContent = 'Class ' + item.class;
+                        classSelect.appendChild(opt);
+                    }
+                });
+            });
+        }
+
         const $ = (s, ctx = document) => ctx.querySelector(s);
         const formSection = document.currentScript.previousElementSibling;
         if (!formSection) return;
