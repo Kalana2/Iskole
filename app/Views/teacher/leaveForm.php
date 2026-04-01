@@ -72,7 +72,12 @@
                         name="reason"
                         id="reason"
                         rows="4"
+                        maxlength="250"
                         placeholder="Enter reason..."></textarea>
+
+                    <small class="hint">
+                        <span id="reasonCount">0</span> / 250 characters
+                    </small>
                 </div>
 
 
@@ -90,10 +95,10 @@
 <script>
     (function() {
         const $ = (s, ctx = document) => ctx.querySelector(s);
-        const formSection = document.currentScript.previousElementSibling; // section.mp-management
+        const formSection = document.currentScript.previousElementSibling;
         if (!formSection) return;
 
-        // Lightweight client-side validation
+        // Existing validation
         const formEl = formSection.querySelector('form');
         formEl?.addEventListener('submit', (e) => {
             if (!formEl.checkValidity()) {
@@ -102,5 +107,19 @@
                 invalid?.focus();
             }
         });
+
+        // ✅ Character counter for Reason
+        const reason = $('#reason', formSection);
+        const counter = $('#reasonCount', formSection);
+        const max = reason?.getAttribute('maxlength') || 0;
+
+        if (reason && counter) {
+            const updateCount = () => {
+                counter.textContent = reason.value.length;
+            };
+
+            reason.addEventListener('input', updateCount);
+            updateCount(); // initial
+        }
     })();
 </script>

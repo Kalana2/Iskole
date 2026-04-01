@@ -3,7 +3,7 @@ require_once __DIR__ . '/../Core/Controller.php';
 
 class LeaveController extends Controller
 {
-    // GET: show form
+    
     public function index()
     {
         $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
@@ -22,7 +22,7 @@ class LeaveController extends Controller
         ]);
     }
 
-    // POST: submit leave request
+
     public function submit()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -91,7 +91,7 @@ class LeaveController extends Controller
         exit;
     }
 
-    // ✅ ADD THIS METHOD HERE (cancel() එකට පස්සේ)
+    
     public function decide()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -111,7 +111,7 @@ class LeaveController extends Controller
         $leaveModel = $this->model('LeaveRequestModel');
         $leaveModel->decide($leaveId, (int)$managerUserId, $status, null);
 
-        // ✅ IMPORTANT: stay in manager panel
+       
         header('Location: /index.php?url=mp&tab=Requests');
         exit;
     }

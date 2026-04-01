@@ -12,6 +12,7 @@ $formType     = $isEdit ? ($editReport['report_type'] ?? 'positive') : 'positive
 $formCategory = $isEdit ? ($editReport['category'] ?? '') : '';
 $formTitle    = $isEdit ? ($editReport['title'] ?? '') : '';
 $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
+
 ?>
 
 <section class="reports-entry tab-panel mp-management">
@@ -19,13 +20,13 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
     <header class="mgmt-header">
       <div class="title-wrap">
         <h2 id="report-title">Student Reports</h2>
-        <p class="subtitle">View student progress reports & Behavior reports</p>
+        <p class="subtitle">Search a student to view progress reports & behavior reports</p>
       </div>
     </header>
 
     <div class="center-container card">
 
-      <!-- Search -->
+      <!-- ✅ SEARCH ALWAYS VISIBLE -->
       <div class="search-container">
         <form method="GET" action="/index.php" style="display: contents;">
           <input type="hidden" name="url" value="teacher">
@@ -42,7 +43,7 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
             autocapitalize="off"
             autocorrect="off"
             value="<?= htmlspecialchars($_GET['q'] ?? '') ?>"
-            onfocus="this.value=''; this.dispatchEvent(new Event('input'));">
+          >
 
           <datalist id="studentList">
             <?php foreach (($suggestions ?? []) as $s): ?>
@@ -60,37 +61,64 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
         </form>
       </div>
 
-      <div class="student-container">
+      <!-- ✅ IF SEARCHED BUT NO STUDENT FOUND -->
+      <?php if (empty($student) && !empty($_GET['q'])): ?>
+        <div class="empty-state" style="margin-top: 18px;">
+          <div class="empty-icon">🔎</div>
+          <h3>No Student Found</h3>
+          <p>This student is not in your class.</p>
+        </div>
+      <?php endif; ?>
 
-        <!-- Student Details Card -->
-        <?php if (!empty($student)): ?>
+      <!-- ✅ EVERYTHING BELOW ONLY SHOWS AFTER A STUDENT IS FOUND -->
+      <?php if (!empty($student)): ?>
+
+        <?php
+          $studentInfo = [
+            'name'  => trim(($student['firstName'] ?? '') . ' ' . ($student['lastName'] ?? '')) ?: '—',
+            'class' => $student['className'] ?? '—',
+            'stu_id'=> $student['studentID'] ?? '—',
+          ];
+
+          // View-level filter (if behaviorReports has studentID)
+          $selectedStudentId = $student['studentID'] ?? null;
+          $filteredBehaviorReports = [];
+          foreach ($behaviorReports as $r) {
+            if (!isset($r['studentID']) || (string)$r['studentID'] === (string)$selectedStudentId) {
+              $filteredBehaviorReports[] = $r;
+            }
+          }
+          $behaviorReportsToShow = $filteredBehaviorReports;
+        ?>
+
+        <div class="student-container">
+
+          <!-- Student Details Card -->
           <div class="student-info-card">
             <div class="student-avatar">
               <div class="avatar-circle">
                 <?php
-                $fn = $student['firstName'] ?? '';
-                $ln = $student['lastName'] ?? '';
-                $initials = strtoupper(mb_substr($fn, 0, 1) . mb_substr($ln, 0, 1));
-                if ($initials === '') $initials = 'S';
+                  $fn = $student['firstName'] ?? '';
+                  $ln = $student['lastName'] ?? '';
+                  $initials = strtoupper(mb_substr($fn, 0, 1) . mb_substr($ln, 0, 1));
+                  if ($initials === '') $initials = 'S';
                 ?>
                 <span><?= htmlspecialchars($initials) ?></span>
               </div>
             </div>
 
             <div class="details">
-              <h2 class="student-name">
-                <?= htmlspecialchars(trim(($student['firstName'] ?? '') . ' ' . ($student['lastName'] ?? '')) ?: 'N/A') ?>
-              </h2>
+              <h2 class="student-name"><?= htmlspecialchars($studentInfo['name']) ?></h2>
 
               <div class="info-grid">
                 <div class="info-item"><span class="label">Grade:</span>
                   <span class="value"><?= htmlspecialchars($student['grade'] ?? 'N/A') ?></span>
                 </div>
                 <div class="info-item"><span class="label">Class:</span>
-                  <span class="value"><?= htmlspecialchars($student['className'] ?? 'N/A') ?></span>
+                  <span class="value"><?= htmlspecialchars($studentInfo['class']) ?></span>
                 </div>
                 <div class="info-item"><span class="label">Student ID:</span>
-                  <span class="value"><?= htmlspecialchars($student['studentID'] ?? 'N/A') ?></span>
+                  <span class="value"><?= htmlspecialchars($studentInfo['stu_id']) ?></span>
                 </div>
                 <div class="info-item"><span class="label">Email:</span>
                   <span class="value"><?= htmlspecialchars($student['email'] ?? 'N/A') ?></span>
@@ -105,204 +133,176 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
             </div>
           </div>
 
-        <?php elseif (!empty($_GET['q'])): ?>
-          <div class="empty-state">
-            <div class="empty-icon">🔎</div>
-            <h3>No Student Found</h3>
-            <p>This student is not in your class.</p>
-          </div>
-        <?php endif; ?>
+          <!-- ✅ Chart section -->
+          <input type="hidden" id="studentId" value="<?= htmlspecialchars($studentInfo['stu_id']) ?>">
 
-        <!-- ✅ Performance Overview + Chart (the missing part) -->
-        <div class="stats-overview">
-          <div class="stat-card">
-            <div class="stat-icon">📊</div>
-            <div class="stat-content">
-              <h4>Overall Average</h4>
-              <p class="stat-value">72.3%</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-content">
-              <h4>Section Rank</h4>
-              <p class="stat-value">#5</p>
-            </div>
-          </div>
-
-          <div class="stat-card">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-content">
-              <h4>Class Rank</h4>
-              <p class="stat-value">#1</p>
-            </div>
-          </div>
-        </div>
-
-        <div class="performance-report">
-          <h3 class="report-title">
-            <span>Performance Report</span>
-            <div class="chart-toggle">
-              <button class="toggle-btn active" type="button" data-chart="line">Trend</button>
-              <button class="toggle-btn" type="button" data-chart="radar">Radar Chart</button>
-            </div>
-          </h3>
-
-          <div class="chart-controls"></div>
-
-          <div class="chart-container">
-            <canvas id="performanceChart"></canvas>
-          </div>
-        </div>
-
-        <!-- Behavior Section -->
-        <div class="behavior-section">
-
-          <!-- Add / Edit Form -->
-          <div class="behavior-form-wrapper">
-            <h3 class="report-title"><?= $isEdit ? 'Edit Behavior Report' : 'Add Behavior Report' ?></h3>
-
-            <div class="behavior-update">
-              <form action="/index.php?url=report/<?= $isEdit ? 'update' : 'submit' ?>" method="POST">
-                <?php if ($isEdit): ?>
-                  <input type="hidden" name="report_id" value="<?= htmlspecialchars($editReport['id'] ?? '') ?>">
-                <?php endif; ?>
-
-                <?php if (!empty($student)): ?>
-                  <input type="hidden" name="studentID" value="<?= htmlspecialchars($student['studentID']) ?>">
-                <?php endif; ?>
-
-                <div class="form-row">
-                  <label for="report_type">Report Type</label>
-                  <select id="report_type" name="report_type" required>
-                    <option value="positive" <?= $formType === 'positive' ? 'selected' : '' ?>>Positive</option>
-                    <option value="neutral" <?= $formType === 'neutral' ? 'selected' : '' ?>>Neutral</option>
-                    <option value="concern" <?= $formType === 'concern' ? 'selected' : '' ?>>Concern</option>
-                  </select>
+          <div class="center-container card" style="margin-top:16px;">
+            <div class="stats-overview">
+              <div class="stat-card">
+                <div class="stat-icon">🏆</div>
+                <div class="stat-content">
+                  <h4>Section Rank</h4>
+                  <p class="stat-value">#5</p>
                 </div>
-
-                <div class="form-row">
-                  <label for="category">Category</label>
-                  <input type="text" id="category" name="category"
-                    value="<?= htmlspecialchars($formCategory) ?>"
-                    placeholder="e.g. Academic Excellence" required />
+              </div>
+              <div class="stat-card">
+                <div class="stat-icon">⭐</div>
+                <div class="stat-content">
+                  <h4>Class Rank</h4>
+                  <p class="stat-value">#1</p>
                 </div>
+              </div>
+            </div>
 
-                <div class="form-row">
-                  <label for="title">Title</label>
-                  <input type="text" id="title" name="title"
-                    value="<?= htmlspecialchars($formTitle) ?>"
-                    placeholder="e.g. Excellent Leadership in Group Work" required />
-                </div>
+            <div class="performance-report">
+              <h3 class="report-title">
+                <span>Performance Report</span>
+              </h3>
 
-                <div class="form-row">
-                  <label for="description">Description</label>
-                  <textarea id="description" name="description" rows="4"
-                    placeholder="Enter detailed observation..." required><?= htmlspecialchars($formDesc) ?></textarea>
-                </div>
+              <div class="chart-controls"></div>
 
-                <button type="submit" class="update-behavior-btn">
-                  <?= $isEdit ? '✏️ Update Report' : '➕ Add Report' ?>
-                </button>
-
-                <?php if ($isEdit): ?>
-                  <button type="button" class="cancel-btn" id="cancelEditBtn">❌ Cancel</button>
-                <?php endif; ?>
-              </form>
+              <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+              </div>
             </div>
           </div>
 
-          <!-- Reports List -->
-          <div class="behavior-report-list">
-            <h3 class="report-title">Recent Behavior Reports</h3>
+          <!-- ✅ Behavior Section -->
+          <div class="behavior-section" style="margin-top: 22px;">
 
-            <?php if (!empty($behaviorReports)): ?>
-              <?php foreach ($behaviorReports as $report): ?>
-                <?php
-                $reportDate = !empty($report['report_date']) ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
-                $reportType = $report['report_type'] ?? 'neutral';
-                $teacherName = trim($report['teacher_name'] ?? '');
+            <!-- Add / Edit Form -->
+            <div class="behavior-form-wrapper">
+              <h3 class="report-title"><?= $isEdit ? 'Edit Behavior Report' : 'Add Behavior Report' ?></h3>
 
-                if ($teacherName === '') {
-                  $teacherName = 'Unknown Teacher';
-                }
-
-                $teacherSubject = $report['teacher_subject'] ?? '';
-                $category = $report['category'] ?? 'General';
-                $typeIcons = ['positive' => '✓', 'neutral' => '◉', 'concern' => '⚠'];
-                $rid = $report['report_id'] ?? $report['id'] ?? '';
-                $teacherName = trim($report['teacher_name'] ?? '');
-                if ($teacherName === '') $teacherName = 'Unknown Teacher';
-
-                ?>
-
-                <div class="behavior-report <?= htmlspecialchars($reportType) ?>"
-                  data-report-id="<?= htmlspecialchars($rid) ?>"
-                  data-type="<?= htmlspecialchars($reportType) ?>">
-
-                  <div class="report-header">
-                    <div class="report-info">
-                      <div class="teacher-details">
-                        <span class="reporter"><?= htmlspecialchars($teacherName) ?></span>
-                        <?php if ($teacherSubject): ?>
-                          <span class="subject-badge"><?= htmlspecialchars($teacherSubject) ?></span>
-                        <?php endif; ?>
-                      </div>
-
-                      <div class="report-meta">
-                        <span class="repo-date"><?= htmlspecialchars($reportDate) ?></span>
-                        <span class="category-badge js-category"><?= htmlspecialchars($category) ?></span>
-                      </div>
-                    </div>
-
-                    <div class="report-type-indicator">
-                      <span class="type-badge <?= htmlspecialchars($reportType) ?> js-typeBadge">
-                        <?= $typeIcons[$reportType] ?? '◉' ?>
-                        <span class="js-typeText"><?= ucfirst($reportType) ?></span>
-                      </span>
-                    </div>
-
-                    <!-- ✅ NO RELOAD buttons -->
-                    <div class="report-actions">
-                      <button type="button"
-                        class="edit-btn js-edit"
-                        data-report-id="<?= htmlspecialchars($rid) ?>">
-                        ✏️ Edit
-                      </button>
-
-                      <button type="button"
-                        class="delete-btn js-delete"
-                        data-report-id="<?= htmlspecialchars($rid) ?>">
-                        🗑 Delete
-                      </button>
-                    </div>
-                  </div>
-
-                  <?php if (!empty($report['title'])): ?>
-                    <div class="report-title js-title">
-                      <?= htmlspecialchars($report['title']) ?>
-                    </div>
+              <div class="behavior-update">
+                <!-- ✅ add id="behaviorAddForm" so we can intercept and prevent refresh -->
+                <form id="behaviorAddForm" action="/index.php?url=report/<?= $isEdit ? 'update' : 'submit' ?>" method="POST">
+                  <?php if ($isEdit): ?>
+                    <input type="hidden" name="report_id" value="<?= htmlspecialchars($editReport['id'] ?? '') ?>">
                   <?php endif; ?>
 
-                  <div class="report-content">
-                    <p class="js-desc"><?= htmlspecialchars($report['description'] ?? 'No description provided') ?></p>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-            <?php else: ?>
-              <div class="empty-state">
-                <div class="empty-icon">📋</div>
-                <h3>No Behavior Reports</h3>
-                <p>There are no behavior reports available at this time.</p>
-              </div>
-            <?php endif; ?>
-          </div>
+                  <!-- ✅ ALWAYS attach selected student -->
+                  <input type="hidden" name="studentID" value="<?= htmlspecialchars($studentInfo['stu_id']) ?>">
 
-        </div>
-      </div>
-    </div>
-  </div>
+                  <div class="form-row">
+                    <label for="report_type">Report Type</label>
+                    <select id="report_type" name="report_type" required>
+                      <option value="positive" <?= $formType === 'positive' ? 'selected' : '' ?>>Positive</option>
+                      <option value="neutral" <?= $formType === 'neutral' ? 'selected' : '' ?>>Neutral</option>
+                      <option value="concern" <?= $formType === 'concern' ? 'selected' : '' ?>>Concern</option>
+                    </select>
+                  </div>
+
+                  <div class="form-row">
+                    <label for="category">Category</label>
+                    <input type="text" id="category" name="category"
+                      value="<?= htmlspecialchars($formCategory) ?>"
+                      placeholder="e.g. Academic Excellence" required />
+                  </div>
+
+                  <div class="form-row">
+                    <label for="title">Title</label>
+                    <input type="text" id="title" name="title"
+                      value="<?= htmlspecialchars($formTitle) ?>"
+                      placeholder="e.g. Excellent Leadership in Group Work" required />
+                  </div>
+
+                  <div class="form-row">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" rows="4"
+                      placeholder="Enter detailed observation..." required><?= htmlspecialchars($formDesc) ?></textarea>
+                  </div>
+
+                  <button type="submit" class="update-behavior-btn">
+                    <?= $isEdit ? '✏️ Update Report' : '➕ Add Report' ?>
+                  </button>
+
+                  <?php if ($isEdit): ?>
+                    <button type="button" class="cancel-btn" id="cancelEditBtn">❌ Cancel</button>
+                  <?php endif; ?>
+                </form>
+              </div>
+            </div>
+
+            <!-- Reports List -->
+            <div class="behavior-report-list" id="behaviorReportList">
+              <h3 class="report-title">Recent Behavior Reports</h3>
+
+              <?php if (!empty($behaviorReportsToShow)): ?>
+                <?php foreach ($behaviorReportsToShow as $report): ?>
+                  <?php
+                    $reportDate = !empty($report['report_date']) ? date('F j, Y', strtotime($report['report_date'])) : 'N/A';
+                    $reportType = $report['report_type'] ?? 'neutral';
+                    $teacherName = trim($report['teacher_name'] ?? '') ?: 'Unknown Teacher';
+                    $teacherSubject = $report['teacher_subject'] ?? '';
+                    $category = $report['category'] ?? 'General';
+                    $typeIcons = ['positive' => '✓', 'neutral' => '◉', 'concern' => '⚠'];
+                    $rid = $report['report_id'] ?? $report['id'] ?? '';
+                  ?>
+
+                  <div class="behavior-report <?= htmlspecialchars($reportType) ?>"
+                    data-report-id="<?= htmlspecialchars($rid) ?>"
+                    data-type="<?= htmlspecialchars($reportType) ?>">
+
+                    <div class="report-header">
+                      <div class="report-info">
+                        <div class="teacher-details">
+                          <span class="reporter"><?= htmlspecialchars($teacherName) ?></span>
+                          <?php if ($teacherSubject): ?>
+                            <span class="subject-badge"><?= htmlspecialchars($teacherSubject) ?></span>
+                          <?php endif; ?>
+                        </div>
+
+                        <div class="report-meta">
+                          <span class="repo-date"><?= htmlspecialchars($reportDate) ?></span>
+                          <span class="category-badge js-category"><?= htmlspecialchars($category) ?></span>
+                        </div>
+                      </div>
+
+                      <div class="report-type-indicator">
+                        <span class="type-badge <?= htmlspecialchars($reportType) ?> js-typeBadge">
+                          <?= $typeIcons[$reportType] ?? '◉' ?>
+                          <span class="js-typeText"><?= ucfirst($reportType) ?></span>
+                        </span>
+                      </div>
+
+                      <div class="report-actions">
+                        <button type="button" class="edit-btn js-edit" data-report-id="<?= htmlspecialchars($rid) ?>">
+                          ✏️ Edit
+                        </button>
+                        <button type="button" class="delete-btn js-delete" data-report-id="<?= htmlspecialchars($rid) ?>">
+                          🗑 Delete
+                        </button>
+                      </div>
+                    </div>
+
+                    <?php if (!empty($report['title'])): ?>
+                      <div class="report-title js-title">
+                        <?= htmlspecialchars($report['title']) ?>
+                      </div>
+                    <?php endif; ?>
+
+                    <div class="report-content">
+                      <p class="js-desc"><?= htmlspecialchars($report['description'] ?? 'No description provided') ?></p>
+                    </div>
+                  </div>
+                <?php endforeach; ?>
+              <?php else: ?>
+                <div class="empty-state" id="noBehaviorReports">
+                  <div class="empty-icon">📋</div>
+                  <h3>No Behavior Reports</h3>
+                  <p>There are no behavior reports for this student.</p>
+                </div>
+              <?php endif; ?>
+            </div>
+
+          </div><!-- /behavior-section -->
+
+        </div><!-- /student-container -->
+      <?php endif; ?>
+
+    </div><!-- /center-container -->
+  </div><!-- /reports-section -->
 </section>
 
 <!-- EDIT MODAL -->
@@ -347,23 +347,9 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 </div>
 
 <style>
-  .report-modal {
-    position: fixed;
-    inset: 0;
-    display: none;
-    z-index: 9999;
-  }
-
-  .report-modal.show {
-    display: block;
-  }
-
-  .report-modal-backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, .35);
-  }
-
+  .report-modal { position: fixed; inset: 0; display: none; z-index: 9999; }
+  .report-modal.show { display: block; }
+  .report-modal-backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, .35); }
   .report-modal-card {
     position: relative;
     width: min(640px, 92vw);
@@ -373,12 +359,7 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
     padding: 16px;
     box-shadow: 0 18px 60px rgba(0, 0, 0, .25);
   }
-
-  .cancel-btn {
-    text-decoration: none;
-    border: none;
-    cursor: pointer;
-  }
+  .cancel-btn { text-decoration: none; border: none; cursor: pointer; }
 </style>
 
 <script>
@@ -394,15 +375,160 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
   const cancelEditBtn = document.getElementById('cancelEditBtn');
   if (cancelEditBtn) {
     cancelEditBtn.addEventListener('click', () => {
-      // simple way: reload without edit session (your controller already unsets on load)
-      window.location.href = '/index.php?url=teacher&tab=Reports' + (new URLSearchParams(window.location.search).get('q') ? '&q=' + encodeURIComponent(new URLSearchParams(window.location.search).get('q')) : '');
+      window.location.href = '/index.php?url=teacher&tab=Reports' +
+        (new URLSearchParams(window.location.search).get('q')
+          ? '&q=' + encodeURIComponent(new URLSearchParams(window.location.search).get('q'))
+          : '');
     });
   }
 
-  // AJAX helpers
   (function() {
+    // ✅ helpers
+    function escapeHtml(str) {
+      if (str === null || str === undefined) return "";
+      const text = String(str);
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function ucfirst(s) {
+      s = String(s || "");
+      return s ? (s.charAt(0).toUpperCase() + s.slice(1)) : "";
+    }
+
+    function renderBehaviorCard(r) {
+      const typeIcons = { positive: "✓", neutral: "◉", concern: "⚠" };
+      const reportType = r.report_type || "neutral";
+      const teacherName = (r.teacher_name || "Unknown Teacher").trim();
+      const teacherSubject = (r.teacher_subject || "").trim();
+      const category = r.category || "General";
+      const title = r.title || "";
+      const desc = r.description || "";
+      const reportDate = r.report_date || r.date || "";
+
+      const card = document.createElement("div");
+      card.className = `behavior-report ${reportType}`;
+      card.setAttribute("data-report-id", r.id);
+      card.setAttribute("data-type", reportType);
+
+      card.innerHTML = `
+        <div class="report-header">
+          <div class="report-info">
+            <div class="teacher-details">
+              <span class="reporter">${escapeHtml(teacherName)}</span>
+              ${teacherSubject ? `<span class="subject-badge">${escapeHtml(teacherSubject)}</span>` : ""}
+            </div>
+            <div class="report-meta">
+              <span class="repo-date">${escapeHtml(reportDate)}</span>
+              <span class="category-badge js-category">${escapeHtml(category)}</span>
+            </div>
+          </div>
+
+          <div class="report-type-indicator">
+            <span class="type-badge ${escapeHtml(reportType)} js-typeBadge">
+              ${typeIcons[reportType] || "◉"}
+              <span class="js-typeText">${escapeHtml(ucfirst(reportType))}</span>
+            </span>
+          </div>
+
+          <div class="report-actions">
+            <button type="button" class="edit-btn js-edit" data-report-id="${escapeHtml(r.id)}">✏️ Edit</button>
+            <button type="button" class="delete-btn js-delete" data-report-id="${escapeHtml(r.id)}">🗑 Delete</button>
+          </div>
+        </div>
+
+        ${title ? `<div class="report-title js-title">${escapeHtml(title)}</div>` : `<div class="report-title js-title" style="display:none;"></div>`}
+
+        <div class="report-content">
+          <p class="js-desc">${escapeHtml(desc)}</p>
+        </div>
+      `;
+      return card;
+    }
+
+    async function postJSON(url, formDataObj) {
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "X-Requested-With": "XMLHttpRequest" },
+        body: formDataObj
+      });
+
+      // try parse json safely
+      const text = await res.text();
+      try {
+        return JSON.parse(text);
+      } catch (e) {
+        console.error("Server returned non-JSON:", text);
+        return { ok: false, message: "Server error: response not JSON" };
+      }
+    }
+
+    // ✅ ADD REPORT (NO REFRESH)
+    const addForm = document.getElementById("behaviorAddForm");
+    const list = document.getElementById("behaviorReportList");
+
+    if (addForm && list) {
+      addForm.addEventListener("submit", async (e) => {
+        e.preventDefault(); // ✅ stop page refresh
+
+        const btn = addForm.querySelector('button[type="submit"]');
+        const oldBtnText = btn ? btn.textContent : "";
+        if (btn) {
+          btn.disabled = true;
+          btn.textContent = "Saving...";
+        }
+
+        const fd = new FormData(addForm);
+        const data = await postJSON(addForm.action, fd);
+
+        if (btn) {
+          btn.disabled = false;
+          btn.textContent = oldBtnText;
+        }
+
+        if (!data || !data.ok) {
+          alert((data && data.message) ? data.message : "Add failed.");
+          return;
+        }
+
+        // ✅ remove empty state
+        const empty = document.getElementById("noBehaviorReports");
+        if (empty) empty.remove();
+
+        // ✅ backend should return { ok:true, report:{...} }
+        const r = data.report || data.data || null;
+        if (!r || !r.id) {
+          alert("Saved, but cannot render card (missing report data).");
+          return;
+        }
+
+        // ✅ add card to top (after title)
+        const card = renderBehaviorCard(r);
+        const titleEl = list.querySelector("h3.report-title");
+        if (titleEl && titleEl.nextSibling) {
+          list.insertBefore(card, titleEl.nextSibling);
+        } else {
+          list.appendChild(card);
+        }
+
+        // ✅ reset form after add (only when creating)
+        // if your add endpoint is "submit", reset
+        if (String(addForm.action).includes("report/submit")) {
+          addForm.reset();
+          const typeSel = document.getElementById("report_type");
+          if (typeSel) typeSel.value = "positive";
+        }
+      });
+    }
+
+    // ✅ MODAL + EDIT/DELETE AJAX (your existing logic)
     const modal = document.getElementById('editModal');
     const editForm = document.getElementById('editForm');
+    if (!modal || !editForm) return;
 
     const openModal = () => {
       modal.classList.add('show');
@@ -416,18 +542,9 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
     modal.addEventListener('click', (e) => {
       if (e.target?.dataset?.close === "1") closeModal();
     });
-    document.getElementById('editCancelBtn').addEventListener('click', closeModal);
 
-    async function postJSON(url, formDataObj) {
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'X-Requested-With': 'XMLHttpRequest'
-        },
-        body: formDataObj
-      });
-      return res.json();
-    }
+    const cancel = document.getElementById('editCancelBtn');
+    if (cancel) cancel.addEventListener('click', closeModal);
 
     // DELETE (no reload)
     document.addEventListener('click', async (e) => {
@@ -500,7 +617,10 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
         const typeBadge = card.querySelector('.js-typeBadge');
         const typeText = card.querySelector('.js-typeText');
 
-        if (titleEl) titleEl.textContent = r.title || '';
+        if (titleEl) {
+          titleEl.style.display = r.title ? "" : "none";
+          titleEl.textContent = r.title || '';
+        }
         if (descEl) descEl.textContent = r.description || '';
         if (catEl) catEl.textContent = r.category || 'General';
 
@@ -519,5 +639,6 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 
       closeModal();
     });
+
   })();
 </script>

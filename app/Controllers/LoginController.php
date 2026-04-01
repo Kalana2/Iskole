@@ -36,14 +36,14 @@ class LoginController extends Controller
             return;
         }
 
-        // Load user model
+        
         $userModel = $this->model('UserModel');
 
         $user = $userModel->getUserByEmail($email);
 
 
 
-        if (($user['role'] ?? null) == 2) { // 2 = teacher (ඔයාගේ system එකේ teacher role id එක)
+        if (($user['role'] ?? null) == 2) { 
             $teacherExtra = $userModel->getUserByEmailWithClassID($email);
             $_SESSION['classID'] = $teacherExtra['classID'] ?? '';
         } else {
@@ -67,7 +67,7 @@ class LoginController extends Controller
         $userlastName = $user['lastName'] ?? '';
         $userName = $userfirstName . ' ' . $userlastName;
 
-        // Using Session helper
+   
         $this->session->set('user_id', $userId);
         $this->session->set('userId', $userId);
         $this->session->set('user_email', $userEmail);
@@ -76,15 +76,14 @@ class LoginController extends Controller
         $this->session->set('userRole', $userRole);
         $this->session->set('name', $userName);
 
-        // Also ensure superglobal is set for any direct checks
+       
         $_SESSION['user_id'] = $userId;
         $_SESSION['userId'] = $userId;
         $_SESSION['user_email'] = $userEmail;
         $_SESSION['userEmail'] = $userEmail;
         $_SESSION['user_role'] = $userRole;
         $_SESSION['userRole'] = $userRole;
-        //$_SESSION['classID'] = $user['classID'] ?? '';
-        // ✅ classID should come from teachers join result, not from getUserByEmail()
+       
         if ($userRole === 2) {
             $teacherExtra = $userModel->getUserByEmailWithClassID($email);
             $_SESSION['classID'] = $teacherExtra['classID'] ?? '';
@@ -119,13 +118,13 @@ class LoginController extends Controller
 
     public function resetPassword()
     {
-        // If GET request, show the reset password form
+        
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $this->view('login/resetPasswordIndex');
             return;
         }
 
-        // Handle POST request for password reset
+       
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             header('Location: /login/resetPassword');
             exit;
@@ -134,7 +133,7 @@ class LoginController extends Controller
         $action = isset($_POST['action']) ? $_POST['action'] : '';
         $email = isset($_POST['email']) ? trim($_POST['email']) : '';
 
-        // Handle resend OTP via AJAX
+        
         if ($action === 'resend_otp') {
             header('Content-Type: application/json');
 
