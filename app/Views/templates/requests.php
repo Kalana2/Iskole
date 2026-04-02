@@ -1,5 +1,11 @@
-<!-- filepath: /home/snake/Projects/Iskole/app/Views/templates/requests.php -->
+<?php
+// filepath: /home/snake/Projects/Iskole/app/Views/templates/requests.php
+?>
 <link rel="stylesheet" href="/css/request/request.css">
+
+<?php
+$list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
+?>
 
 <div class="box">
     <div class="container info-box-large">
@@ -7,155 +13,93 @@
             <span class="heading-text">Pending Leave Requests</span>
             <span class="sub-heding-text">Review and approve leave requests</span>
         </div>
-        
-        <div class="info-box border-container">
-            <div class="left">
-                <span class="heading-name">K K Jina</span>
-                <span class="sub-heading">Teacher - Nov 25 2025</span>
-                <span class="sub-heading-bolt">Medical Leave</span>
-                <span class="sub-heading">Submitted on Nov 15 2025</span>
-                <label class="label label-green">18 days remaining</label>
-            </div>
-            <div class="right two-com">
-                <button class="btn btn-green">Approve</button>
-                <button class="btn btn-red">Reject</button>
-            </div>
-        </div>
-        
-        <div class="info-box border-container">
-            <div class="left">
-                <span class="heading-name">Sarah Johnson</span>
-                <span class="sub-heading">Teacher - Nov 28 2025</span>
-                <span class="sub-heading-bolt">Annual Leave</span>
-                <span class="sub-heading">Submitted on Nov 18 2025</span>
-                <label class="label label-green">16 days remaining</label>
-            </div>
-            <div class="right two-com">
-                <button class="btn btn-green">Approve</button>
-                <button class="btn btn-red">Reject</button>
-            </div>
-        </div>
-        
-        <div class="info-box border-container">
-            <div class="left">
-                <span class="heading-name">Michael Chen</span>
-                <span class="sub-heading">Teacher - Dec 05 2025</span>
-                <span class="sub-heading-bolt">Personal Leave</span>
-                <span class="sub-heading">Submitted on Nov 20 2025</span>
-                <label class="label label-red">5 days remaining</label>
-            </div>
-            <div class="right two-com">
-                <button class="btn btn-green">Approve</button>
-                <button class="btn btn-red">Reject</button>
-            </div>
-        </div>
-        
-        <div class="info-box border-container">
-            <div class="left">
-                <span class="heading-name">Emily Rodriguez</span>
-                <span class="sub-heading">Teacher - Dec 10 2025</span>
-                <span class="sub-heading-bolt">Sick Leave</span>
-                <span class="sub-heading">Submitted on Nov 22 2025</span>
-                <label class="label label-green">12 days remaining</label>
-            </div>
-            <div class="right two-com">
-                <button class="btn btn-green">Approve</button>
-                <button class="btn btn-red">Reject</button>
-            </div>
-        </div>
+
+        <?php if (empty($list)): ?>
+            <p style="padding:20px;">No pending leave requests.</p>
+        <?php else: ?>
+
+            <?php foreach ($list as $req): ?>
+                <?php
+                $requestedDate = !empty($req['createdAt']) ? date('M d Y', strtotime($req['createdAt'])) : '';
+                $from = !empty($req['dateFrom']) ? date('M d Y', strtotime($req['dateFrom'])) : '';
+                $to   = !empty($req['dateTo']) ? date('M d Y', strtotime($req['dateTo'])) : '';
+
+                // Remaining days (optional)
+                $remainLabel = '';
+                if (!empty($req['dateFrom'])) {
+                    $today = new DateTime();
+                    $start = new DateTime($req['dateFrom']);
+                    $diffDays = (int)$today->diff($start)->format('%r%a'); // can be negative
+
+                    if ($diffDays > 0) {
+                        $remainLabel = $diffDays . " days remaining";
+                        $labelClass = "label label-green";
+                    } elseif ($diffDays === 0) {
+                        $remainLabel = "Starts today";
+                        $labelClass = "label label-green";
+                    } else {
+                        $remainLabel = "Started";
+                        $labelClass = "label label-red";
+                    }
+                } else {
+                    $labelClass = "label label-green";
+                }
+
+                // Display teacher name if you joined it in SQL, otherwise fallback to ID
+                $teacherName = $req['teacher_name'] ?? null;
+                $teacherDisplay = $teacherName ? $teacherName : ("Teacher ID: " . ($req['teacherUserID'] ?? ''));
+                ?>
+
+                <div class="info-box border-container">
+                    <div class="left">
+                        <span class="heading-name">
+                            <?= htmlspecialchars($req['teacher_name'] ?? 'Unknown') ?>
+                            <span style="font-weight:500; color:#6b7280;">
+                                (ID: <?= htmlspecialchars($req['teacher_id'] ?? $req['teacherUserID'] ?? '') ?>)
+                            </span>
+                        </span>
+
+
+                        <span class="sub-heading">From: <?= htmlspecialchars($from) ?> → To: <?= htmlspecialchars($to) ?></span>
+
+                        <span class="sub-heading-bolt"><?= ucfirst(htmlspecialchars($req['leaveType'] ?? '')) ?> Leave</span>
+
+                        <span class="sub-heading">Submitted on <?= htmlspecialchars($requestedDate) ?></span>
+
+                        <?php if (!empty($req['reason'])): ?>
+                            <span class="sub-heading"><?= htmlspecialchars($req['reason']) ?></span>
+                        <?php endif; ?>
+
+                        <?php if (!empty($remainLabel)): ?>
+                            <label class="<?= $labelClass ?>"><?= htmlspecialchars($remainLabel) ?></label>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="right two-com">
+                        <!-- Approve -->
+                        <form action="/index.php?url=leave/decide" method="post" style="display:inline;">
+                            <input type="hidden" name="leave_id" value="<?= (int)($req['id'] ?? 0) ?>">
+                            <input type="hidden" name="status" value="approved">
+                            <button class="btn btn-green" type="submit"
+                                onclick="return confirm('Approve this leave request?');">
+                                Approve
+                            </button>
+                        </form>
+
+                        <!-- Reject -->
+                        <form action="/index.php?url=leave/decide" method="post" style="display:inline;">
+                            <input type="hidden" name="leave_id" value="<?= (int)($req['id'] ?? 0) ?>">
+                            <input type="hidden" name="status" value="rejected">
+                            <button class="btn btn-red" type="submit"
+                                onclick="return confirm('Reject this leave request?');">
+                                Reject
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+            <?php endforeach; ?>
+
+        <?php endif; ?>
     </div>
 </div>
-
-<script>
-// Add click handlers for approve/reject buttons
-document.addEventListener('DOMContentLoaded', function() {
-    const approveButtons = document.querySelectorAll('.btn-green');
-    const rejectButtons = document.querySelectorAll('.btn-red');
-    
-    approveButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const requestCard = this.closest('.info-box');
-            const employeeName = requestCard.querySelector('.heading-name').textContent;
-            
-            if (confirm(`Approve leave request for ${employeeName}?`)) {
-                // Add your approval logic here
-                requestCard.style.opacity = '0.5';
-                requestCard.style.pointerEvents = 'none';
-                
-                // Show success message
-                showNotification('Leave request approved successfully!', 'success');
-            }
-        });
-    });
-    
-    rejectButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const requestCard = this.closest('.info-box');
-            const employeeName = requestCard.querySelector('.heading-name').textContent;
-            
-            if (confirm(`Reject leave request for ${employeeName}?`)) {
-                // Add your rejection logic here
-                requestCard.style.opacity = '0.5';
-                requestCard.style.pointerEvents = 'none';
-                
-                // Show warning message
-                showNotification('Leave request rejected.', 'warning');
-            }
-        });
-    });
-    
-    function showNotification(message, type) {
-        // Create notification element
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 1rem 1.5rem;
-            background: ${type === 'success' ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #f59e0b, #d97706)'};
-            color: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-            font-weight: 600;
-            z-index: 1000;
-            animation: slideIn 0.3s ease-out;
-        `;
-        notification.textContent = message;
-        
-        document.body.appendChild(notification);
-        
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.animation = 'slideOut 0.3s ease-out';
-            setTimeout(() => notification.remove(), 300);
-        }, 3000);
-    }
-});
-
-// Add animation styles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-        to {
-            transform: translateX(0);
-            opacity: 1;
-        }
-    }
-    
-    @keyframes slideOut {
-        from {
-            transform: translateX(0);
-            opacity: 1;
-        }
-        to {
-            transform: translateX(400px);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
-</script>

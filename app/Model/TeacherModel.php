@@ -44,6 +44,8 @@ class TeacherModel extends UserModel
         }
     }
 
+
+
     public function getTeacherByClass($grade, $classId)
     {
         $sql = "SELECT t.*, u.* FROM `{$this->teacherTable}` t JOIN `{$this->userTable}` u ON t.`userID` = u.`userID` WHERE t.`grade` = :grade AND t.`classID` = :classId";
@@ -81,6 +83,18 @@ class TeacherModel extends UserModel
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
             throw new Exception("Error fetching all teachers: " . $e->getMessage());
+        }
+    }
+
+    public function getGradeByUserID($userId)
+    {
+        $sql = "SELECT grade FROM {$this->teacherTable} WHERE userID = :uid LIMIT 1";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([':uid' => $userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching teacher grade: " . $e->getMessage());
         }
     }
 }

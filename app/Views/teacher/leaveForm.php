@@ -12,54 +12,76 @@
         </div>
     </header>
 
+
+
+    <?php if (!empty($_SESSION['leave_msg'])): $msg = $_SESSION['leave_msg'];
+        unset($_SESSION['leave_msg']); ?>
+        <div style="margin:10px 0;padding:12px;border-radius:6px;
+              border:1px solid <?= $msg['type'] === 'error' ? 'red' : 'green' ?>;
+              color:<?= $msg['type'] === 'error' ? 'red' : 'green' ?>;">
+            <?= htmlspecialchars($msg['text']) ?>
+        </div>
+    <?php endif; ?>
+
     <div class="card">
-        <form action="" method="post" novalidate>
+        <form action="/index.php?url=leave/submit" method="post" novalidate>
             <div class="form-grid">
                 <div class="field">
                     <label for="date-from">Date From</label>
-                    <input type="date" name="date-from" id="date-from" required>
+                    <input type="date" name="dateFrom" id="date-from" required>
                     <small class="hint">Select the start date of your leave.</small>
                 </div>
 
                 <div class="field">
                     <label for="date-to">Date To</label>
-                    <input type="date" name="date-to" id="date-to" required>
+                    <input type="date" name="dateTo" id="date-to" required>
                     <small class="hint">Select the end date of your leave.</small>
                 </div>
 
+
                 <div class="field span-2">
                     <label>Type of Leave</label>
-                    <div class="radio-group">
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leave-type"
-                                id="medical-leave"
-                                value="medical"
-                                required>
-                            <label for="medical-leave">Medical Leave</label>
-                        </div>
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leave-type"
-                                id="personal-leave"
-                                value="personal"
-                                required>
-                            <label for="personal-leave">Personal Leave</label>
-                        </div>
-                        <div class="radio-option">
-                            <input
-                                type="radio"
-                                name="leave-type"
-                                id="duty-leave"
-                                value="duty"
-                                required>
-                            <label for="duty-leave">Duty Leave</label>
-                        </div>
+
+                    <div class="leave-type-group">
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="medical" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Medical Leave</span>
+                        </label>
+
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="personal" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Personal Leave</span>
+                        </label>
+
+                        <label class="leave-tick">
+                            <input type="radio" name="leaveType" value="duty" required>
+                            <span class="tick-box"></span>
+                            <span class="tick-text">Duty Leave</span>
+                        </label>
                     </div>
+
                     <small class="hint">Choose the type of leave you are requesting.</small>
                 </div>
+
+
+                <div class="field span-2">
+                    <label for="reason">Reason</label>
+                    <textarea
+                        name="reason"
+                        id="reason"
+                        rows="4"
+                        maxlength="250"
+                        placeholder="Enter reason..."></textarea>
+
+                    <small class="hint">
+                        <span id="reasonCount">0</span> / 250 characters
+                    </small>
+                </div>
+
+
+
             </div>
 
             <div class="form-actions">
@@ -73,10 +95,10 @@
 <script>
     (function() {
         const $ = (s, ctx = document) => ctx.querySelector(s);
-        const formSection = document.currentScript.previousElementSibling; // section.mp-management
+        const formSection = document.currentScript.previousElementSibling;
         if (!formSection) return;
 
-        // Lightweight client-side validation
+        // Existing validation
         const formEl = formSection.querySelector('form');
         formEl?.addEventListener('submit', (e) => {
             if (!formEl.checkValidity()) {
@@ -85,5 +107,19 @@
                 invalid?.focus();
             }
         });
+
+        // ✅ Character counter for Reason
+        const reason = $('#reason', formSection);
+        const counter = $('#reasonCount', formSection);
+        const max = reason?.getAttribute('maxlength') || 0;
+
+        if (reason && counter) {
+            const updateCount = () => {
+                counter.textContent = reason.value.length;
+            };
+
+            reason.addEventListener('input', updateCount);
+            updateCount(); // initial
+        }
     })();
 </script>

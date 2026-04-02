@@ -7,7 +7,12 @@ class MaterialController extends Controller
 {
     public function index()
     {
-        $this->view('teacher/uploadMaterials');
+        $model = new Material();
+        $data = [
+            'dbClasses' => $model->getAllClasses(),
+            'dbSubjects' => $model->getAllSubjects()
+        ];
+        $this->view('teacher/uploadMaterials', $data);
     }
 
     public function create()

@@ -9,8 +9,66 @@ class AdminController extends Controller
             return;
         }
 
-        $this->view('admin/index');
+        // Provide data for Relief tab
+        $data = [];
+        $tab = $_GET['tab'] ?? '';
+        if ($tab === 'Relief') {
+            $date = $_GET['date'] ?? date('Y-m-d');
+            if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+                $date = date('Y-m-d');
+            }
+
+            require_once __DIR__ . '/../Model/reliefModel.php';
+            $reliefModel = new reliefModel();
+
+            try {
+                $data['selectedDate'] = $date;
+                $data['pendingRelief'] = $reliefModel->getPendingReliefSlots($date);
+                $data['presentTeacherCount'] = $reliefModel->getPresentTeacherCount($date);
+            } catch (Exception $e) {
+                error_log('Admin relief load error: ' . $e->getMessage());
+                $data['selectedDate'] = $date;
+                $data['pendingRelief'] = [];
+                $data['presentTeacherCount'] = 0;
+                $data['reliefError'] = 'Failed to load relief data.';
+            }
+        }
+
+        // Handle Class & Subjects tab
+        if ($tab === 'Class & Subjects') {
+            $model = $this->model('ClassSubjectModel');
+
+            $data['classes']  = $model->getAllClasses();
+            $data['subjects'] = $model->getAllSubjects();
+
+            $data['flash'] = $_SESSION['cs_msg'] ?? null;
+            unset($_SESSION['cs_msg']);
+        }
+
+        // Handle Assign Class Teacher tab
+        if ($tab === 'Assign Class Teacher') {
+            $model = $this->model('ClassTeacherModel');
+
+            $data['classesWithTeachers'] = $model->getAllClassesWithTeachers();
+            $data['teachers'] = $model->getAllTeachers();
+
+            $data['flash'] = $_SESSION['ct_msg'] ?? null;
+            unset($_SESSION['ct_msg']);
+        }
+
+        // Handle Exam Time Table flash messages
+        if ($tab === 'Exam Time Table') {
+            $data['exam_tt_msg'] = $_SESSION['exam_tt_msg'] ?? null;
+            unset($_SESSION['exam_tt_msg']);
+        }
+
+        // Pass tab to view data
+        $data['tab'] = $tab;
+
+        // Render admin page with tab + data
+        $this->view('admin/index', $data);
     }
+
 
     private function handleAnnouncementAction($action)
     {

@@ -1,0 +1,36 @@
+========================================
+ISKOLE - PASSWORD RESET
+========================================
+
+Hello {{USER_NAME}},
+
+You requested to reset your ISKOLE account password.
+
+----------------------------------------
+YOUR VERIFICATION CODE
+----------------------------------------
+
+        {{OTP_CODE}}
+
+Valid for {{EXPIRY_MINUTES}} minutes
+
+----------------------------------------
+
+⚠️ SECURITY NOTICE:
+Never share this code with anyone.
+
+NEXT STEPS:
+1. Enter this code on the password reset page
+2. Create your new password
+
+If you didn't request this, ignore this email.
+
+----------------------------------------
+
+Best regards,
+ISKOLE Team
+
+========================================
+This is an automated message.
+© {{CURRENT_YEAR}} ISKOLE. All rights reserved.
+========================================

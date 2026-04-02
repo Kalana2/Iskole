@@ -278,4 +278,42 @@ class ApiController extends Controller
             echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         }
     }
+
+    /**
+     * Get classes by grade
+     */
+    public function getClasses()
+    {
+        header('Content-Type: application/json');
+        
+        if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+            http_response_code(405);
+            echo json_encode(['success' => false, 'message' => 'Method Not Allowed']);
+            return;
+        }
+
+        try {
+            require_once __DIR__ . '/../Model/StudentAttendance.php';
+            $grade = $_GET['grade'] ?? null;
+            
+            if (!$grade) {
+                echo json_encode(['success' => false, 'message' => 'Grade is required']);
+                return;
+            }
+
+            $model = new StudentAttendance();
+            $classes = $model->getClassesByGrade($grade);
+            
+            // Extract just the class sections to match the UI expectation
+            $classList = [];
+            foreach ($classes as $row) {
+                $classList[] = $row['section'];
+            }
+            
+            echo json_encode(['success' => true, 'classes' => $classList]);
+        } catch (Exception $e) {
+            error_log('getClasses API Error: ' . $e->getMessage());
+            echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+        }
+    }
 }

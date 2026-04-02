@@ -1,45 +1,28 @@
 <?php
-// Sample attendance data
-$studentInfo = [
-    'name' => 'Kasun Perera',
-    'class' => 'Grade 10-A',
-    'reg_no' => 'STU2024-1025',
-    'year' => '2025'
-];
 
-// Attendance statistics
-$attendanceStats = [
-    'total_days' => 180,
-    'present_days' => 165,
-    'absent_days' => 10,
-    'attendance_rate' => 91.67,
-    'this_month_rate' => 95.45,
-    'last_month_rate' => 88.24
-];
+/**
+ * Student Attendance View Template
+ * 
+ * This template displays attendance data for the logged-in student.
+ * Data is fetched from the database via the StudentAttendance model.
+ */
 
-// 4-week attendance summary (last 4 weeks)
-$weeklyData = [
-    ['week' => 'Week 1 (Oct 7-11)', 'present' => 5, 'absent' => 0, 'late' => 0, 'total' => 5],
-    ['week' => 'Week 2 (Oct 14-18)', 'present' => 4, 'absent' => 1, 'late' => 0, 'total' => 5],
-    ['week' => 'Week 3 (Oct 21-25)', 'present' => 3, 'absent' => 1, 'late' => 1, 'total' => 5],
-    ['week' => 'Week 4 (Oct 28-Nov 1)', 'present' => 4, 'absent' => 0, 'late' => 1, 'total' => 5]
-];
+// Include the controller to fetch attendance data
+require_once __DIR__ . '/../../Controllers/studentAttendance/getStudentAttendanceController.php';
 
-// 12-month attendance summary (backend should supply this in production)
-$monthlyData = [
-    ['month' => 'Jan', 'present' => 20, 'absent' => 2, 'total' => 22],
-    ['month' => 'Feb', 'present' => 18, 'absent' => 2, 'total' => 20],
-    ['month' => 'Mar', 'present' => 21, 'absent' => 1, 'total' => 22],
-    ['month' => 'Apr', 'present' => 19, 'absent' => 3, 'total' => 22],
-    ['month' => 'May', 'present' => 20, 'absent' => 2, 'total' => 22],
-    ['month' => 'Jun', 'present' => 17, 'absent' => 5, 'total' => 22],
-    ['month' => 'Jul', 'present' => 22, 'absent' => 0, 'total' => 22],
-    ['month' => 'Aug', 'present' => 21, 'absent' => 1, 'total' => 22],
-    ['month' => 'Sep', 'present' => 20, 'absent' => 2, 'total' => 22],
-    ['month' => 'Oct', 'present' => 20, 'absent' => 2, 'total' => 22],
-    ['month' => 'Nov', 'present' => 15, 'absent' => 0, 'total' => 15],
-    ['month' => 'Dec', 'present' => 0, 'absent' => 0, 'total' => 0]
-];
+// Fetch real attendance data from the database
+$attendanceData = getStudentAttendanceData();
+
+// Extract data for the template
+$studentInfo = $attendanceData['studentInfo'];
+$attendanceStats = $attendanceData['attendanceStats'];
+$monthlyData = $attendanceData['monthlyData'];
+
+// Check if there was an error fetching data
+$hasError = isset($attendanceData['error']);
+if ($hasError) {
+    error_log("Attendance view error: " . $attendanceData['error']);
+}
 
 ?>
 
@@ -55,7 +38,8 @@ $monthlyData = [
                         <i class="fas fa-calendar-check"></i>
                         Attendance Record
                     </h1>
-                    <p class="header-subtitle"><?php echo $studentInfo['name']; ?> - <?php echo $studentInfo['class']; ?> (<?php echo $studentInfo['reg_no']; ?>)</p>
+                    <p class="header-subtitle">Attendance distribution across the academic year</p>
+                    <!-- <p class="header-subtitle"><?php echo $studentInfo['name']; ?> - <?php echo $studentInfo['class']; ?> (<?php echo $studentInfo['reg_no']; ?>)</p> -->
                 </div>
                 <div class="header-badge">
                     <div class="badge-item">
@@ -129,11 +113,11 @@ $monthlyData = [
                 <div class="chart-legend">
                     <div class="legend-item">
                         <span class="legend-color present-color"></span>
-                        <span class="legend-label">Present (<?php echo $attendanceStats['present_days']; ?>)</span>
+                        <span class="legend-label">Present</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color absent-color"></span>
-                        <span class="legend-label">Absent (<?php echo $attendanceStats['absent_days']; ?>)</span>
+                        <span class="legend-label">Absent</span>
                     </div>
                 </div>
             </div>

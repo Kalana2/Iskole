@@ -333,6 +333,15 @@
   color: #374151;
 }
 
+.form-group .meta span {
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 400;
+  text-align: center;
+  min-width: 100px;
+  opacity: 0.75;
+}
+
 .input-date,
 .textarea-details {
   padding: 0.75rem 1rem;

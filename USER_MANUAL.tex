@@ -1,0 +1,209 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{xcolor}
+
+\geometry{margin=1in}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue,
+    filecolor=magenta,      
+    urlcolor=cyan,
+}
+
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+
+\title{Iskole - School Management System\\User Manual}
+\author{Iskole Development Team}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\chapter{Introduction}
+Iskole is a modern, integrated School Management System (SMS) designed to digitize and streamline school operations. It facilitates seamless communication between administrators, teachers, students, and parents, ensuring that academic and administrative information is easily accessible and manageable.
+
+\section{Key Benefits}
+\begin{itemize}
+    \item \textbf{Efficiency}: Automates repetitive tasks like attendance and mark entry.
+    \item \textbf{Transparency}: Provides real-time access to student performance and attendance.
+    \item \textbf{Communication}: Centralized platform for announcements and requests.
+    \item \textbf{Organization}: Structured storage for learning materials and schedules.
+\end{itemize}
+
+\chapter{Getting Started}
+
+\section{Login Process}
+\begin{enumerate}
+    \item Navigate to the Iskole web portal.
+    \item Enter your \textbf{Username} and \textbf{Password} provided by the school administration.
+    \item Click \textbf{Login}.
+    \item Upon successful login, you will be directed to your role-specific dashboard.
+\end{enumerate}
+
+\section{Profile Management}
+Your profile is your personal information hub within the system.
+\begin{itemize}
+    \item \textbf{View Profile}: Click on your profile icon/name in the top navigation bar.
+    \item \textbf{Edit Details}: Update your contact information, address, and profile picture.
+    \item \textbf{Change Password}: Regularly update your password for security through the settings gear icon.
+\end{itemize}
+
+\chapter{Administrator Guide}
+The Administrator has full control over the system's configuration and user management.
+
+\section{User Management}
+\begin{itemize}
+    \item \textbf{Add New Users}: Navigate to \textit{User Management} $\rightarrow$ \textit{Add User}. Fill in the required details for Teachers, Students, or Parents.
+    \item \textbf{Manage Directories}: View and search for existing users in the \textit{User Directory}.
+\end{itemize}
+
+\section{Academic Management}
+\begin{itemize}
+    \item \textbf{Assign Class Teacher}: Locate \textit{Management} $\rightarrow$ \textit{Assign Class Teacher} to link teachers to specific classes.
+    \item \textbf{Manage Classes \& Subjects}: Set up the school structure by defining classes and the subjects taught in each.
+\end{itemize}
+
+\section{Attendance \& Reports}
+\begin{itemize}
+    \item \textbf{Monitor Attendance}: Access \textit{Reports} to view daily or monthly attendance summaries for both students and teachers.
+    \item \textbf{Behavior Reports}: Review behavior logs submitted by teachers to maintain school discipline.
+\end{itemize}
+
+\section{Leave \& Relief}
+\begin{itemize}
+    \item \textbf{Leave Request Management}: Review teacher leave applications in \textit{Teacher Leave Requests}. Approve or reject based on school policy.
+    \item \textbf{Relief Duty}: Assign relief teachers to classes when a regular teacher is on leave.
+\end{itemize}
+
+\section{System Communications}
+\begin{itemize}
+    \item \textbf{Post Announcements}: Use the \textit{Announcements} tool to broadcast important school-wide messages.
+\end{itemize}
+
+\section{Scheduling}
+\begin{itemize}
+    \item \textbf{Timetable Management}: Create and update the weekly class timetable.
+    \item \textbf{Exam Timetables}: Schedule exam dates and times for all grades.
+\end{itemize}
+
+\chapter{Teacher Guide}
+Teachers are the primary users for academic and attendance management.
+
+\section{Dashboard Overview}
+\begin{itemize}
+    \item \textbf{My Dashboard}: Access your daily schedule, pending tasks, and recent announcements.
+\end{itemize}
+
+\section{Attendance Marking}
+\begin{itemize}
+    \item \textbf{Mark Student Attendance}: Go to \textit{Attendance} $\rightarrow$ \textit{Student Attendance}. Select your class and mark students as Present or Absent.
+    \item \textbf{Student Absence}: View and track reasons for student absences in the \textit{Student Absence} module.
+\end{itemize}
+
+\section{Academic Records}
+\begin{itemize}
+    \item \textbf{Enter Marks}: Navigate to \textit{Marks} $\rightarrow$ \textit{Mark Entry}. Select the class, subject, and exam to record student performance.
+    \item \textbf{Marks Reports}: Generate and view performance reports for your class.
+\end{itemize}
+
+\section{Course Materials}
+\begin{itemize}
+    \item \textbf{Upload Materials}: Go to \textit{Materials} $\rightarrow$ \textit{Upload Materials}. Select the subject and grade to share documents, links, or notes with students.
+    \item \textbf{View Materials}: Organize and manage study resources for your students.
+\end{itemize}
+
+\section{Leave Requests}
+\begin{itemize}
+    \item \textbf{Apply for Leave}: Access \textit{Leave} $\rightarrow$ \textit{Leave Form} to submit a leave application.
+    \item \textbf{My Leave Requests}: Track the status (Pending, Approved, Rejected) of your submitted leave forms.
+\end{itemize}
+
+\section{Relief Duties}
+\begin{itemize}
+    \item \textbf{View Relief}: Check the \textit{Relief} module to see if you have been assigned to cover any classes for absent colleagues.
+\end{itemize}
+
+\section{Timetables}
+\begin{itemize}
+    \item \textbf{Class Timetable}: View your weekly teaching schedule.
+\end{itemize}
+
+\chapter{Student Guide}
+Students can access their academic data and resources through the portal.
+
+\section{Academic Progress}
+\begin{itemize}
+    \item \textbf{View My Marks}: Access \textit{My Marks} to see results from various exams.
+    \item \textbf{Reports}: View overall performance summaries.
+\end{itemize}
+
+\section{Attendance}
+\begin{itemize}
+    \item \textbf{Check Attendance}: View your personal attendance percentages and records.
+\end{itemize}
+
+\section{Learning Resources}
+\begin{itemize}
+    \item \textbf{Student Materials}: Download lecture notes, assignments, and other resources uploaded by your teachers.
+\end{itemize}
+
+\section{Timetables}
+\begin{itemize}
+    \item \textbf{Class Timetable}: Access your weekly class schedule.
+    \item \textbf{Exam Timetable}: View upcoming exam dates and venues.
+\end{itemize}
+
+\section{Stay Informed}
+\begin{itemize}
+    \item \textbf{Announcements}: Check the dashboard for the latest school-wide notifications.
+\end{itemize}
+
+\chapter{Parent Guide}
+Parents can monitor their child's school life through a dedicated interface.
+
+\section{Child Monitoring}
+\begin{itemize}
+    \item \textbf{Academic Overview}: View your child's overall academic performance and exam results.
+    \item \textbf{Attendance Monitoring}: Check your child's daily attendance records.
+    \item \textbf{Behavior Monitoring}: Review any behavior-related notes or reports for your child.
+\end{itemize}
+
+\section{Communication}
+\begin{itemize}
+    \item \textbf{Parent Requests}: Submit formal requests to the school (e.g., for meetings or information updates).
+    \item \textbf{Contact Teacher}: Use the \textit{Contact} module to communicate with your child's class teacher.
+\end{itemize}
+
+\section{Stay Updated}
+\begin{itemize}
+    \item \textbf{Exam Timetable}: Access upcoming exam schedules for your child.
+    \item \textbf{Announcements}: Read school announcements and notifications.
+\end{itemize}
+
+\chapter{Frequently Asked Questions}
+
+\paragraph{Q: I forgot my password. How do I reset it?}
+\textbf{A:} Contact the school IT administrator or your class teacher to have your password reset.
+
+\paragraph{Q: Why can't I see my exam marks?}
+\textbf{A:} Marks are only visible once they have been officially released by the school administration.
+
+\paragraph{Q: How do I update my contact information?}
+\textbf{A:} Navigate to your \textit{Profile} settings and use the edit option, or contact the school office if certain fields are locked.
+
+\bigskip
+
+\section*{Technical Support}
+For further assistance, please contact the school's technical support team at \texttt{support@iskole.edu} or visit the IT office during school hours.
+
+\end{document}

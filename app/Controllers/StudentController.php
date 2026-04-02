@@ -6,13 +6,35 @@ class StudentController extends Controller
 {
     public function index()
     {
-        // Handle announcement actions
-        if (isset($_GET['action']) && in_array($_GET['action'], ['delete', 'update'])) {
-            $this->handleAnnouncementAction($_GET['action']);
-            return;
+        $tab = $_GET['tab'] ?? 'Announcements';
+
+        $userId = (int) ($_SESSION['user_id'] ?? 0);
+        $fallbackClassId = isset($_SESSION['classID']) ? (int) $_SESSION['classID'] : (isset($_SESSION['class_id']) ? (int) $_SESSION['class_id'] : null);
+
+        $baseCtx = [];
+        if ($userId > 0) {
+            try {
+                $ttModel = $this->model('StudentTimeTableModel');
+                $baseCtx['studentInfo'] = $ttModel->getStudentInfoForUserId($userId, $fallbackClassId);
+            } catch (Throwable $e) {
+                // Ignore; templates will show placeholders.
+            }
         }
 
-        $this->view('student/index');
+        if ($tab === 'Time Table') {
+            try {
+                $model = $this->model('StudentTimeTableModel');
+                $ctx = $model->getStudentTimetableContext($userId, $fallbackClassId);
+                $this->view('student/index', $ctx);
+                return;
+            } catch (Throwable $e) {
+                // Fall back to rendering without data; template will show placeholders.
+                $this->view('student/index', array_merge($baseCtx, ['tt_error' => $e->getMessage()]));
+                return;
+            }
+        }
+
+        $this->view('student/index', $baseCtx);
     }
     private function handleAnnouncementAction($action)
     {
