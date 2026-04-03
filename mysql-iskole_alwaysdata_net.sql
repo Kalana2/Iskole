@@ -367,14 +367,14 @@ CREATE TABLE `user` (
   `userID` int(11) NOT NULL,
   `gender` enum('Male','Female') DEFAULT NULL,
   `email` varchar(200) DEFAULT NULL,
-  `phone` varchar(20) DEFAULT NULL CHECK (`phone` regexp '^[0-9-]+$'),
-  `createDate` date NOT NULL,
+  `phone` varchar(20) DEFAULT NULL,
+  `createDate` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `role` int(11) DEFAULT NULL,
   `active` tinyint(1) DEFAULT NULL,
   `dateOfBirth` date DEFAULT NULL,
   `password` varchar(400) DEFAULT NULL,
   `pwdChanged` int(11) DEFAULT 0
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- --------------------------------------------------------
@@ -424,7 +424,11 @@ CREATE TABLE `userRoles` (
 --
 
 INSERT INTO `userRoles` (`roleID`, `roleName`) VALUES
-(0, 'Admin');
+(0, 'Admin'),
+(1, 'MP'),
+(2, 'Teacher'),
+(3, 'Student'),
+(4, 'Parent');
 
 INSERT INTO `user` (`userID`, `gender`, `email`, `phone`, `createDate`, `role`, `active`, `dateOfBirth`, `password`, `pwdChanged`) VALUES
 (1, 'Male', 'admin@gmail.com', '071123231', curdate(), 0, 1, '2001-05-14', '$2y$10$0P35BO/EclquW8mApVR7MeYAIgZLEGE5CT/LNo.6d9f6FYBG1xEjC', 1);

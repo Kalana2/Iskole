@@ -344,5 +344,4 @@ class UserModel
             return false;
         }
     }
-
 }
