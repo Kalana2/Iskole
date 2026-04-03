@@ -39,7 +39,7 @@ class ClassSubjectModel
         $section = strtoupper(trim($section));
 
         // Safety validation in model too
-        if (!preg_match('/^[A-Z]$/', $section)) {
+        if (!preg_match('/^[A-Za-z]$/', $section)) {
             return false;
         }
 

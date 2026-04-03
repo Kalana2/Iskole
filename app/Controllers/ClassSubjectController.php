@@ -51,10 +51,10 @@ class ClassSubjectController extends Controller
         }
 
         // Only one capital letter A-Z allowed
-        if (!preg_match('/^[A-Z]$/', $section)) {
+        if (!preg_match('/^[A-Za-z]$/', $section)) {
             $_SESSION['cs_msg'] = [
                 'type' => 'error',
-                'text' => 'Section must be a single capital letter from A to Z only.'
+                'text' => 'Section must be a single English letter only.'
             ];
             $this->goBackToTab();
         }

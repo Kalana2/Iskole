@@ -64,8 +64,8 @@
                             type="text"
                             name="section"
                             maxlength="1"
-                            pattern="[A-Z]"
-                            title="Enter one capital letter only (A-Z)"
+                            pattern="[A-Za-z]"
+                            title="Enter one English letter only"
                             placeholder="A"
                             style="text-transform: uppercase;"
                             required
