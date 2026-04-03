@@ -1,5 +1,7 @@
 <?php
 
+require_once __DIR__ . '/../Core/Database.php';
+
 class ReportModel
 {
     protected $pdo;
@@ -10,7 +12,6 @@ class ReportModel
         $this->pdo = Database::getInstance();
     }
 
-    // ✅ FIX: Teacher name join must match report.teacherID stored as teachers.userID
     private function baseSelectSql(): string
     {
         return "
@@ -24,39 +25,68 @@ class ReportModel
         ";
     }
 
-    // ✅ Used by TeacherController (fix your fatal error)
     public function getReportsByTeacher(int $teacherUserId): array
     {
         $sql = $this->baseSelectSql() . "
             WHERE r.teacherID = :tid
             ORDER BY r.report_date DESC, r.id DESC
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':tid' => $teacherUserId]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // ✅ IMPORTANT: show ONLY searched student reports
     public function getReportsByStudent(int $studentID): array
     {
         $sql = $this->baseSelectSql() . "
             WHERE r.studentID = :sid
             ORDER BY r.report_date DESC, r.id DESC
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':sid' => $studentID]);
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    // ✅ After insert (for AJAX response)
+    public function getReportsForParent(int $parentUserId): array
+    {
+        $sql = "
+            SELECT
+                r.*,
+                r.id AS report_id,
+                TRIM(CONCAT(IFNULL(tun.firstName,''), ' ', IFNULL(tun.lastName,''))) AS teacher_name,
+                TRIM(CONCAT(IFNULL(sun.firstName,''), ' ', IFNULL(sun.lastName,''))) AS student_name
+            FROM report r
+            INNER JOIN students s ON s.studentID = r.studentID
+            INNER JOIN parents p ON p.studentID = s.studentID
+            LEFT JOIN teachers t ON t.userID = r.teacherID
+            LEFT JOIN userName tun ON tun.userID = t.userID
+            LEFT JOIN userName sun ON sun.userID = s.userID
+            WHERE p.userID = :parentUserId
+            ORDER BY r.report_date DESC, r.id DESC
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':parentUserId' => $parentUserId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function getReportByIdWithTeacherName(int $reportId): ?array
     {
         $sql = $this->baseSelectSql() . "
             WHERE r.id = :id
             LIMIT 1
         ";
+
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute([':id' => $reportId]);
+
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
     }
@@ -77,7 +107,10 @@ class ReportModel
             ':description' => $data['description'],
         ]);
 
-        if (!$ok) return false;
+        if (!$ok) {
+            return false;
+        }
+
         return (int)$this->pdo->lastInsertId();
     }
 
@@ -85,14 +118,22 @@ class ReportModel
     {
         $sql = "DELETE FROM report WHERE id = :id AND teacherID = :tid";
         $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':id' => $reportId, ':tid' => $teacherUserId]);
+
+        return $stmt->execute([
+            ':id' => $reportId,
+            ':tid' => $teacherUserId
+        ]);
     }
 
     public function getReportByIdAndTeacher(int $reportId, int $teacherUserId)
     {
         $sql = "SELECT * FROM report WHERE id = :id AND teacherID = :tid";
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':id' => $reportId, ':tid' => $teacherUserId]);
+        $stmt->execute([
+            ':id' => $reportId,
+            ':tid' => $teacherUserId
+        ]);
+
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
