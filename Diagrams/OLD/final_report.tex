@@ -614,14 +614,23 @@ The IskolE system follows the \textbf{Model-View-Controller (MVC)} architectural
 % ── 4.2 Key Modules & Interactions ─────────────────────────
 \section{Key Modules \& Interactions}
 
-\begin{table}[H]
-\centering
+\begin{longtable}{l p{0.65\textwidth}}
 \caption{Key System Modules and Their Interactions}
-\label{tab:modules}
-\begin{tabularx}{\textwidth}{l X}
+\label{tab:modules} \\
 \toprule
 \textbf{Module} & \textbf{Main Interactions / Purpose} \\
 \midrule
+\endfirsthead
+\multicolumn{2}{c}%
+{{\tablename\ \thetable{} -- continued from previous page}} \\
+\toprule
+\textbf{Module} & \textbf{Main Interactions / Purpose} \\
+\midrule
+\endhead
+\midrule
+\endfoot
+\bottomrule
+\endlastfoot
 Authentication Module & Handles user login, logout, session management, and password reset functionality. Interacts with User Model and Role Controller. \\
 \addlinespace
 Student Management Module & Stores student profiles, academic data, and attendance records. Interacts with Teacher and Management modules. \\
@@ -645,9 +654,7 @@ Grade \& Class Management Module & Create and delete grades and classes. Managed
 Subject Management Module & Create and delete subjects. Handled by R. S. R. G. A. A. Ananda. \\
 \addlinespace
 Assign Class Teacher Module & Assign teachers to their respective classes. Handled by Seniru D S Senaweera. \\
-\bottomrule
-\end{tabularx}
-\end{table}
+\end{longtable}
 
 % ============================================================
 %          CHAPTER 5 – SYSTEM DESIGN
@@ -659,14 +666,36 @@ This chapter presents the key design diagrams of the IskolE system, illustrating
 % ── 5.1 Use Case Diagram ──────────────────────────────────
 \section{Use Case Diagram}
 
-The use case diagram illustrates the interactions between the system's primary actors (Administrator, Management Panel, Teacher, Student, and Parent) and the functional modules of the system.
+The use case diagrams illustrate the interactions between the system's primary actors (Administrator, Management Panel, Teacher, Student, and Parent) and the functional modules of the system.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
-    % \includegraphics[width=\textwidth]{Diagrams/use_case_diagram.png}
-    \fbox{\parbox{0.8\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: use\_case\_diagram.png]}\vspace{3cm}}}
-    \caption{Use Case Diagram}
-    \label{fig:use-case}
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/Use Case/Administrator.png}
+    \caption{Administrator Use Case Diagram}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/Use Case/Management Panel.jpg}
+    \caption{Management Panel Use Case Diagram}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/Use Case/Parent UseCase.png}
+    \caption{Parent Use Case Diagram}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/Use Case/Student.jpg}
+    \caption{Student Use Case Diagram}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/Use Case/Teacher.jpg}
+    \caption{Teacher Use Case Diagram}
 \end{figure}
 
 % ── 5.2 ER Diagram ────────────────────────────────────────
@@ -674,11 +703,9 @@ The use case diagram illustrates the interactions between the system's primary a
 
 The Entity-Relationship diagram depicts the database schema, showing all entities, their attributes, and the relationships between them. The system is centred on the \texttt{USER} entity, with specialisations for Student, Teacher, and Parent roles.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
-    % Uncomment the line below and comment the fbox when the image is ready
-    % \includegraphics[width=\textwidth]{Diagrams/iskole_er_diagram.png}
-    \fbox{\parbox{0.8\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: er\_diagram.png]}\vspace{3cm}}}
+    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/ER/iskole_er_diagram.png}
     \caption{ER Diagram}
     \label{fig:er-diagram}
 \end{figure}
@@ -688,10 +715,9 @@ The Entity-Relationship diagram depicts the database schema, showing all entitie
 
 The class diagram presents the MVC-based class structure of the system, showing the relationships between Controllers, Models, and Entity classes.
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
-    % \includegraphics[width=\textwidth]{Diagrams/class_diagram.png}
-    \fbox{\parbox{0.8\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: class\_diagram.png]}\vspace{3cm}}}
+    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{Diagrams/class_diagram/class_diagram-2.png}
     \caption{Class Diagram}
     \label{fig:class-diagram}
 \end{figure}
@@ -707,6 +733,47 @@ The system architecture diagram provides a high-level overview of the MVC archit
     \fbox{\parbox{0.8\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: system\_architecture.png]}\vspace{3cm}}}
     \caption{System Architecture Diagram}
     \label{fig:sys-arch}
+\end{figure}
+
+% ── 5.5 Activity Diagrams ─────────────────────────────────
+\section{Activity Diagrams}
+
+The activity diagrams depict the flow of operations and interactions for various core functionalities and user roles within the system.
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/Admin and workflow.png"}
+    \caption{Admin Workflow}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/Manager workFlow.png"}
+    \caption{Manager Workflow}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/Parent workflow.png"}
+    \caption{Parent Workflow}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/Student workflow.png"}
+    \caption{Student Workflow}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/Teacher Workflow.png"}
+    \caption{Teacher Workflow}
+\end{figure}
+
+\begin{figure}[!htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/Activity/User Login and password reset.png"}
+    \caption{User Login and Password Reset Workflow}
 \end{figure}
 
 % ============================================================
@@ -889,9 +956,9 @@ To the best of our knowledge and belief, the project work will not contain any m
 
 \vspace{2cm}
 
-\begin{figure}[H]
+\begin{figure}[!htbp]
     \centering
-    \fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: Table with Index Number, Name, and Signature of all group members]}\vspace{3cm}}}
+    \includegraphics[width=\textwidth,height=0.85\textheight,keepaspectratio]{"Diagrams/member details.png"}
 \end{figure}
 
 % ============================================================
