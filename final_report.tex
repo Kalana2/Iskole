@@ -1,5 +1,5 @@
 % ============================================================
-% IskolE – Final Year Group Project Report
+% IskolE – Second Year Group Project Report
 % CS Group 38 | SCS2202 – Group Project
 % ============================================================
 \documentclass[12pt, a4paper]{report}
@@ -23,14 +23,21 @@
 \usepackage{float}
 \usepackage{array}
 \usepackage{tabularx}
+\usepackage{colortbl}       % For \rowcolor in tables
 \usepackage{pgf-pie}       % For the contribution pie chart
 \usepackage{tikz}
+
+% ── Light Blue Color Theme ───────────────────────────────────
+\definecolor{themeblue}{HTML}{2B7BBF}
+\definecolor{themelightblue}{HTML}{D6EAF8}
+\definecolor{themedarkblue}{HTML}{1A5276}
+\definecolor{themeaccent}{HTML}{3498DB}
 
 % ── Page Style ───────────────────────────────────────────────
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\small IskolE – School Management System}
-\fancyhead[R]{\small CS Group 38}
+\fancyhead[L]{\small\color{themedarkblue} IskolE – School Management System}
+\fancyhead[R]{\small\color{themedarkblue} CS Group 38}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
@@ -38,18 +45,23 @@
 % ── Hyperlink Style ──────────────────────────────────────────
 \hypersetup{
     colorlinks=true,
-    linkcolor=black,
-    urlcolor=blue,
-    citecolor=black
+    linkcolor=themedarkblue,
+    urlcolor=themeaccent,
+    citecolor=themedarkblue
 }
 
 % ── Spacing ──────────────────────────────────────────────────
 \setstretch{1.5}
 
-% ── Chapter/Section Formatting ───────────────────────────────
+% ── Chapter/Section Formatting (Light Blue Theme) ────────────
 \titleformat{\chapter}[display]
-  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+  {\normalfont\huge\bfseries\color{themeblue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge\color{themedarkblue}}
 \titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{themeblue}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{themedarkblue}}{\thesubsection}{1em}{}
 
 % ============================================================
 \begin{document}
@@ -59,36 +71,47 @@
 % ────────────────────────────────────────────────────────────
 \begin{titlepage}
     \centering
-    \vspace*{1cm}
+    \vspace*{0.2cm}
 
-    {\Huge\textbf{IskolE}}\\[0.5cm]
-    {\LARGE\textbf{The School Management System}}\\[1.5cm]
+    {\Huge\textbf{\color{themedarkblue}IskolE}}\\[0.3cm]
+    {\LARGE\textbf{\color{themeblue}The School Management System}}\\[0.8cm]
 
-    {\Large\textbf{FINAL YEAR GROUP PROJECT REPORT}}\\[0.5cm]
-    {\large SCS2202 -- Group Project}\\[1cm]
+    {\Large\textbf{\color{themedarkblue}SECOND YEAR GROUP PROJECT REPORT}}\\[0.3cm]
+    {\large SCS2202 -- Group Project}\\[0.5cm]
 
-    {\Large\textbf{CS Group: 38}}\\[2cm]
+    {\Large\textbf{CS Group: 38}}\\[0.5cm]
 
-    \rule{0.8\textwidth}{0.4pt}\\[0.5cm]
+    {\color{themeblue}\rule{0.8\textwidth}{0.4pt}}\\[0.5cm]
 
-    {\large
-    \begin{tabular}{l l}
-        \textbf{Group Members:} & \\[0.3cm]
-        Kalana   & \\
-        Seniru   & \\
-        Thasiya  & \\
-        Aditha   & \\
+    {\large\textbf{\color{themedarkblue}Group Member Details}}\\[0.3cm]
+    \begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.5}
+    \begin{tabular}{|c|l|}
+    \hline
+    \rowcolor{themelightblue}
+    \textbf{Index Number} & \textbf{Full Name} \\
+    \hline
+    23001879 & Seniru D S Senaweera \\
+    \hline
+    23000821 & R K K Jinendra \\
+    \hline
+    23000104 & R. S. R. G. A. A. Ananda \\
+    \hline
+    23001542 & S. K. Thasindu Ramsitha \\
+    \hline
     \end{tabular}
-    }\\[1cm]
+    \end{table}
 
-    \rule{0.8\textwidth}{0.4pt}\\[1cm]
+    \vspace{0.3cm}
+    {\color{themeblue}\rule{0.8\textwidth}{0.4pt}}\\[0.5cm]
 
     {\large
-    \textbf{Project Supervisor:} Dr.\ Viraj Welgama\\[0.3cm]
+    \textbf{Project Supervisor:} Mr.\ Viraj Welgama\\[0.2cm]
     \textbf{Project Co-Supervisor:} Mr.\ Janitha Dissanayake
-    }\\[2cm]
+    }\\[0.8cm]
 
-    {\large University of Colombo School of Computing}\\[0.3cm]
+    {\large University of Colombo School of Computing}\\[0.2cm]
     {\large \the\year}
 
     \vfill
@@ -124,7 +147,7 @@ This report consolidates the proposal into a complete software engineering docum
 % ── 1.1 Domain Description ──────────────────────────────────
 \section{Domain Description}
 
-The domain is K--12 school operations: academic record keeping; parent--teacher--student communication; attendance and leave handling; class, exam, and annual academic scheduling; and dissemination of learning materials and announcements. The system's stakeholders interact via a secure web application with role-scoped permissions.
+The domain is school operations: academic record keeping; parent--teacher--student communication; attendance and leave handling; class, exam, and annual academic scheduling; and dissemination of learning materials and announcements. The system's stakeholders interact via a secure web application with role-scoped permissions.
 
 % ── 1.2 Current System and Limitations ──────────────────────
 \section{Current System and Limitations}
@@ -156,9 +179,8 @@ Many schools still rely on paper logs or ad-hoc spreadsheets and verbal/noticebo
 
 \begin{itemize}
     \item Users have internet access and valid emails.
-    \item One role per account; unique username/email; role-scoped data access.
-    \item Password complexity rules are enforced ($\geq$8 characters with letters, numbers, and symbols).
-    \item Institutional adoption provides the required master data (classes, subjects, user rosters).
+    \item One role per account; unique email; role-scoped data access.
+    \item The school must provide the foundation data, and the system builds everything else on top of it.
 \end{itemize}
 
 % ============================================================
@@ -179,7 +201,11 @@ In this section we measure how feasible our solution is in a real-world scenario
 \subsection{Back-End Technologies}
 \begin{itemize}
     \item \textbf{PHP:} PHP is used for handling server-side logic, managing user sessions, server-side requests, and interacting with the MySQL database.
-    \item \textbf{Docker:} Docker is used as the server environment to containerise the application. This allows for easy deployment, scalability, and consistency across development and production environments.
+\end{itemize}
+
+\subsection{Environmental Technologies}
+\begin{itemize}
+    \item \textbf{Docker:} Docker is used for containerisation and deployment of the application. This allows for easy deployment, scalability, and consistency across development and production environments.
 \end{itemize}
 
 \subsection{Database Management}
@@ -305,9 +331,9 @@ The system identifies the following primary stakeholders:
 
 \textbf{3. Announcement Viewing}
 \begin{itemize}
-    \item Teachers and the management panel can publish announcements through the system.
+    \item Admin, Teachers and the management panel can publish announcements through the system.
     \item Users can view these announcements in the announcement preview panel.
-    \item Announcements may include exam notifications, school events, holiday notices, and other important messages.
+    \item Announcements may include exam details, school events, holiday notices, and other important messages.
 \end{itemize}
 
 \textbf{4. Subject Teacher Information}
@@ -318,7 +344,7 @@ The system identifies the following primary stakeholders:
 
 \textbf{5. User Authentication}
 \begin{itemize}
-    \item Parents can log into the system using secure credentials.
+    \item Parents can log into the system using initial credentials.
     \item These credentials are generated and distributed by the management panel.
     \item Unauthorised access is restricted through role-based access control.
 \end{itemize}
@@ -360,25 +386,24 @@ The system identifies the following primary stakeholders:
     \item Parent data is accurately stored and kept up to date in the system.
 \end{itemize}
 
-\textbf{5. Define User Roles and Permissions}
+\textbf{5. Grade, Class, and Subject Management}
 \begin{itemize}
-    \item Admin defines and manages roles (e.g., student, teacher, parent) and assigns appropriate permissions.
-    \item Admin accesses the Role Management module, creates new roles or updates existing roles.
-    \item Assigns permissions to users based on their responsibilities.
-    \item Role-based access control is applied throughout the platform.
+    \item Administrator can create and manage grades, classes, and subjects within the system.
+    \item Administrator can assign teachers to respective classes.
 \end{itemize}
+
 
 \subsection{Students}
 
 \begin{enumerate}
-    \item \textbf{View Marks:} The system allows students to view their subject-wise marks, final examination marks, and provides an option to download or print the marks.
+    \item \textbf{View Marks:} The system allows students to view their subject-wise marks, final examination marks.
     \item \textbf{View Timetable:} The system allows students to view their daily and weekly timetables with real-time updates for schedule changes.
     \item \textbf{Check Academic Progress:} The system enables students to view their academic progress.
     \item \textbf{View Announcements:} The system allows students to view announcements posted by school administration and teachers.
-    \item \textbf{View Academic Calendar:} The system provides access to an up-to-date academic calendar, highlighting key dates such as exams, holidays, and parent-teacher meetings.
+    \item \textbf{View Exam Time Table:} Student is able to view exam timetable that was uploaded by Management pannel or admin
     \item \textbf{View Absent Reason:} The system allows parents/students to view the status of their submitted absence reasons.
-    \item \textbf{Login:} The system requires valid login credentials (username and password) to access the portal, authenticating user credentials against the database.
-    \item \textbf{View Result Report:} The system allows students to view detailed result reports including grades and rank, with the option to download result reports as PDFs.
+    \item \textbf{Login:} The system requires valid login credentials (email and password) to access the portal, authenticating user credentials against the database.
+    \item \textbf{View Result Report:} The system allows students to view detailed result reports including grades and rank.
     \item \textbf{View Attendance:} The system allows students to view their attendance records with calculated attendance percentage.
 \end{enumerate}
 
@@ -386,15 +411,15 @@ The system identifies the following primary stakeholders:
 
 \textbf{1. User Login}
 \begin{itemize}
-    \item \textbf{User Authentication:} The system allows management panel users to log in using a valid username and password.
+    \item \textbf{User Authentication:} The system allows management panel users to log in using a valid email and password.
     \item \textbf{Credential Verification:} The system validates the entered credentials against stored user data in the database.
     \item \textbf{Access Control:} The system grants access to the management panel dashboard only if the credentials are correct.
-    \item \textbf{Error Handling for Invalid Login:} The system displays an appropriate error message if the credentials are invalid (e.g., ``Invalid username or password'').
+    \item \textbf{Error Handling for Invalid Login:} The system displays an appropriate error message if the credentials are invalid (e.g., ``Invalid email or password'').
 \end{itemize}
 
 \textbf{2. CRUD -- Student Records}
 \begin{itemize}
-    \item The management panel user can search for a specific student and edit their records, including personal details, grades, and attendance.
+    \item The management panel user can search for a specific student and edit their records, including personal details, grades.
     \item The user initiates a search by entering identifying information (student ID or name).
     \item The system displays a list of matching student records; the user selects a student and modifies preferred fields.
     \item The system validates the input data (e.g., data type, required fields).
@@ -403,7 +428,6 @@ The system identifies the following primary stakeholders:
 
 \textbf{3. CRUD -- Parent Records}
 \begin{itemize}
-    \item Primary actors log into the system, navigate to a student's profile, and view the parent's contact details and relevant information linked to that student.
     \item The system retrieves the parent's contact details and other relevant information from the database and displays it clearly.
 \end{itemize}
 
@@ -422,7 +446,7 @@ The system identifies the following primary stakeholders:
 
 \textbf{6. Monitor Attendance}
 \begin{itemize}
-    \item The user logs into the system, opens the attendance module, selects a student or teacher from the list, and the system retrieves and displays detailed attendance records showing dates and attendance status for review.
+    \item The user logs into the system, opens the attendance module, selects a teacher from the list, and the system retrieves and displays detailed attendance records showing dates and attendance status for review.
 \end{itemize}
 
 \textbf{7. Leave Requests}
@@ -439,14 +463,13 @@ The system identifies the following primary stakeholders:
 \subsection{Teacher}
 
 \begin{enumerate}
-    \item \textbf{Teacher Authentication:} The system provides a login interface for teachers and verifies teacher credentials (username and password), granting access to authorised features upon successful login.
+    \item \textbf{Teacher Authentication:} The system provides a login interface for teachers and verifies teacher credentials (email and password), granting access to authorised features upon successful login.
     \item \textbf{View Student Reports:} The system allows teachers to select a student from their class list and displays student reports including academic marks, attendance records, and teacher remarks.
     \item \textbf{Post Announcements:} The system allows teachers to post announcements to students and/or parents via a submission module.
     \item \textbf{Submit Leave Requests:} The system provides a leave application form for teachers to submit leave requests to management.
     \item \textbf{Track Leave Request Status:} The system allows teachers to check the approval status of their leave requests (pending, approved, or rejected).
     \item \textbf{Manage Announcements:} The system allows teachers to edit or delete previously posted announcements.
     \item \textbf{Add Student Remarks:} The system allows teachers to select a student and add remarks to their record.
-    \item \textbf{Submit Daily Teaching Activities:} The system allows teachers to enter and submit daily lesson plans or activities linked to a specific date and class.
     \item \textbf{Upload Learning Materials for Absent Students:} The system allows teachers to select students marked absent and upload worksheets, notes, or learning content.
     \item \textbf{Manage Student Marks:} The system allows teachers to add or update student marks for assessments with validation before saving.
 \end{enumerate}
@@ -464,19 +487,19 @@ The system identifies the following primary stakeholders:
 
     \item \textbf{Reliability:}
     \begin{itemize}
-        \item Daily database backups to maintain data integrity and continuity.
-        \item Recovery Point Objective (RPO) maintained at $\leq$ 24 hours.
+        \item The system ensures high availability and minimal downtime during normal operations.
+        \item Data consistency is maintained across all modules through transactional integrity.
+        \item Error handling mechanisms are implemented to gracefully manage unexpected failures.
+        \item Backup and recovery mechanisms are supported to prevent data loss.
     \end{itemize}
 
     \item \textbf{Performance:}
     \begin{itemize}
         \item Typical page load times under 2 seconds on standard broadband connections.
-        \item System-generated reports produced in less than 5 seconds for cohorts of up to 100 students.
     \end{itemize}
 
     \item \textbf{Usability:}
     \begin{itemize}
-        \item Consistent navigation and WCAG-inspired accessibility standards for appropriate contrast, labels, and semantics.
         \item Intuitive and easy-to-use interface for all user roles.
     \end{itemize}
 
@@ -529,19 +552,16 @@ The following functionalities are not included in the first phase of development
     \item The server and database are expected to remain available during normal operations, with minimal downtime.
     \item The fingerprint attendance module is a simulated feature for demonstration purposes. It is assumed that the fingerprint input correctly maps to the corresponding UserID.
     \item Phone number is used as the initial default password for new accounts.
-    \item NIC format: Either 12-digit numeric or 10-digit + V/W format.
-    \item Fixed grade range: Grades 6--9 or 1--11 depending on context.
+    \item NIC format: Either 12-digit numeric.
     \item One class per student: Students belong to exactly one class.
     \item Student must exist first: Parents can only be added if the student already exists in the system.
     \item NIC required: All teachers, managers, and parents must have a National Identity Card number.
-    \item One class responsibility: Teachers are assigned to one primary grade and class.
     \item Subject assignment: Each teacher has one primary subject they teach.
-    \item File types: Supports PDF, DOC, PPT.
-    \item Class-based tracking: Attendance marked for entire class at once.
     \item The system does not include an automated notification system (such as email, SMS, or push notifications) in this phase. In future deployment stages, email or SMS-based notifications can be added once the project moves to a scalable, funded environment.
     \item One-way communication: Announcements are broadcast only (no replies/comments).
     \item No multi-school support: System assumes single school deployment.
     \item Class options: Configurable class sections (e.g., A, B) with extensibility for future expansion.
+    \item A parent and student have a strict one-to-one relationship (one parent per student).
     \item The system is currently deployed and tested on the demo environment at \url{https://iskole.ct.ws/}.
 \end{itemize}
 
@@ -567,8 +587,6 @@ The IskolE system follows the \textbf{Model-View-Controller (MVC)} architectural
     \item Notifies the Controller when data changes.
 \end{itemize}
 
-\textbf{Example in IskolE:} The \textit{Student} model fetches marks and attendance from the database and calculates averages or ranks.
-
 \subsection{View (V)}
 
 \textbf{Role:} Manages the user interface (UI) and presentation layer.
@@ -579,8 +597,6 @@ The IskolE system follows the \textbf{Model-View-Controller (MVC)} architectural
     \item Provides forms and interfaces for user input.
     \item Contains no business logic --- only handles what the user sees.
 \end{itemize}
-
-\textbf{Example in IskolE:} The \textit{Student Dashboard} or \textit{Announcement Page} showing marks, attendance, and updates.
 
 \subsection{Controller (C)}
 
@@ -594,7 +610,6 @@ The IskolE system follows the \textbf{Model-View-Controller (MVC)} architectural
     \item Controls the overall flow of data and user navigation.
 \end{itemize}
 
-\textbf{Example in IskolE:} When a teacher submits marks, the controller validates the input, updates the Model (database), and refreshes the View (student's mark page).
 
 % ── 4.2 Key Modules & Interactions ─────────────────────────
 \section{Key Modules \& Interactions}
@@ -607,7 +622,7 @@ The IskolE system follows the \textbf{Model-View-Controller (MVC)} architectural
 \toprule
 \textbf{Module} & \textbf{Main Interactions / Purpose} \\
 \midrule
-Authentication Module & Handles user login, logout, and session management. Interacts with User Model and Role Controller. \\
+Authentication Module & Handles user login, logout, session management, and password reset functionality. Interacts with User Model and Role Controller. \\
 \addlinespace
 Student Management Module & Stores student profiles, academic data, and attendance records. Interacts with Teacher and Management modules. \\
 \addlinespace
@@ -617,13 +632,19 @@ Attendance Module & Takes input (manual or simulated fingerprint), validates wit
 \addlinespace
 Marks \& Performance Module & Allows teachers to enter marks; system calculates averages and ranks. Used by Students, Parents, and Management modules. \\
 \addlinespace
-Announcement Module & Enables teachers or management to post announcements; students and parents view them via dashboard. \\
+Announcement Module & Enables admin, teachers or management to post announcements; students and parents view them via dashboard. \\
 \addlinespace
 Timetable \& Calendar Module & Displays schedules and events; data managed by Management panel. \\
 \addlinespace
 Behaviour \& Remarks Module & Teachers record student behaviour; visible to parents and management. \\
 \addlinespace
-Admin Module & Handles role creation, CRUD operations, and overall system settings. \\
+Admin Module & Handles role creation, CRUD operations, and overall system settings such as class, grade, subjects, etc. \\
+\addlinespace
+Grade \& Class Management Module & Create and delete grades and classes. Managed by Administrator. \\
+\addlinespace
+Subject Management Module & Create and delete subjects. Handled by R. S. R. G. A. A. Ananda. \\
+\addlinespace
+Assign Class Teacher Module & Assign teachers to their respective classes. Handled by Seniru D S Senaweera. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -698,16 +719,16 @@ The system architecture diagram provides a high-level overview of the MVC archit
 
 All functionalities defined in the project proposal and interim report have been \textbf{100\% completed}. The system consists of \textbf{16 CRUD-based functional modules}, distributed among four group members as follows:
 
-\subsection{Kalana -- Module Owner}
+\subsection{R K K Jinendra -- Module Owner}
 \begin{enumerate}
-    \item Management Staff Records (CRUD + activate/deactivate)
-    \item Teacher Records (CRUD + activate/deactivate)
-    \item Student Records (CRUD + activate/deactivate)
-    \item Parent/Guardian Records (CRUD + activate/deactivate)
-    \item Student Absence Reason Management (Create/Read/Update)
+    \item Management Staff Records (CRUD)
+    \item Teacher Records (CRUD)
+    \item Student Records (CRUD)
+    \item Parent/Guardian Records (CRUD)
+    \item Student Absence Reason Management (CRUD)
 \end{enumerate}
 
-\subsection{Seniru -- Module Owner}
+\subsection{Seniru D S Senaweera -- Module Owner}
 \begin{enumerate}
     \item Announcements (CRUD)
     \item Learning Materials Management (Upload/Update/Delete/Download)
@@ -715,7 +736,7 @@ All functionalities defined in the project proposal and interim report have been
     \item Student Attendance Records (CRUD)
 \end{enumerate}
 
-\subsection{Thasiya -- Module Owner}
+\subsection{S. K. Thasindu Ramsitha -- Module Owner}
 \begin{enumerate}
     \item Marks / Exam Results Management (Create/Read/Update)
     \item Student Timetables (CRUD + publish/unpublish)
@@ -723,7 +744,7 @@ All functionalities defined in the project proposal and interim report have been
     \item Relief / Teacher Substitution Management (CRUD)
 \end{enumerate}
 
-\subsection{Aditha -- Module Owner}
+\subsection{R. S. R. G. A. A. Ananda -- Module Owner}
 \begin{enumerate}
     \item Classes Management (CRUD)
     \item Exam Timetables (Upload/Update/Delete + image handling)
@@ -763,10 +784,10 @@ All team members contributed equally (25\% each) in the following areas:
             color={blue!60, green!60, orange!60, purple!60},
             sum=auto
         ]{
-            25/Kalana -- 25\%,
-            25/Seniru -- 25\%,
-            25/Thasiya -- 25\%,
-            25/Aditha -- 25\%
+            25/R K K Jinendra -- 25\%,
+            25/Seniru D S Senaweera -- 25\%,
+            25/S. K. Thasindu Ramsitha -- 25\%,
+            25/R. S. R. G. A. A. Ananda -- 25\%
         }
     \end{tikzpicture}
     \caption{Individual Contribution of Team Members}
@@ -777,16 +798,16 @@ All team members contributed equally (25\% each) in the following areas:
 \centering
 \caption{Individual Contribution Summary}
 \label{tab:contribution}
-\begin{tabular}{l c l}
+\begin{tabularx}{\textwidth}{l c >{\raggedright\arraybackslash}X}
 \toprule
 \textbf{Member} & \textbf{Contribution (\%)} & \textbf{Primary Modules} \\
 \midrule
-Kalana  & 25\% & Staff, Teacher, Student, Parent Records; Absence Reasons \\
-Seniru  & 25\% & Announcements, Learning Materials, Attendance Records \\
-Thasiya & 25\% & Marks/Results, Timetables, Relief Management \\
-Aditha  & 25\% & Classes, Exam Timetables, Leave Requests, Behaviour, Subjects \\
+R K K Jinendra  & 25\% & Staff, Teacher, Student, Parent Records; Absence Reasons \\
+Seniru D S Senaweera  & 25\% & Announcements, Learning Materials, Attendance Records \\
+S. K. Thasindu Ramsitha & 25\% & Marks/Results, Timetables, Relief Management \\
+R. S. R. G. A. A. Ananda  & 25\% & Classes, Exam Timetables, Leave Requests, Behaviour, Subjects \\
 \bottomrule
-\end{tabular}
+\end{tabularx}
 \end{table}
 
 % ============================================================
@@ -835,30 +856,26 @@ Test Result                   & All test cases passed successfully \\
 % ============================================================
 %          CHAPTER 9 – SUPERVISOR DETAILS
 % ============================================================
-\chapter{Supervisor Details}
+\chapter{Details of Project Supervisor and Co-Supervisor}
 
-\section{Project Supervisor \& Co-Supervisor}
-
-\begin{table}[H]
-\centering
-\begin{tabular}{l l}
-\toprule
-\textbf{Role} & \textbf{Name} \\
-\midrule
-Project Supervisor (Academic Staff of UCSC) & Dr.\ Viraj Welgama \\
-Project Co-Supervisor (Assigned by Course Coordinator) & Mr.\ Janitha Dissanayake \\
-\bottomrule
-\end{tabular}
-\end{table}
-
-\vspace{2cm}
+\section*{Proposed Project Supervisor (Academic Staff of UCSC)}
 
 \noindent
-\begin{tabular}{p{7cm} p{7cm}}
-\textbf{Supervisor Signature:} & \textbf{Date:} \\[1.5cm]
-\rule{6cm}{0.4pt} & \rule{4cm}{0.4pt} \\[2cm]
-\textbf{Co-Supervisor Signature:} & \textbf{Date:} \\[1.5cm]
-\rule{6cm}{0.4pt} & \rule{4cm}{0.4pt} \\
+\begin{tabular}{@{} p{6cm} p{8cm} @{}}
+Name of the supervisor: & Mr.\ Viraj Welgama \\[1cm]
+Signature of the supervisor: & \rule{6cm}{0.4pt} \\[1cm]
+Date: & \rule{6cm}{0.4pt} \\
+\end{tabular}
+
+\vspace{1cm}
+
+\section*{Proposed Project Co-Supervisor (Assigned by the Course Coordinator)}
+
+\noindent
+\begin{tabular}{@{} p{6cm} p{8cm} @{}}
+Name of the co-supervisor: & Mr.\ Janitha Dissanayake \\[1cm]
+Signature of the co-supervisor: & \rule{6cm}{0.4pt} \\[1cm]
+Date: & \rule{6cm}{0.4pt} \\
 \end{tabular}
 
 % ============================================================
@@ -872,72 +889,10 @@ To the best of our knowledge and belief, the project work will not contain any m
 
 \vspace{2cm}
 
-\noindent
-\begin{tabular}{p{7cm} p{7cm}}
-\textbf{Signature:} & \textbf{Date:} \\[1.5cm]
-\rule{6cm}{0.4pt} & \rule{4cm}{0.4pt} \\[0.5cm]
-\textit{(On behalf of all group members)} & \\
-\end{tabular}
-
-% ============================================================
-%          CHAPTER 11 – STUDENT DETAILS
-% ============================================================
-\chapter{Student Details}
-
-\begin{table}[H]
-\centering
-\caption{Student Details and Signatures}
-\label{tab:student-details}
-\begin{tabular}{|c|l|c|}
-\hline
-\textbf{Index Number} & \textbf{Student Name} & \textbf{Signature} \\
-\hline
- & Kalana & \\[1cm]
-\hline
- & Seniru & \\[1cm]
-\hline
- & Thasiya & \\[1cm]
-\hline
- & Aditha & \\[1cm]
-\hline
-\end{tabular}
-\end{table}
-
-% ============================================================
-%          APPENDICES
-% ============================================================
-\appendix
-
-\chapter{Entity Catalogue}
-
-User, Role, Student, Parent, Teacher, Class, Subject, Marks, Attendance, LeaveRequest, Announcement, Material, Event, Timetable.
-
-\chapter{Sample RBAC Matrix (Excerpt)}
-
-\begin{table}[H]
-\centering
-\caption{Role-Based Access Control Matrix}
-\label{tab:rbac}
-\begin{tabularx}{\textwidth}{l X}
-\toprule
-\textbf{Role} & \textbf{Permissions} \\
-\midrule
-Students & READ self marks/attendance/timetable/announcements. \\
-\addlinespace
-Parents & READ child marks/attendance/timetable; CREATE pre-absence reason. \\
-\addlinespace
-Teachers & CREATE/UPDATE marks, remarks, announcements, materials; READ assigned students. \\
-\addlinespace
-Management & CRUD student/parent/staff; SCHEDULE events/exams; APPROVE leaves; MONITOR attendance. \\
-\addlinespace
-Administrator & Global CRUD + role/permission and settings. \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\chapter{Deployment \& Security Considerations}
-
-Deploy on hardened LAMP stack with HTTPS, secure cookie flags, CSRF tokens, prepared statements/ORM, hashed passwords (bcrypt/argon2), rate-limiting on auth, and nightly database backups with offsite retention.
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{0.85\textwidth}{\centering\vspace{3cm}\textbf{[INSERT IMAGE HERE: Table with Index Number, Name, and Signature of all group members]}\vspace{3cm}}}
+\end{figure}
 
 % ============================================================
 \end{document}
