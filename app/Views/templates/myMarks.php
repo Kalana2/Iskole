@@ -22,7 +22,7 @@ $isParent = ($userRole == 4);
     </header>
 
     <div class="center-container card">
-      <!-- Stats Overview -->
+      
       <div class="stats-overview">
         <div class="stat-card">
           <div class="stat-icon">🏆</div>
