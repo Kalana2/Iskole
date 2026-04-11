@@ -125,6 +125,21 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
           <input type="text" id="edit-student-id" name="studentID" readonly>
         </div>
 
+        <div class="form-row" id="edit-student-grade-class-group" style="display: none;">
+          <div class="form-group">
+            <label for="edit-grade">Grade</label>
+            <select id="edit-grade" name="gradeID" required>
+              <option value="">Select Grade</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="edit-class">Class</label>
+            <select id="edit-class" name="classID" required>
+              <option value="">Select Class</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-group">
           <label for="edit-address-1">Address Line 1</label>
           <input type="text" id="edit-address-1" name="address_line1" placeholder="Street address">
@@ -249,6 +264,47 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
       location.reload(); // Reload to show initial 5 users
     });
 
+    // Dynamic Grade/Class logic for Edit Modal
+    const editGradeSelect = document.getElementById('edit-grade');
+    const editClassSelect = document.getElementById('edit-class');
+    let editAllClassData = [];
+
+    async function initEditDynamicSelection() {
+      try {
+        const response = await fetch('/addNewUser/getGradesAndClasses');
+        const data = await response.json();
+        editAllClassData = data.classes || [];
+
+        const grades = [...new Set(editAllClassData.map(item => item.grade))].sort((a, b) => a - b);
+        grades.forEach(grade => {
+          const opt = document.createElement('option');
+          opt.value = grade;
+          opt.textContent = grade;
+          editGradeSelect.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Error fetching dynamic modal data:', err);
+      }
+    }
+
+    function updateEditClassOptions(selectedClassId = null) {
+      const selectedGrade = editGradeSelect.value;
+      editClassSelect.innerHTML = '<option value="">Select Class</option>';
+      if (selectedGrade) {
+        const filtered = editAllClassData.filter(item => item.grade == selectedGrade);
+        filtered.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.classID;
+          opt.textContent = item.class;
+          if (selectedClassId && item.classID == selectedClassId) opt.selected = true;
+          editClassSelect.appendChild(opt);
+        });
+      }
+    }
+
+    editGradeSelect.addEventListener('change', () => updateEditClassOptions());
+    initEditDynamicSelection();
+
     // Modal functionality
     const editModal = document.getElementById('edit-user-modal');
     const deleteModal = document.getElementById('delete-user-modal');
@@ -292,9 +348,18 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
           document.getElementById('edit-address-2').value = userData.address_line2 || '';
           document.getElementById('edit-address-3').value = userData.address_line3 || '';
 
-          // Show student ID field if user is a student
+          // Show student specific fields if user is a student
+          const isStudent = userData.role === 'Student' || !!userData.studentID;
           const studentIdGroup = document.getElementById('edit-student-id-group');
-          studentIdGroup.style.display = userData.studentID ? 'block' : 'none';
+          const studentGradeClassGroup = document.getElementById('edit-student-grade-class-group');
+
+          studentIdGroup.style.display = isStudent ? 'block' : 'none';
+          studentGradeClassGroup.style.display = isStudent ? 'grid' : 'none';
+
+          if (isStudent) {
+            editGradeSelect.value = userData.gradeID || '';
+            updateEditClassOptions(userData.classID);
+          }
 
           openModal(editModal);
         })
