@@ -1,0 +1,80 @@
+% act_d5_parent.tex — Iskole: Parent Workflow
+\documentclass[a4paper,landscape]{article}
+\usepackage[a4paper,landscape,top=1.8cm,bottom=1.2cm,left=1.2cm,right=1.2cm]{geometry}
+\usepackage[dvipsnames,svgnames]{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,calc}
+\usepackage{fancyhdr}
+\definecolor{ColHdr} {RGB}{30,58,138}
+\definecolor{ActFill}{RGB}{219,234,254}
+\definecolor{ActLine}{RGB}{52,109,219}
+\definecolor{SysFill}{RGB}{220,254,220}
+\definecolor{SysLine}{RGB}{34,139,34}
+\definecolor{SwimBg} {RGB}{240,240,248}
+\tikzset{
+  nd_start/.style={circle,fill=black,minimum size=10pt,inner sep=0pt},
+  nd_stop/.style={circle,fill=black,draw=black,double,double distance=2pt,minimum size=10pt,inner sep=0pt},
+  nd_act/.style={rectangle,rounded corners=3pt,draw=ActLine,fill=ActFill,text width=4.9cm,minimum height=0.62cm,align=center,font=\footnotesize},
+  nd_sys/.style={rectangle,rounded corners=3pt,draw=SysLine,fill=SysFill,text width=4.9cm,minimum height=0.62cm,align=center,font=\footnotesize\itshape},
+  arr/.style={-{Stealth[length=5pt,width=4pt]},thick},
+}
+\newcommand{\swimbox}[4]{%
+  \fill[SwimBg,rounded corners=4pt](#1-2.6,#2+0.15) rectangle (#1+2.6,#3);
+  \node[font=\small\bfseries\color{ColHdr}] at (#1,#2) {#4};}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[C]{\bfseries\color{ColHdr}Iskole — Activity Diagram 5: Parent Workflow}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{1pt}
+\renewcommand{\headrule}{\hbox to\headwidth{\color{ColHdr}\leaders\hrule height 1pt\hfill}}
+\setlength{\headheight}{16pt}
+\begin{document}
+\begin{center}
+\begin{tikzpicture}[x=1cm,y=1cm]
+\def\cA{3.3}\def\cB{9.6}\def\cC{15.9}\def\cD{22.2}
+\swimbox{\cA}{0.2}{-13.8}{Announcements \& Timetable}
+\swimbox{\cB}{0.2}{-13.8}{Absence Requests}
+\swimbox{\cC}{0.2}{-13.8}{Teachers \& Behaviour}
+\swimbox{\cD}{0.2}{-13.8}{Child's Marks}
+\node[nd_start] at (12.75,-0.7)(S){};
+\node[nd_act]   at (12.75,-1.6)(HD){Login as Parent \textemdash{} Dashboard};
+\fill[black](2.5,-2.25) rectangle (23.0,-2.21);
+% Col A
+\node[nd_act] at (\cA,-3.1)(A1){View Announcements\\(filtered: parent)};
+\node[nd_act] at (\cA,-4.2)(A2){View Child's Timetable};
+\node[nd_sys] at (\cA,-5.3)(A3){StudentTimeTableModel::\\getChildTimetableContextForParent()};
+% Col B
+\node[nd_act] at (\cB,-3.1)(B1){Submit Absence Reason\\(from date, to date, reason)};
+\node[nd_sys] at (\cB,-4.2)(B2){StudentAbsenceReasonModel::create()};
+\node[nd_act] at (\cB,-5.3)(B3){View Submitted Requests};
+\node[nd_sys] at (\cB,-6.3)(B4){getAbsenceReasonsByParentId()};
+\node[nd_act] at (\cB,-7.4)(B5){Check Status\\(pending / acknowledged)};
+% Col C
+\node[nd_act] at (\cC,-3.1)(C1){View Child's Class Teachers\\(name, subject, contact)};
+\node[nd_sys] at (\cC,-4.2)(C2){ParentModel::getTeachersForClass()};
+\node[nd_act] at (\cC,-5.3)(C3){View Behaviour Reports};
+\node[nd_sys] at (\cC,-6.3)(C4){ReportModel::getReportsForParent()};
+% Col D
+\node[nd_act] at (\cD,-3.1)(D1){Select Term};
+\node[nd_sys] at (\cD,-4.1)(D2){MarksReportModel::\\getChildStudentByParentUserId()};
+\node[nd_sys] at (\cD,-5.2)(D3){getMarksForStudent()};
+\node[nd_act] at (\cD,-6.3)(D4){View Subject Marks\\+ Grade Letters};
+\node[nd_sys] at (\cD,-7.4)(D5){getStudentPerformanceStats()\\(average, rank)};
+% join
+\fill[black](2.5,-9.8) rectangle (23.0,-9.76);
+\node[nd_stop] at (12.75,-10.5)(E){};
+% arrows
+\draw[arr](S)--(HD);
+\draw[arr](HD.south)--(12.75,-2.23);
+\foreach \x/\n in {\cA/A1,\cB/B1,\cC/C1,\cD/D1}{\draw[arr](\x,-2.23)--(\n);}
+\draw[arr](A1)--(A2)--(A3);
+\draw[arr](B1)--(B2);\draw[arr](B3)--(B4)--(B5);\draw[arr](B2)--(B3);
+\draw[arr](C1)--(C2);\draw[arr](C3)--(C4);\draw[arr](C2)--(C3);
+\draw[arr](D1)--(D2)--(D3)--(D4)--(D5);
+\draw[arr](A3)--(\cA,-9.78);
+\draw[arr](B5)--(\cB,-9.78);
+\draw[arr](C4)--(\cC,-9.78);
+\draw[arr](D5)--(\cD,-9.78);
+\draw[arr](12.75,-9.76)--(E);
+\end{tikzpicture}
+\end{center}
+\end{document}
