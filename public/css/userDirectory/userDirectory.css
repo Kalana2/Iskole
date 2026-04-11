@@ -296,6 +296,13 @@
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
 }
 
+.form-group input[readonly] {
+  background-color: #f9fafb !important;
+  cursor: not-allowed;
+  border-color: rgba(17, 24, 39, 0.1);
+  color: var(--muted);
+}
+
 .modal-actions {
   display: flex;
   gap: 0.75rem;
