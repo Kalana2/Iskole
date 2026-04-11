@@ -74,20 +74,20 @@
 
                 <!-- NIC (Management / Teacher / Parent) -->
                 <div class="field role role-mp role-teacher role-parent span-2 hidden" data-role="nic">
-                    <label for="nic">NIC number <span class="required-mark">*</span></label>
+                    <label for="nic">NIC number</label>
                     <input type="text" id="nic" name="nic" placeholder="xxxxxxxxxxxx"
                         title="Enter NIC number (xxxxxxxxxxxx)">
                 </div>
 
                 <!-- Grade & Class (Teacher / Student) -->
                 <div class="field role role-teacher role-student hidden" data-role="grade">
-                    <label for="grade">Grade <span class="required-mark">*</span></label>
+                    <label for="grade">Grade</label>
                     <select name="grade" id="grade">
                         <option value="" selected disabled>Select grade</option>
                     </select>
                 </div>
                 <div class="field role role-teacher role-student hidden" data-role="class">
-                    <label for="class">Class <span class="required-mark">*</span></label>
+                    <label for="class">Class</label>
                     <select name="class" id="class">
                         <option value="" selected disabled>Select class</option>
                     </select>
@@ -95,7 +95,7 @@
 
                 <!-- Subject (Teacher) -->
                 <div class="field role role-teacher span-2 hidden" data-role="subject">
-                    <label for="subject">Subject <span class="required-mark">*</span></label>
+                    <label for="subject">Subject</label>
                     <select name="subject" id="subject">
                         <option value="" selected disabled>Select subject</option>
                     </select>
@@ -103,11 +103,11 @@
 
                 <!-- Parent fields -->
                 <div class="field role role-parent hidden" data-role="studentIndex">
-                    <label for="studentIndex">Student index <span class="required-mark">*</span></label>
+                    <label for="studentIndex">Student index</label>
                     <input type="number" id="studentIndex" name="studentIndex" placeholder="e.g. 10234">
                 </div>
                 <div class="field role role-parent hidden" data-role="relationship">
-                    <label for="relationship">Relationship type <span class="required-mark">*</span></label>
+                    <label for="relationship">Relationship type</label>
                     <select id="relationship" name="relationship">
                         <option value="" selected disabled>Select relationship</option>
                         <option value="father">Father</option>
@@ -146,14 +146,26 @@
             ids.forEach(id => {
                 const el = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
                 if (el) {
+                    const label = document.querySelector(`label[for="${el.id}"]`);
                     if (required) {
                         el.setAttribute('required', 'required');
+                        if (label && !label.querySelector('.required-mark')) {
+                            const span = document.createElement('span');
+                            span.className = 'required-mark';
+                            span.textContent = ' *';
+                            label.appendChild(span);
+                        }
                     } else {
                         el.removeAttribute('required');
+                        if (label) {
+                            const mark = label.querySelector('.required-mark');
+                            if (mark) mark.remove();
+                        }
                     }
                 }
             });
         }
+
 
         function updateVisibility() {
             const val = roleSelect.value;
@@ -170,7 +182,7 @@
 
             // Required toggles per role
             setRequired(['nic', 'grade', 'class', 'subject', 'studentIndex', 'relationship'], false);
-            if (val === 'teacher') setRequired(['nic', 'grade', 'class', 'subject'], true);
+            if (val === 'teacher') setRequired(['nic', 'subject'], true)
             if (val === 'student') setRequired(['grade', 'class'], true);
             if (val === 'parent') setRequired(['nic', 'studentIndex', 'relationship'], true);
             if (val === 'mp') setRequired(['nic'], true);
@@ -209,10 +221,10 @@
             try {
                 const response = await fetch('/addNewUser/getGradesAndClasses');
                 const data = await response.json();
-                
+
                 allClassData = data.classes || [];
                 const subjects = data.subjects || [];
-                
+
                 // --- Populate Grades ---
                 const grades = [...new Set(allClassData.map(item => item.grade))].sort((a, b) => a - b);
                 grades.forEach(grade => {
@@ -240,7 +252,7 @@
         function updateClassOptions() {
             const selectedGrade = gradeSelect.value;
             classSelect.innerHTML = '<option value="" selected disabled>Select class</option>';
-            
+
             if (selectedGrade) {
                 const filtered = allClassData.filter(item => item.grade == selectedGrade);
                 filtered.forEach(item => {
