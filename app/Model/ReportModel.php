@@ -158,6 +158,35 @@ class ReportModel
         ]);
     }
 
+    public function getStudentsByClass(int $classId): array
+    {
+        $sql = "
+            SELECT
+                s.studentID,
+                s.classID,
+                c.class AS className,
+                c.grade AS grade,
+                u.email,
+                u.phone,
+                u.dateOfBirth,
+                un.firstName,
+                un.lastName
+            FROM students s
+            INNER JOIN class c ON c.classID = s.classID
+            INNER JOIN user u ON u.userID = s.userID
+            LEFT JOIN userName un ON un.userID = s.userID
+            WHERE s.classID = :class_id
+            ORDER BY un.firstName ASC, un.lastName ASC, s.studentID ASC
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            ':class_id' => $classId
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
     public function findStudentInClass(int $classId, string $q): ?array
     {
         $sql = "
