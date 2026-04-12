@@ -3,17 +3,16 @@ require_once __DIR__ . '/../Core/Controller.php';
 
 class LeaveController extends Controller
 {
-    // GET: show form
     public function index()
     {
         $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
         if (!$teacherUserId) {
             header('Location: /login');
             exit;
         }
 
         $leaveModel = $this->model('LeaveRequestModel');
-
         $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
 
         $this->view('teacher/index', [
@@ -22,7 +21,6 @@ class LeaveController extends Controller
         ]);
     }
 
-    // POST: submit leave request
     public function submit()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -38,7 +36,10 @@ class LeaveController extends Controller
         $reason    = trim($_POST['reason'] ?? '');
 
         if (!$teacherUserId || !$dateFrom || !$dateTo || !$leaveType) {
-            $_SESSION['leave_msg'] = ['type' => 'error', 'text' => 'Missing required fields.'];
+            $_SESSION['leave_msg'] = [
+                'type' => 'error',
+                'text' => 'Missing required fields.'
+            ];
             header('Location: /index.php?url=teacher&tab=Leave');
             exit;
         }
@@ -54,9 +55,15 @@ class LeaveController extends Controller
                 'reason'        => $reason,
             ]);
 
-            $_SESSION['leave_msg'] = ['type' => 'success', 'text' => 'Leave request submitted successfully.'];
+            $_SESSION['leave_msg'] = [
+                'type' => 'success',
+                'text' => 'Leave request submitted successfully.'
+            ];
         } catch (Exception $e) {
-            $_SESSION['leave_msg'] = ['type' => 'error', 'text' => 'Database error: ' . $e->getMessage()];
+            $_SESSION['leave_msg'] = [
+                'type' => 'error',
+                'text' => 'Database error: ' . $e->getMessage()
+            ];
         }
 
         header('Location: /index.php?url=teacher&tab=Leave');
@@ -91,7 +98,6 @@ class LeaveController extends Controller
         exit;
     }
 
-    // ✅ ADD THIS METHOD HERE (cancel() එකට පස්සේ)
     public function decide()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -111,7 +117,6 @@ class LeaveController extends Controller
         $leaveModel = $this->model('LeaveRequestModel');
         $leaveModel->decide($leaveId, (int)$managerUserId, $status, null);
 
-        // ✅ IMPORTANT: stay in manager panel
         header('Location: /index.php?url=mp&tab=Requests');
         exit;
     }

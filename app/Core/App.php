@@ -9,15 +9,35 @@ class App
     {
         $url = $this->parseUrl();
 
-        if ($url && isset($url[0]) && $url[0] !== '' && file_exists(__DIR__ . '/../Controllers/' . ucfirst($url[0]) . 'Controller.php')) {
-            $this->controller = ucfirst($url[0]) . 'Controller';
-            unset($url[0]);
+        $controllerPath = null;
+
+        // Support both:
+        // 1) /Foo/bar   => app/Controllers/FooController.php
+        // 2) /foo/bar   => app/Controllers/foo/FooController.php (feature folders)
+        if ($url && isset($url[0]) && $url[0] !== '') {
+            $segment0 = $url[0];
+
+            $rootControllerFile = __DIR__ . '/../Controllers/' . ucfirst($segment0) . 'Controller.php';
+            $folderControllerFile = __DIR__ . '/../Controllers/' . $segment0 . '/' . ucfirst($segment0) . 'Controller.php';
+
+            if (file_exists($rootControllerFile)) {
+                $this->controller = ucfirst($segment0) . 'Controller';
+                $controllerPath = $rootControllerFile;
+                unset($url[0]);
+            } elseif (file_exists($folderControllerFile)) {
+                $this->controller = ucfirst($segment0) . 'Controller';
+                $controllerPath = $folderControllerFile;
+                unset($url[0]);
+            } else {
+                header('Location: /login');
+                exit;
+            }
         } else {
             header('Location: /login');
             exit;
         }
 
-        require_once __DIR__ . '/../Controllers/' . $this->controller . '.php';
+        require_once $controllerPath;
         $this->controller = new $this->controller;
 
         if (isset($url[1]) && method_exists($this->controller, $url[1])) {

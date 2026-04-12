@@ -8,36 +8,36 @@
     </header>
 
     <div class="card">
-        <form action="/addNewUser/submit" method="post" >
-              <div class="form-grid">
+        <form action="/addNewUser/submit" method="post">
+            <div class="form-grid">
                 <div class="field">
-                    <label for="fName">First Name</label>
+                    <label for="fName">First Name <span class="required-mark">*</span></label>
                     <input type="text" id="fName" name="fName" placeholder="Kalana" title="Enter first name" required>
                 </div>
                 <div class="field">
-                    <label for="lName">Last Name</label>
+                    <label for="lName">Last Name <span class="required-mark">*</span></label>
                     <input type="text" id="lName" name="lName" placeholder="Jinendra" title="Enter last name" required>
                 </div>
 
                 <div class="field span-2">
-                    <label for="email">Email</label>
+                    <label for="email">Email <span class="required-mark">*</span></label>
                     <input type="email" id="email" name="email" placeholder="name@example.com" title="Enter email"
                         required>
                 </div>
 
                 <div class="field">
-                    <label for="phone">Phone</label>
+                    <label for="phone">Phone <span class="required-mark">*</span></label>
                     <input type="tel" id="phone" name="phone" placeholder="07xxxxxxxx"
                         title="Enter phone number (07xxxxxxxx)" pattern="^07\d{8}$" inputmode="numeric" required>
                     <small class="hint">Format: 07XXXXXXXX</small>
                 </div>
                 <div class="field">
-                    <label for="dob">Date of birth</label>
+                    <label for="dob">Date of birth <span class="required-mark">*</span></label>
                     <input type="date" id="dob" name="dateOfBirth" title="Enter date of birth" required>
                 </div>
 
                 <div class="field span-2">
-                    <label for="addressL1">Address line 1</label>
+                    <label for="addressL1">Address line 1 <span class="required-mark">*</span></label>
                     <input type="text" id="addressL1" name="addressLine1" placeholder="Street address"
                         title="Enter address line 1" required>
                 </div>
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="field">
-                    <label for="gender">Gender</label>
+                    <label for="gender">Gender <span class="required-mark">*</span></label>
                     <select name="gender" id="gender" required>
                         <option value="" selected disabled>Gender</option>
                         <option value="Male">Male</option>
@@ -62,7 +62,7 @@
                 </div>
 
                 <div class="field">
-                    <label for="userType">User Type</label>
+                    <label for="userType">User Type <span class="required-mark">*</span></label>
                     <select name="role" id="userType" required>
                         <option value="" selected disabled>Select user type</option>
                         <option value="mp">Management</option>
@@ -84,18 +84,12 @@
                     <label for="grade">Grade</label>
                     <select name="grade" id="grade">
                         <option value="" selected disabled>Select grade</option>
-                        <option value="6">6</option>
-                        <option value="7">7</option>
-                        <option value="8">8</option>
-                        <option value="9">9</option>
                     </select>
                 </div>
                 <div class="field role role-teacher role-student hidden" data-role="class">
                     <label for="class">Class</label>
                     <select name="class" id="class">
                         <option value="" selected disabled>Select class</option>
-                        <option value="1">A</option>
-                        <option value="2">B</option>
                     </select>
                 </div>
 
@@ -104,18 +98,6 @@
                     <label for="subject">Subject</label>
                     <select name="subject" id="subject">
                         <option value="" selected disabled>Select subject</option>
-                        <option value="1">Maths</option>
-                        <option value="2">Science</option>
-                        <option value="3">English</option>
-                        <option value="4">History</option>
-                        <option value="5">Geography</option>
-                        <option value="6">Aesthetics</option>
-                        <option value="7">PTS</option>
-                        <option value="8">Religion</option>
-                        <option value="9">Health and Physical Education</option>
-                        <option value="10">Tamil</option>
-                        <option value="11">Citizenship Education</option>
-                        <option value="12">Sinhala</option>
                     </select>
                 </div>
 
@@ -164,14 +146,26 @@
             ids.forEach(id => {
                 const el = document.getElementById(id) || document.querySelector(`[name="${id}"]`);
                 if (el) {
+                    const label = document.querySelector(`label[for="${el.id}"]`);
                     if (required) {
                         el.setAttribute('required', 'required');
+                        if (label && !label.querySelector('.required-mark')) {
+                            const span = document.createElement('span');
+                            span.className = 'required-mark';
+                            span.textContent = ' *';
+                            label.appendChild(span);
+                        }
                     } else {
                         el.removeAttribute('required');
+                        if (label) {
+                            const mark = label.querySelector('.required-mark');
+                            if (mark) mark.remove();
+                        }
                     }
                 }
             });
         }
+
 
         function updateVisibility() {
             const val = roleSelect.value;
@@ -188,7 +182,7 @@
 
             // Required toggles per role
             setRequired(['nic', 'grade', 'class', 'subject', 'studentIndex', 'relationship'], false);
-            if (val === 'teacher') setRequired(['nic', 'grade', 'class', 'subject'], true);
+            if (val === 'teacher') setRequired(['nic', 'subject'], true)
             if (val === 'student') setRequired(['grade', 'class'], true);
             if (val === 'parent') setRequired(['nic', 'studentIndex', 'relationship'], true);
             if (val === 'mp') setRequired(['nic'], true);
@@ -215,6 +209,64 @@
             };
             dobInput.addEventListener('input', validateDob);
             validateDob();
+        }
+
+        // --- Dynamic Grade/Class/Subject Logic ---
+        const gradeSelect = document.getElementById('grade');
+        const classSelect = document.getElementById('class');
+        const subjectSelect = document.getElementById('subject');
+        let allClassData = [];
+
+        async function initDynamicSelection() {
+            try {
+                const response = await fetch('/addNewUser/getGradesAndClasses');
+                const data = await response.json();
+
+                allClassData = data.classes || [];
+                const subjects = data.subjects || [];
+
+                // --- Populate Grades ---
+                const grades = [...new Set(allClassData.map(item => item.grade))].sort((a, b) => a - b);
+                grades.forEach(grade => {
+                    const opt = document.createElement('option');
+                    opt.value = grade;
+                    opt.textContent = grade;
+                    gradeSelect.appendChild(opt);
+                });
+
+                // --- Populate Subjects ---
+                if (subjectSelect) {
+                    subjects.forEach(subject => {
+                        const opt = document.createElement('option');
+                        opt.value = subject.subjectID;
+                        opt.textContent = subject.subjectName;
+                        subjectSelect.appendChild(opt);
+                    });
+                }
+
+            } catch (err) {
+                console.error('Error fetching dynamic form data:', err);
+            }
+        }
+
+        function updateClassOptions() {
+            const selectedGrade = gradeSelect.value;
+            classSelect.innerHTML = '<option value="" selected disabled>Select class</option>';
+
+            if (selectedGrade) {
+                const filtered = allClassData.filter(item => item.grade == selectedGrade);
+                filtered.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.classID;
+                    opt.textContent = item.class;
+                    classSelect.appendChild(opt);
+                });
+            }
+        }
+
+        if (gradeSelect && classSelect) {
+            initDynamicSelection();
+            gradeSelect.addEventListener('change', updateClassOptions);
         }
     })();
 </script>

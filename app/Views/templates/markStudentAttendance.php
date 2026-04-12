@@ -7,6 +7,8 @@ $today = date('Y-m-d');
 $selectedGrade = isset($_GET['grade']) ? $_GET['grade'] : '';
 $selectedClass = isset($_GET['class']) ? $_GET['class'] : '';
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
+$isToday = ($selectedDate === $today); // Check if viewing today's attendance
+$isReadOnly = !$isToday; // Read-only mode for past dates
 
 // Initialize model and fetch data
 $studentAttendanceModel = new StudentAttendance();
@@ -17,39 +19,27 @@ $totalStudents = 0;
 $attendancePercentage = 0;
 $classID = null;
 
-// Get available grades from database
+// Get available dimensions from database
 $grades = [];
+$classes = [];
 try {
-    $gradeList = $studentAttendanceModel->getGrades();
-    foreach ($gradeList as $g) {
-        $grades[] = ['value' => $g, 'label' => str_pad($g, 2, '0', STR_PAD_LEFT)];
+    $rawGrades = $studentAttendanceModel->getGrades();
+    foreach ($rawGrades as $g) {
+        if ($g !== null && $g !== '') {
+            $grades[] = ['value' => $g, 'label' => str_pad($g, 2, '0', STR_PAD_LEFT)];
+        }
+    }
+    
+    if (!empty($selectedGrade)) {
+        $classData = $studentAttendanceModel->getClassesByGrade($selectedGrade);
+        foreach ($classData as $row) {
+            $classes[] = $row['section'];
+        }
     }
 } catch (Exception $e) {
-    error_log("Error loading grades: " . $e->getMessage());
-    $grades = [
-        ['value' => '6', 'label' => '06'],
-        ['value' => '7', 'label' => '07'],
-        ['value' => '8', 'label' => '08'],
-        ['value' => '9', 'label' => '09'],
-        ['value' => '10', 'label' => '10'],
-        ['value' => '11', 'label' => '11']
-    ];
-}
-
-// Get classes for selected grade
-$classes = [];
-if (!empty($selectedGrade)) {
-    try {
-        $classList = $studentAttendanceModel->getClassesByGrade($selectedGrade);
-        foreach ($classList as $c) {
-            $classes[] = $c['section'];
-        }
-    } catch (Exception $e) {
-        error_log("Error loading classes: " . $e->getMessage());
-        $classes = ['A', 'B', 'C'];
-    }
-} else {
-    $classes = ['A', 'B', 'C'];
+    error_log("Error loading DB dimensions: " . $e->getMessage());
+    $grades = [];
+    $classes = [];
 }
 
 // Teacher information (from session if available)
@@ -116,7 +106,7 @@ try {
         <div class="heading-section">
             <div class="header-content">
                 <div>
-                    <h1 class="heading-text" id="attendance-title">Mark Attendance</h1>
+                    <h1 class="heading-text" id="attendance-title">Student Attendance</h1>
                     <p class="sub-heding-text">Record and manage daily attendance for your classes</p>
                 </div>
             </div>
@@ -124,7 +114,8 @@ try {
 
         <!-- Filter Form -->
         <div class="filter-container">
-            <form action="" method="GET" class="filter-form" id="filterForm">
+            <form action="<?php echo htmlspecialchars($_SERVER['PHP_SELF'] . '?url=' . ($_GET['url'] ?? 'admin')); ?>" method="GET" class="filter-form" id="filterForm">
+                <input type="hidden" name="url" value="<?php echo htmlspecialchars($_GET['url'] ?? 'admin'); ?>">
                 <input type="hidden" name="tab" value="Attendance">
                 <div class="filter-grid">
                     <div class="form-group">
@@ -195,12 +186,21 @@ try {
                     <span class="summary-text">
                         Attendance for: <strong>Grade <?php echo $selectedGrade; ?>-<?php echo $selectedClass; ?></strong> •
                         <strong><?php echo date('l, F j, Y', strtotime($selectedDate)); ?></strong>
-                        <?php if ($selectedDate === $today): ?>
+                        <?php if ($isToday): ?>
                             <span class="today-tag">Today</span>
+                        <?php endif; ?>
+                        <?php if ($isReadOnly): ?>
+                            <span class="readonly-tag" style="background: #f59e0b; color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 8px;">View Only</span>
                         <?php endif; ?>
                     </span>
                 </div>
             </div>
+            <?php if ($isReadOnly): ?>
+                <div class="readonly-notice" style="background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.25rem;">🔒</span>
+                    <span><strong>View Only Mode:</strong> You can only modify attendance for today's date. Past attendance records are locked for viewing only.</span>
+                </div>
+            <?php endif; ?>
 
             <!-- Statistics Grid -->
             <div class="stats-grid">
@@ -229,20 +229,22 @@ try {
             </div>
 
             <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button type="button" class="quick-btn" onclick="markAllPresent()">
-                    <span class="quick-icon">✅</span>
-                    <span class="quick-text">Mark All Present</span>
-                </button>
-                <button type="button" class="quick-btn" onclick="markAllAbsent()">
-                    <span class="quick-icon">❌</span>
-                    <span class="quick-text">Mark All Absent</span>
-                </button>
-                <button type="button" class="quick-btn" onclick="resetAttendance()">
-                    <span class="quick-icon">🔄</span>
-                    <span class="quick-text">Reset</span>
-                </button>
-            </div>
+            <?php if (!$isReadOnly): ?>
+                <div class="quick-actions">
+                    <button type="button" class="quick-btn" onclick="markAllPresent()">
+                        <span class="quick-icon">✅</span>
+                        <span class="quick-text">Mark All Present</span>
+                    </button>
+                    <button type="button" class="quick-btn" onclick="markAllAbsent()">
+                        <span class="quick-icon">❌</span>
+                        <span class="quick-text">Mark All Absent</span>
+                    </button>
+                    <button type="button" class="quick-btn" onclick="resetAttendance()">
+                        <span class="quick-icon">🔄</span>
+                        <span class="quick-text">Reset</span>
+                    </button>
+                </div>
+            <?php endif; ?>
 
             <!-- Attendance Table -->
             <div class="attendance-table-container">
@@ -303,12 +305,14 @@ try {
                                                     <input type="hidden" name="attendance[<?php echo $student['id']; ?>]" value="<?php echo htmlspecialchars($student['status']); ?>" id="input-<?php echo $student['id']; ?>">
                                                     <button type="button" class="action-btn btn-present <?php echo $student['status'] === 'present' ? 'active' : ''; ?>"
                                                         onclick="markStatus(<?php echo $student['id']; ?>, 'present')"
-                                                        title="Mark Present">
+                                                        title="Mark Present"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>
                                                         ✓
                                                     </button>
                                                     <button type="button" class="action-btn btn-absent <?php echo $student['status'] === 'absent' ? 'active' : ''; ?>"
                                                         onclick="markStatus(<?php echo $student['id']; ?>, 'absent')"
-                                                        title="Mark Absent">
+                                                        title="Mark Absent"
+                                                        <?php echo $isReadOnly ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''; ?>>
                                                         ✗
                                                     </button>
                                                 </div>
@@ -320,7 +324,7 @@ try {
                         </table>
                     </div>
 
-                    <?php if (!empty($students)): ?>
+                    <?php if (!empty($students) && !$isReadOnly): ?>
                         <!-- Action Buttons -->
                         <div class="form-actions">
                             <button type="button" class="btn btn-secondary" onclick="cancelAttendance()">
@@ -347,6 +351,48 @@ try {
 </section>
 
 <script>
+    const gradeSelect = document.getElementById('grade');
+    const classSelect = document.getElementById('class');
+
+    if (gradeSelect && classSelect) {
+        gradeSelect.addEventListener('change', function() {
+            const selectedGrade = String(this.value);
+            classSelect.innerHTML = '<option value="">Loading...</option>';
+            classSelect.disabled = true;
+
+            if (!selectedGrade) {
+                classSelect.innerHTML = '<option value="">Select Class</option>';
+                classSelect.disabled = false;
+                return;
+            }
+
+            // Fetch classes from database
+            fetch('/api/getClasses?grade=' + selectedGrade)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(data => {
+                    classSelect.innerHTML = '<option value="">Select Class</option>';
+                    if (data.success && data.classes) {
+                        data.classes.forEach(cls => {
+                            const opt = document.createElement('option');
+                            opt.value = cls;
+                            opt.textContent = 'Class ' + cls;
+                            classSelect.appendChild(opt);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching classes:', error);
+                    classSelect.innerHTML = '<option value="">Error loading classes</option>';
+                })
+                .finally(() => {
+                    classSelect.disabled = false;
+                });
+        });
+    }
+
     // Mark attendance status
     function markStatus(studentId, status) {
         const row = document.querySelector(`tr[data-student-id="${studentId}"]`);

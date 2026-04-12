@@ -91,7 +91,35 @@ class StudentModel extends UserModel
             ORDER BY un.firstName ASC, un.lastName ASC";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute([':classId' => (int)$classId]);
+        $stmt->execute([':classId' => (int) $classId]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getStudentsByParentId($parentId)
+    {
+        $sql = "SELECT s.studentID, un.firstName, un.lastName
+            FROM students s
+            LEFT JOIN userName un ON un.userID = s.userID
+            WHERE s.parentID = :parentId
+            ORDER BY un.firstName ASC, un.lastName ASC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([':parentId' => (int) $parentId]);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function getStudentByUserId($userId)
+    {
+        $sql = "SELECT s.*, u.*, un.* FROM {$this->studentTable} s
+            JOIN {$this->userTable} u ON s.userID = u.userID
+            LEFT JOIN {$this->userNameTable} un ON u.userID = un.userID
+            WHERE s.userID = :userId";
+        try {
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute(['userId' => $userId]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            throw new Exception("Error fetching student by user ID: " . $e->getMessage());
+        }
     }
 }

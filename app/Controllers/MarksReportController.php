@@ -21,14 +21,30 @@ class MarksReportController extends Controller
 			return;
 		}
 
+		// Get user role: 3 = student, 4 = parent
+		$userRole = $this->session->get('userRole') ?? $this->session->get('user_role');
+
 		try {
 			$model = $this->model('MarksReportModel');
 
-			$student = $model->getStudentByUserId($userId);
-			if (!$student) {
-				http_response_code(404);
-				echo json_encode(['success' => false, 'message' => 'Student record not found']);
-				return;
+			$student = null;
+
+			// If user is a parent (role 4), get their child's student record
+			if ($userRole == 4) {
+				$student = $model->getChildStudentByParentUserId($userId);
+				if (!$student) {
+					http_response_code(404);
+					echo json_encode(['success' => false, 'message' => 'Child student record not found']);
+					return;
+				}
+			} else {
+				// User is a student (role 3) - get their own record
+				$student = $model->getStudentByUserId($userId);
+				if (!$student) {
+					http_response_code(404);
+					echo json_encode(['success' => false, 'message' => 'Student record not found']);
+					return;
+				}
 			}
 
 			$marks = $model->getMarksForStudent($student['studentID']);
@@ -38,7 +54,8 @@ class MarksReportController extends Controller
 				'success' => true,
 				'student' => $student,
 				'subjects' => $subjects,
-				'marks' => $marks
+				'marks' => $marks,
+				'isParentView' => ($userRole == 4)
 			]);
 		} catch (Exception $e) {
 			error_log('MarksReport API error: ' . $e->getMessage());

@@ -10,6 +10,20 @@ class AddNewUserController extends Controller
         exit;
     }
 
+    public function getGradesAndClasses()
+    {
+        $model = $this->model('ClassSubjectModel');
+        $classes = $model->getAllClasses();
+        $subjects = $model->getAllSubjects();
+
+        header('Content-Type: application/json');
+        echo json_encode([
+            'classes' => $classes,
+            'subjects' => $subjects
+        ]);
+        exit;
+    }
+
     public function submit()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {

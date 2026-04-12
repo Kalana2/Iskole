@@ -38,13 +38,13 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
     </div>
   </div>
 
-    <?php if ($msg): ?>
-      <div class="ann-grid">
-        <article class="ann-card" role="alert">
-          <?= htmlspecialchars($msg) ?>
-        </article>
-      </div>
-    <?php endif; ?>
+  <?php if ($msg): ?>
+    <div class="ann-grid">
+      <article class="ann-card" role="alert">
+        <?= htmlspecialchars($msg) ?>
+      </article>
+    </div>
+  <?php endif; ?>
 
   <div class="ann-grid" role="list">
     <article class="ann-card" role="listitem" aria-label="Upload or toggle timetable">
@@ -84,7 +84,7 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
     <article class="ann-card" role="listitem" aria-label="Current timetable preview">
       <div class="ann-card-header">
         <div class="ann-badges">
-          <span class="badge">Preview</span>
+          <!-- <span class="badge">Preview</span> -->
           <span class="badge"><?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></span>
         </div>
       </div>

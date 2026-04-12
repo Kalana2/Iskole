@@ -44,6 +44,8 @@ class TeacherModel extends UserModel
         }
     }
 
+
+
     public function getTeacherByClass($grade, $classId)
     {
         $sql = "SELECT t.*, u.* FROM `{$this->teacherTable}` t JOIN `{$this->userTable}` u ON t.`userID` = u.`userID` WHERE t.`grade` = :grade AND t.`classID` = :classId";

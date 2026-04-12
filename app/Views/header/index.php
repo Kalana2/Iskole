@@ -13,7 +13,8 @@
         </div>
 
         <nav class="header-right" role="navigation" aria-label="User navigation">
-            <div class="user-info" tabindex="0" role="button" aria-label="User account">
+            <div class="user-info" tabindex="0" role="button" aria-label="User account"
+                onclick="window.location.href='/profile/index'">
                 <div class="user-avatar" aria-hidden="true">
                     <?php
                     $name = $_SESSION['name'] ?? 'User';
@@ -21,9 +22,9 @@
                     ?>
                 </div>
                 <div class="user-details">
-                    <span class="user-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'User'); ?></span>
+                    <span class="user-name"><?php echo htmlspecialchars($_SESSION['name'] ?? 'Kalana'); ?></span>
                     <span
-                        class="user-email"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'user@example.com'); ?></span>
+                        class="user-email"><?php echo htmlspecialchars($_SESSION['user_email'] ?? 'kalana@gmail.com'); ?></span>
                 </div>
             </div>
 

@@ -1,6 +1,5 @@
 <?php
 
-// Reusable navigation bar partial
 // Usage:
 //   $items = ['Announcements', 'Academic', 'Requests']; // or $navItems
 //   $active = 'Announcements'; // or index: 0

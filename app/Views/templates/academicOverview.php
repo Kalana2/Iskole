@@ -12,18 +12,32 @@
         </div>
     </header>
 
-    <!-- Quick Grade Navigation (DB-driven) -->
-    <div class="grade-nav" id="aoGradeNav" aria-label="Grade selector">
-        <span class="ao-loading">Loading grades…</span>
-    </div>
+    <div class="filter-container" aria-label="Academic filters">
+        <form class="filter-form" id="aoFilterForm">
+            <div class="filter-grid">
+                <div class="form-group">
+                    <label for="aoGradeSelect" class="form-label">Grade</label>
+                    <select id="aoGradeSelect" class="form-select" aria-label="Select grade">
+                        <option value="">Loading grades...</option>
+                    </select>
+                </div>
 
-    <!-- Class Navigation (DB-driven by selected grade) -->
-    <div class="class-nav" id="aoClassNav" aria-label="Class selector">
-        <span class="ao-loading">Select a grade to load classes…</span>
-    </div>
+                <div class="form-group">
+                    <label for="aoClassSelect" class="form-label">Class</label>
+                    <select id="aoClassSelect" class="form-select" aria-label="Select class">
+                        <option value="">Select grade first</option>
+                    </select>
+                </div>
 
-    <!-- Term Navigation (Term 1 / Term 2 / Term 3) -->
-    <div class="term-nav" id="aoTermNav" aria-label="Term selector"></div>
+                <div class="form-group">
+                    <label for="aoTermSelect" class="form-label">Term</label>
+                    <select id="aoTermSelect" class="form-select" aria-label="Select term">
+                        <option value="">Loading terms...</option>
+                    </select>
+                </div>
+            </div>
+        </form>
+    </div>
 
     <!-- Grade Content Sections (rendered by JS from DB grades) -->
     <div id="aoGradeSections"></div>

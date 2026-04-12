@@ -45,6 +45,17 @@ class AdminController extends Controller
             unset($_SESSION['cs_msg']);
         }
 
+        // Handle Assign Class Teacher tab
+        if ($tab === 'Assign Class Teacher') {
+            $model = $this->model('ClassTeacherModel');
+
+            $data['classesWithTeachers'] = $model->getAllClassesWithTeachers();
+            $data['teachers'] = $model->getAllTeachers();
+
+            $data['flash'] = $_SESSION['ct_msg'] ?? null;
+            unset($_SESSION['ct_msg']);
+        }
+
         // Handle Exam Time Table flash messages
         if ($tab === 'Exam Time Table') {
             $data['exam_tt_msg'] = $_SESSION['exam_tt_msg'] ?? null;

@@ -74,33 +74,33 @@ function initChart() {
       label: "Term 1",
       data: studentData.terms.term1,
       termKey: "term1",
-      borderColor: "rgba(239, 68, 68, 0.8)",
+      borderColor: "rgba(96, 165, 250, 0.85)",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(239, 68, 68, 0.55)"
-          : "rgba(239, 68, 68, 0.1)",
+          ? "rgba(96, 165, 250, 0.55)"
+          : "rgba(96, 165, 250, 0.1)",
     },
     {
       key: "term2",
       label: "Term 2",
       data: studentData.terms.term2,
       termKey: "term2",
-      borderColor: "rgba(245, 158, 11, 0.8)",
+      borderColor: "rgba(37, 99, 235, 0.85)",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(245, 158, 11, 0.55)"
-          : "rgba(245, 158, 11, 0.1)",
+          ? "rgba(37, 99, 235, 0.55)"
+          : "rgba(37, 99, 235, 0.1)",
     },
     {
       key: "term3",
       label: "Term 3",
       data: studentData.terms.term3,
       termKey: "term3",
-      borderColor: "rgba(16, 185, 129, 0.8)",
+      borderColor: "rgba(30, 64, 175, 0.85)",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(16, 185, 129, 0.55)"
-          : "rgba(16, 185, 129, 0.1)",
+          ? "rgba(30, 64, 175, 0.55)"
+          : "rgba(30, 64, 175, 0.1)",
     },
   ];
 
@@ -237,6 +237,18 @@ async function loadMyMarksData() {
       console.error("Failed to load marks:", json);
       studentData = fallbackStudentData;
       return false;
+    }
+
+    // If parent view, update the child's name display
+    if (json.isParentView && json.student) {
+      const childNameEl = document.getElementById("childName");
+      if (childNameEl) {
+        childNameEl.textContent = json.student.name || "—";
+      }
+      const childInfoBadge = document.getElementById("childInfoBadge");
+      if (childInfoBadge) {
+        childInfoBadge.style.display = "flex";
+      }
     }
 
     studentData = buildStudentDataFromMarks(

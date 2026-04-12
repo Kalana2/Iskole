@@ -117,10 +117,13 @@ class UserModel
         }
 
         // order by userID descending to get the latest users; bind LIMIT as integer
-        $sql = "SELECT {$this->userTable}.*, {$this->userNameTable}.firstName, {$this->userNameTable}.lastName
+        $sql = "SELECT {$this->userTable}.*, {$this->userNameTable}.firstName, {$this->userNameTable}.lastName,
+                c.grade AS grade_name, c.class AS class_name
         FROM {$this->userTable}
         LEFT JOIN {$this->userNameTable}
         ON {$this->userTable}.userID = {$this->userNameTable}.userID
+        LEFT JOIN students s ON {$this->userTable}.userID = s.userID
+        LEFT JOIN class c ON s.classID = c.classID
         WHERE {$this->userTable}.active = 1
         ORDER BY {$this->userTable}.userID DESC
         LIMIT :count";
@@ -140,7 +143,9 @@ class UserModel
                 {$this->userAddressTable}.address_line1,
                 {$this->userAddressTable}.address_line2,
                 {$this->userAddressTable}.address_line3,
-                students.studentID
+                students.studentID,
+                c.grade AS grade_name,
+                c.class AS class_name
         FROM {$this->userTable}
         LEFT JOIN {$this->userNameTable}
         ON {$this->userTable}.userID = {$this->userNameTable}.userID
@@ -148,6 +153,8 @@ class UserModel
         ON {$this->userTable}.userID = {$this->userAddressTable}.userID
         LEFT JOIN students
         ON {$this->userTable}.userID = students.userID
+        LEFT JOIN class c
+        ON students.classID = c.classID
         WHERE {$this->userTable}.active = 1
         ORDER BY {$this->userTable}.userID DESC";
 
@@ -164,7 +171,9 @@ class UserModel
                 {$this->userAddressTable}.address_line1,
                 {$this->userAddressTable}.address_line2,
                 {$this->userAddressTable}.address_line3,
-                students.studentID
+                students.studentID,
+                students.classID,
+                students.gradeID
         FROM {$this->userTable}
         LEFT JOIN {$this->userNameTable}
         ON {$this->userTable}.userID = {$this->userNameTable}.userID
@@ -189,7 +198,9 @@ class UserModel
                 {$this->userAddressTable}.address_line1,
                 {$this->userAddressTable}.address_line2,
                 {$this->userAddressTable}.address_line3,
-                students.studentID
+                students.studentID,
+                c.grade AS grade_name,
+                c.class AS class_name
         FROM {$this->userTable}
         LEFT JOIN {$this->userNameTable}
         ON {$this->userTable}.userID = {$this->userNameTable}.userID
@@ -197,6 +208,8 @@ class UserModel
         ON {$this->userTable}.userID = {$this->userAddressTable}.userID
         LEFT JOIN students
         ON {$this->userTable}.userID = students.userID
+        LEFT JOIN class c
+        ON students.classID = c.classID
         WHERE {$this->userTable}.active = 1
         AND (
             {$this->userNameTable}.firstName LIKE :search
@@ -269,6 +282,17 @@ class UserModel
             'userId' => $userId
         ]);
 
+        // Update student info if applicable
+        if (isset($data['gradeID'])) {
+            $sql = "UPDATE students SET gradeID = :gradeID, classID = :classID WHERE userID = :userId";
+            $stmt = $this->pdo->prepare($sql);
+            $stmt->execute([
+                'gradeID' => $data['gradeID'],
+                'classID' => $data['classID'],
+                'userId' => $userId
+            ]);
+        }
+
         return true;
     }
 
@@ -325,5 +349,23 @@ class UserModel
 
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row ?: null;
+    }
+
+    public function updatePassword($userId, $hashedPassword)
+    {
+        try {
+            $sql = "UPDATE {$this->userTable} SET password = :password, pwdChanged = :pwdChanged WHERE userID = :userId";
+            $stmt = $this->pdo->prepare($sql);
+            $result = $stmt->execute([
+                'password' => $hashedPassword,
+                'pwdChanged' => date('Y-m-d H:i:s'),
+                'userId' => $userId
+            ]);
+
+            return $result && $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            error_log("Error updating password: " . $e->getMessage());
+            return false;
+        }
     }
 }

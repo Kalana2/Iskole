@@ -395,7 +395,7 @@ body {
   );
   color: #e1e7ff;
   text-decoration: none;
-  border-radius: 8px;
+  border-radius: 30px !important;
   font-weight: 600;
   font-size: 0.85rem;
   border: 1px solid rgba(102, 126, 234, 0.2);

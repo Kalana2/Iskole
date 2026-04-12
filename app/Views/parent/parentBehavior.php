@@ -94,35 +94,7 @@ $behaviorReports = $behaviorReports ?? [];
         </div>
 
         <!-- Summary Stats -->
-        <div class="stats-section">
-            <div class="stat-card positive">
-                <div class="stat-icon">😊</div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <?php echo count(array_filter($behaviorReports, fn($r) => $r['report_type'] === 'positive')); ?>
-                    </div>
-                    <div class="stat-label">Positive Reports</div>
-                </div>
-            </div>
-            <div class="stat-card neutral">
-                <div class="stat-icon">😐</div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <?php echo count(array_filter($behaviorReports, fn($r) => $r['report_type'] === 'neutral')); ?>
-                    </div>
-                    <div class="stat-label">Neutral Reports</div>
-                </div>
-            </div>
-            <div class="stat-card concern">
-                <div class="stat-icon">⚠️</div>
-                <div class="stat-content">
-                    <div class="stat-number">
-                        <?php echo count(array_filter($behaviorReports, fn($r) => $r['report_type'] === 'concern')); ?>
-                    </div>
-                    <div class="stat-label">Concerns</div>
-                </div>
-            </div>
-        </div>
+        
     </div>
 </section>
 

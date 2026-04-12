@@ -11,8 +11,11 @@
         </div>
         <div class="ann-actions">
             <div class="chip-group" role="tablist" aria-label="Announcement filters">
-                <button class="chip active" role="tab" aria-selected="true" data-filter="all">All Announcements</button>
-                <button class="chip" role="tab" aria-selected="false" data-filter="my">My Announcements</button>
+                <?php if ($_SESSION['user_role'] < 3): ?>
+                    <button class="chip active" role="tab" aria-selected="true" data-filter="all">All</button>
+
+                    <button class="chip" role="tab" aria-selected="false" data-filter="my">Published</button>
+                <?php endif; ?>
             </div>
         </div>
     </div>
@@ -31,6 +34,20 @@
             <?php
             $classes = ['ann-card'];
             $isMyAnnouncement = isset($a['author_id']) && isset($currentUserId) && $a['author_id'] == $currentUserId;
+            $bodyText = ltrim((string)($a['body'] ?? ''));
+            $maxBodyLength = 1000;
+            $previewLength = 80;
+
+            if (function_exists('mb_strlen') && function_exists('mb_substr')) {
+                $displayBody = mb_strlen($bodyText) > $maxBodyLength ? mb_substr($bodyText, 0, $maxBodyLength) . '...' : $bodyText;
+                $previewBody = mb_strlen($displayBody) > $previewLength ? mb_substr($displayBody, 0, $previewLength) . '...' : $displayBody;
+                $hasPreviewToggle = mb_strlen($displayBody) > $previewLength;
+            } else {
+                $displayBody = strlen($bodyText) > $maxBodyLength ? substr($bodyText, 0, $maxBodyLength) . '...' : $bodyText;
+                $previewBody = strlen($displayBody) > $previewLength ? substr($displayBody, 0, $previewLength) . '...' : $displayBody;
+                $hasPreviewToggle = strlen($displayBody) > $previewLength;
+            }
+
             if ($isMyAnnouncement) {
                 $classes[] = 'is-my-announcement';
             }
@@ -44,7 +61,11 @@
                 </div>
 
                 <h3 class="ann-title-text"><?php echo htmlspecialchars($a['title'] ?? ''); ?></h3>
-                <p class="ann-body"><?php echo htmlspecialchars($a['body'] ?? ''); ?></p>
+                <p class="ann-body"><span class="ann-body-preview<?php echo $hasPreviewToggle ? '' : ' ann-hidden'; ?>"><?php echo htmlspecialchars($previewBody); ?></span><span class="ann-body-full<?php echo $hasPreviewToggle ? ' ann-hidden' : ''; ?>"><?php echo htmlspecialchars($displayBody); ?></span></p>
+
+                <?php if ($hasPreviewToggle): ?>
+                    <button type="button" class="btn-show-more" aria-expanded="false">Show more</button>
+                <?php endif; ?>
 
                 <div class="ann-meta">
                     <span class="author">By <?php echo htmlspecialchars($a['author'] ?? ''); ?></span>
@@ -176,6 +197,34 @@
                 chip.setAttribute('aria-selected', 'true');
                 applyFilter(chip.dataset.filter);
             });
+        });
+    })();
+
+    // Show more / show less toggle for long announcement bodies
+    (function() {
+        document.addEventListener('click', function(e) {
+            const toggleBtn = e.target.closest('.btn-show-more');
+            if (!toggleBtn) return;
+
+            const card = toggleBtn.closest('.ann-card');
+            if (!card) return;
+
+            const preview = card.querySelector('.ann-body-preview');
+            const full = card.querySelector('.ann-body-full');
+            if (!preview || !full) return;
+
+            const isExpanded = toggleBtn.getAttribute('aria-expanded') === 'true';
+            if (isExpanded) {
+                preview.classList.remove('ann-hidden');
+                full.classList.add('ann-hidden');
+                toggleBtn.setAttribute('aria-expanded', 'false');
+                toggleBtn.textContent = 'Show more';
+            } else {
+                preview.classList.add('ann-hidden');
+                full.classList.remove('ann-hidden');
+                toggleBtn.setAttribute('aria-expanded', 'true');
+                toggleBtn.textContent = 'Show less';
+            }
         });
     })();
 

@@ -73,7 +73,9 @@
   color: #111827;
   font-size: 0.95rem;
   outline: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 .toolbar input[type="text"]:focus {
   border-color: var(--ring);
@@ -88,7 +90,10 @@
   border-radius: 12px;
   font-weight: 800;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
 }
 .btn:active {
   transform: translateY(1px);
@@ -235,7 +240,9 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
 }
 
 .modal-close:hover {
@@ -267,6 +274,8 @@
 
 .form-group input[type="text"],
 .form-group input[type="email"],
+.form-group input[type="tel"],
+.form-group input[type="date"],
 .form-group select {
   width: 100%;
   padding: 0.75rem 1rem;
@@ -276,13 +285,22 @@
   color: #111827;
   font-size: 0.95rem;
   outline: none;
-  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .form-group input:focus,
 .form-group select:focus {
   border-color: var(--ring);
   box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+}
+
+.form-group input[readonly] {
+  background-color: #f9fafb !important;
+  cursor: not-allowed;
+  border-color: rgba(17, 24, 39, 0.1);
+  color: var(--muted);
 }
 
 .modal-actions {
