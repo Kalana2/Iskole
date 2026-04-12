@@ -63,6 +63,22 @@ class AcademicOverviewController extends Controller
 		}
 	}
 
+	public function getTerms(): void
+	{
+		if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+			$this->jsonResponse(['success' => false, 'message' => 'Method Not Allowed'], 405);
+		}
+
+		try {
+			$model = $this->model('AcademicOverviewModel');
+			$terms = $model->getTerms();
+			$this->jsonResponse(['success' => true, 'data' => $terms]);
+		} catch (Throwable $e) {
+			error_log('AcademicOverviewController@getTerms: ' . $e->getMessage());
+			$this->jsonResponse(['success' => false, 'message' => 'Failed to load terms'], 500);
+		}
+	}
+
 	public function getSubjectAverages(): void
 	{
 		if ($_SERVER['REQUEST_METHOD'] !== 'GET') {

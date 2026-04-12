@@ -24,12 +24,11 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
                 $from = !empty($req['dateFrom']) ? date('M d Y', strtotime($req['dateFrom'])) : '';
                 $to   = !empty($req['dateTo']) ? date('M d Y', strtotime($req['dateTo'])) : '';
 
-                // Remaining days (optional)
                 $remainLabel = '';
                 if (!empty($req['dateFrom'])) {
                     $today = new DateTime();
                     $start = new DateTime($req['dateFrom']);
-                    $diffDays = (int)$today->diff($start)->format('%r%a'); // can be negative
+                    $diffDays = (int)$today->diff($start)->format('%r%a');
 
                     if ($diffDays > 0) {
                         $remainLabel = $diffDays . " days remaining";
@@ -45,9 +44,8 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
                     $labelClass = "label label-green";
                 }
 
-                // Display teacher name if you joined it in SQL, otherwise fallback to ID
-                $teacherName = $req['teacher_name'] ?? null;
-                $teacherDisplay = $teacherName ? $teacherName : ("Teacher ID: " . ($req['teacherUserID'] ?? ''));
+                $usedLeaveDays = isset($req['used_leave_days']) ? (int)$req['used_leave_days'] : 0;
+                $remainingLeaveDays = isset($req['remaining_leave_days']) ? (int)$req['remaining_leave_days'] : 25;
                 ?>
 
                 <div class="info-box border-container">
@@ -59,7 +57,6 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
                             </span>
                         </span>
 
-
                         <span class="sub-heading">From: <?= htmlspecialchars($from) ?> → To: <?= htmlspecialchars($to) ?></span>
 
                         <span class="sub-heading-bolt"><?= ucfirst(htmlspecialchars($req['leaveType'] ?? '')) ?> Leave</span>
@@ -70,13 +67,23 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
                             <span class="sub-heading"><?= htmlspecialchars($req['reason']) ?></span>
                         <?php endif; ?>
 
+                        <div style="margin-top:10px; padding:10px 14px; background:#f8fafc; border:1px solid #e5e7eb; border-radius:10px; width:fit-content;">
+                            <div style="font-size:14px; color:#374151; margin-bottom:4px;">
+                                Used leave days this year: <strong><?= $usedLeaveDays ?></strong>/25
+                            </div>
+                            <div style="font-size:14px; color:#059669;">
+                                Remaining leave days: <strong><?= $remainingLeaveDays ?></strong>
+                            </div>
+                        </div>
+
                         <?php if (!empty($remainLabel)): ?>
-                            <label class="<?= $labelClass ?>"><?= htmlspecialchars($remainLabel) ?></label>
+                            <label class="<?= $labelClass ?>" style="margin-top:10px; display:inline-block;">
+                                <?= htmlspecialchars($remainLabel) ?>
+                            </label>
                         <?php endif; ?>
                     </div>
 
                     <div class="right two-com">
-                        <!-- Approve -->
                         <form action="/index.php?url=leave/decide" method="post" style="display:inline;">
                             <input type="hidden" name="leave_id" value="<?= (int)($req['id'] ?? 0) ?>">
                             <input type="hidden" name="status" value="approved">
@@ -86,7 +93,6 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
                             </button>
                         </form>
 
-                        <!-- Reject -->
                         <form action="/index.php?url=leave/decide" method="post" style="display:inline;">
                             <input type="hidden" name="leave_id" value="<?= (int)($req['id'] ?? 0) ?>">
                             <input type="hidden" name="status" value="rejected">

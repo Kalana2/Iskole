@@ -1,19 +1,19 @@
 <?php
+require_once __DIR__ . '/../Core/Database.php';
 
 class ClassSubjectModel
 {
-    private $db; // Database instance (PDO wrapper)
+    private $db;
 
     public function __construct()
     {
-        $this->db = Database::getInstance(); // your project DB wrapper
+        $this->db = Database::getInstance();
     }
 
     /* ===================== CLASSES ===================== */
 
     public function getAllClasses(): array
     {
-        // ✅ table columns: classID, grade, class
         $sql = "SELECT classID, grade, class 
                 FROM class
                 ORDER BY grade ASC, class ASC";
@@ -25,18 +25,28 @@ class ClassSubjectModel
 
     public function classExists(int $grade, string $section): bool
     {
-        // ✅ class column stores section (A/B)
+        $section = strtoupper(trim($section));
+
         $sql = "SELECT 1 FROM class WHERE grade = ? AND class = ? LIMIT 1";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$grade, strtoupper(trim($section))]);
+        $stmt->execute([$grade, $section]);
+
         return (bool)$stmt->fetchColumn();
     }
 
     public function createClass(int $grade, string $section): bool
     {
+        $section = strtoupper(trim($section));
+
+        // Safety validation in model too
+        if (!preg_match('/^[A-Za-z]$/', $section)) {
+            return false;
+        }
+
         $sql = "INSERT INTO class (grade, class) VALUES (?, ?)";
         $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$grade, strtoupper(trim($section))]);
+
+        return $stmt->execute([$grade, $section]);
     }
 
     public function deleteClass(int $classId): bool
@@ -48,13 +58,12 @@ class ClassSubjectModel
 
     /* ===================== SUBJECTS ===================== */
 
-
-
     public function getAllSubjects(): array
     {
         $sql = "SELECT subjectID, subjectName FROM subject ORDER BY subjectName ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
+
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -63,6 +72,7 @@ class ClassSubjectModel
         $sql = "SELECT 1 FROM subject WHERE subjectName = ? LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([trim($subjectName)]);
+
         return (bool)$stmt->fetchColumn();
     }
 
@@ -70,6 +80,7 @@ class ClassSubjectModel
     {
         $sql = "INSERT INTO subject (subjectName) VALUES (?)";
         $stmt = $this->db->prepare($sql);
+
         return $stmt->execute([trim($subjectName)]);
     }
 
@@ -77,6 +88,7 @@ class ClassSubjectModel
     {
         $sql = "DELETE FROM subject WHERE subjectID = ?";
         $stmt = $this->db->prepare($sql);
+
         return $stmt->execute([$subjectId]);
     }
 }

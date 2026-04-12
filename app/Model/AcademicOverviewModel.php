@@ -29,6 +29,28 @@ class AcademicOverviewModel
 		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
+	public function getTerms(): array
+	{
+		$sql = "SELECT DISTINCT term FROM marks WHERE term IS NOT NULL AND term <> '' ORDER BY CAST(term AS UNSIGNED), term";
+		$stmt = $this->pdo->prepare($sql);
+		$stmt->execute();
+		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+		$out = [];
+		foreach ($rows as $row) {
+			$term = (string)($row['term'] ?? '');
+			if ($term === '') {
+				continue;
+			}
+			$out[] = [
+				'value' => $term,
+				'label' => ctype_digit($term) ? ('Term ' . $term) : $term,
+			];
+		}
+
+		return $out;
+	}
+
 	public function getSubjects(): array
 	{
 		$sql = "SELECT subjectID, subjectName FROM subject ORDER BY subjectName";
