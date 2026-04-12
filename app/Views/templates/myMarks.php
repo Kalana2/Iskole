@@ -21,24 +21,25 @@ $isParent = ($userRole == 4);
       </div>
     </header>
 
-    <div class="center-container card">
-      
-      <div class="stats-overview">
+    <div class="stats-overview">
         <div class="stat-card">
           <div class="stat-icon">🏆</div>
           <div class="stat-content">
-            <h4>Section Rank</h4>
-            <p class="stat-value">#5</p>
+            <h4>Total marks</h4>
+            <p class="stat-value">1000</p>
           </div>
         </div>
         <div class="stat-card">
-          <div class="stat-icon">⭐</div>
+          <div class="stat-icon">🏆</div>
           <div class="stat-content">
-            <h4>Class Rank</h4>
-            <p class="stat-value">#1</p>
+            <h4>Average</h4>
+            <p class="stat-value">85%</p>
           </div>
         </div>
       </div>
+
+
+    <div class="center-container card">
 
       <!-- Performance Report with Charts -->
       <div class="performance-report">
