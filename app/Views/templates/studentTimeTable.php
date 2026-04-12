@@ -54,9 +54,7 @@ $stats = $stats ?? [
         <!-- Statistics Cards -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <i class="fas fa-calendar-week"></i>
-                </div>
+                <div class="stat-emoji" aria-hidden="true">#️⃣</div>
                 <div class="stat-content">
                     <div class="stat-value"><?php echo $stats['total_periods']; ?></div>
                     <div class="stat-label">Total Periods/Week</div>
@@ -64,9 +62,7 @@ $stats = $stats ?? [
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);">
-                    <i class="fas fa-book"></i>
-                </div>
+                <div class="stat-emoji" aria-hidden="true">📚</div>
                 <div class="stat-content">
                     <div class="stat-value"><?php echo $stats['subjects_count']; ?></div>
                     <div class="stat-label">Subjects</div>
@@ -74,9 +70,7 @@ $stats = $stats ?? [
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                    <i class="fas fa-chalkboard-teacher"></i>
-                </div>
+                <div class="stat-emoji" aria-hidden="true">👩‍🏫</div>
                 <div class="stat-content">
                     <div class="stat-value"><?php echo $stats['teachers_count']; ?></div>
                     <div class="stat-label">Teachers</div>
@@ -84,9 +78,7 @@ $stats = $stats ?? [
             </div>
 
             <div class="stat-card current-day-card">
-                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-                    <i class="fas fa-calendar-day"></i>
-                </div>
+                <div class="stat-emoji" aria-hidden="true">📅</div>
                 <div class="stat-content">
                     <div class="stat-value"><?php echo $currentDay; ?></div>
                     <div class="stat-label">Today</div>

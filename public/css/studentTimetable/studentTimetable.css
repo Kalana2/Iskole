@@ -136,17 +136,14 @@
   box-shadow: var(--shadow-md);
 }
 
-.stat-icon {
+.stat-emoji {
   width: 64px;
-  height: 64px;
-  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.75rem;
-  color: white;
+  font-size: 2.6rem;
+  line-height: 1;
   flex-shrink: 0;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 .stat-content {
@@ -161,7 +158,7 @@
 }
 
 .stat-label {
-  font-size: 0.9rem;
+  font-size: 1.0rem;
   color: var(--muted);
   margin-top: 0.25rem;
 }
@@ -390,6 +387,7 @@
 /* Class Cell */
 .class-cell {
   padding: 0.75rem;
+  height: var(--slot-height);
 }
 
 .today-cell {
@@ -406,7 +404,8 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   transition: all 0.3s ease;
   height: 100%;
-  min-height: 0;
+  min-height: 100%;
+  max-height: 100%;
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -442,6 +441,7 @@
 .class-details {
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   font-size: 0.85rem;
   min-width: 0;
@@ -458,9 +458,19 @@
 }
 
 .teacher-name {
+  display: grid;
+  grid-template-columns: 16px minmax(0, auto) 16px;
+  align-items: center;
+  column-gap: 0.5rem;
+  width: 100%;
+  text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.teacher-name::after {
+  content: "";
 }
 
 .teacher-name i,
@@ -566,10 +576,9 @@
     padding: 1.25rem;
   }
 
-  .stat-icon {
+  .stat-emoji {
     width: 56px;
-    height: 56px;
-    font-size: 1.5rem;
+    font-size: 2.3rem;
   }
 
   .stat-value {
@@ -626,10 +635,9 @@
     gap: 0.75rem;
   }
 
-  .stat-icon {
+  .stat-emoji {
     width: 48px;
-    height: 48px;
-    font-size: 1.25rem;
+    font-size: 2rem;
   }
 
   .stat-value {
