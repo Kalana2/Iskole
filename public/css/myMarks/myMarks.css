@@ -1,17 +1,229 @@
 /* filepath: /home/snake/Projects/Iskole/public/css/myMarks/myMarks.css */
-/* Reuse variables from report.css; override or extend as needed */
 :root {
   --mm-gap: 1rem;
 }
 
-/* Recent Results Card */
+/* ── Marks Card ─────────────────────────────────────── */
+.marks-card {
+  margin-bottom: 1.75rem;
+}
+
+.marks-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.marks-card-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  margin: 0;
+}
+
+/* ── Pill-Style Term Switcher (matching screenshot) ─── */
+.term-pill-switcher {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  background: transparent;
+  padding: 0;
+}
+
+.term-pill {
+  padding: 0.5rem 1.2rem;
+  border: 1.5px solid #d1d5db;
+  background: transparent;
+  border-radius: 24px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.22s ease;
+  white-space: nowrap;
+}
+
+.term-pill:hover {
+  color: #374151;
+  border-color: #9ca3af;
+  background: rgba(102, 126, 234, 0.06);
+}
+
+.term-pill.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 3px 10px rgba(102, 126, 234, 0.35);
+}
+
+/* ── Subject Marks Table ────────────────────────────── */
+.marks-table-wrapper {
+  overflow-x: auto;
+  border-radius: 14px;
+  border: 1px solid rgba(17, 24, 39, 0.07);
+}
+
+.marks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 1rem;
+}
+
+.marks-table thead {
+  background: #f8f9fc;
+}
+
+.marks-table th {
+  padding: 0.9rem 1.1rem;
+  text-align: left;
+  font-weight: 700;
+  color: #6b7280;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  border-bottom: 2px solid #e5e7eb;
+  white-space: nowrap;
+}
+
+.marks-table td {
+  padding: 0.85rem 1.1rem;
+  color: #4b5563;
+  border-bottom: 1px solid #f0f1f5;
+  transition: background 0.2s;
+  font-variant-numeric: tabular-nums;
+  font-size: 1rem;
+}
+
+.marks-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.marks-table tbody tr:hover td {
+  background: rgba(102, 126, 234, 0.04);
+}
+
+/* Subject name cell */
+.marks-table td:first-child {
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+/* Term mark styling — normal */
+.term-mark {
+  font-weight: 400;
+  color: #6b7280;
+}
+
+/* Bold for selected term */
+.term-mark.selected {
+  font-weight: 800;
+  color: #1a1a2e;
+  font-size: 1.05rem;
+}
+
+/* Average percentage */
+.avg-cell {
+  font-weight: 700;
+  color: #667eea;
+}
+
+/* ── Grade Badge (pill style) ───────────────────────── */
+.grade-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 26px;
+  padding: 0 0.55rem;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.grade-badge.A {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.grade-badge.B {
+  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+}
+
+.grade-badge.C {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.grade-badge.S {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+}
+
+.grade-badge.W {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.grade-badge.na {
+  background: #e5e7eb;
+  color: #9ca3af;
+}
+
+/* ── Table Footer (Totals / Average / Rank) ─────────── */
+.marks-table tfoot {
+  background: #f8f9fc;
+}
+
+.marks-table tfoot td {
+  padding: 0.8rem 1.1rem;
+  font-weight: 700;
+  color: #1a1a2e;
+  border-top: 2px solid #e5e7eb;
+  border-bottom: 1px solid #eef0f4;
+  font-size: 0.95rem;
+}
+
+.marks-table tfoot tr:last-child td {
+  border-bottom: none;
+}
+
+.marks-table tfoot .footer-label {
+  font-weight: 700;
+  color: #374151;
+}
+
+.marks-table tfoot .footer-val {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.marks-table tfoot .footer-val.selected {
+  color: #1a1a2e;
+  font-weight: 800;
+}
+
+.marks-table tfoot .footer-avg {
+  color: #667eea;
+  font-weight: 700;
+}
+
+/* ── Chart subtitle ─────────────────────────────────── */
+.report-subtitle {
+  font-size: 0.92rem;
+  color: #6b7280;
+  margin: -0.75rem 0 1rem;
+  font-weight: 400;
+}
+
+/* ── Misc existing ──────────────────────────────────── */
 .recent-results {
   margin-top: 2rem;
   background: #ffffff;
   border: 1px solid rgba(17, 24, 39, 0.08);
   border-radius: 16px;
   padding: 1.5rem 1.75rem;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
 }
 
 .recent-results .report-title {
@@ -30,11 +242,6 @@
   border-bottom: none;
 }
 
-.margin-bottom-top span:first-child {
-  font-weight: 600;
-  color: #1a1a2e;
-}
-
 .leftside {
   display: flex;
   align-items: center;
@@ -48,13 +255,39 @@
   height: 32px;
 }
 
-/* Ensure progress bars animate similarly */
 .subject-card .progress-fill {
   transition: width 0.6s ease;
 }
 
-/* Responsive tweaks */
+/* ── Responsive ─────────────────────────────────────── */
 @media (max-width: 768px) {
+  .marks-card-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .term-pill-switcher {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .term-pill {
+    flex: 1;
+    text-align: center;
+    padding: 0.45rem 0.5rem;
+    font-size: 0.8rem;
+  }
+
+  .marks-table {
+    font-size: 0.88rem;
+  }
+
+  .marks-table th,
+  .marks-table td {
+    padding: 0.65rem 0.7rem;
+  }
+
   .dashboard-headers {
     flex-direction: column;
     align-items: flex-start;

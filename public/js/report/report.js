@@ -27,6 +27,7 @@ let studentData = null;
 // Chart.js configuration
 let performanceChart = null;
 let currentChartType = "bar";
+let currentTerm = "all";
 
 // Color scheme
 const colorScheme = {
@@ -68,44 +69,49 @@ function initChart() {
   }
 
   // Define datasets for all three terms
-  const termDatasets = [
+  const allTermDatasets = [
     {
       key: "term1",
       label: "Term 1",
       data: studentData.terms.term1,
       termKey: "term1",
-      borderColor: "rgba(96, 165, 250, 0.85)",
+      borderColor: "#2DD4BF",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(96, 165, 250, 0.55)"
-          : "rgba(96, 165, 250, 0.1)",
+          ? "rgba(45, 212, 191, 0.75)"
+          : "rgba(45, 212, 191, 0.1)",
     },
     {
       key: "term2",
       label: "Term 2",
       data: studentData.terms.term2,
       termKey: "term2",
-      borderColor: "rgba(37, 99, 235, 0.85)",
+      borderColor: "#60A5FA",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(37, 99, 235, 0.55)"
-          : "rgba(37, 99, 235, 0.1)",
+          ? "rgba(96, 165, 250, 0.75)"
+          : "rgba(96, 165, 250, 0.1)",
     },
     {
       key: "term3",
       label: "Term 3",
       data: studentData.terms.term3,
       termKey: "term3",
-      borderColor: "rgba(30, 64, 175, 0.85)",
+      borderColor: "#818CF8",
       backgroundColor:
         currentChartType === "bar"
-          ? "rgba(30, 64, 175, 0.55)"
-          : "rgba(30, 64, 175, 0.1)",
+          ? "rgba(129, 140, 248, 0.75)"
+          : "rgba(129, 140, 248, 0.1)",
     },
   ];
 
-  // Always show datasets for all three terms
-  const datasets = termDatasets.map((dataset) => ({
+  // Filter datasets based on currentTerm
+  const filteredTermDatasets =
+    currentTerm === "all"
+      ? allTermDatasets
+      : allTermDatasets.filter((d) => d.key === currentTerm);
+
+  const datasets = filteredTermDatasets.map((dataset) => ({
     label: dataset.label,
     data: dataset.data,
     termKey: dataset.termKey,
@@ -183,35 +189,35 @@ function initChart() {
       scales:
         currentChartType === "line" || currentChartType === "bar"
           ? {
-              x: {
-                grid: {
-                  display: false,
+            x: {
+              grid: {
+                display: false,
+              },
+              ticks: {
+                font: {
+                  size: 11,
+                  weight: "600",
                 },
-                ticks: {
-                  font: {
-                    size: 11,
-                    weight: "600",
-                  },
-                  maxRotation: 45,
-                  minRotation: 45,
+                maxRotation: 45,
+                minRotation: 45,
+              },
+            },
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: "rgba(0, 0, 0, 0.05)",
+              },
+              ticks: {
+                font: {
+                  size: 11,
+                },
+                callback: function (value) {
+                  return value + "%";
                 },
               },
-              y: {
-                beginAtZero: true,
-                max: 100,
-                grid: {
-                  color: "rgba(0, 0, 0, 0.05)",
-                },
-                ticks: {
-                  font: {
-                    size: 11,
-                  },
-                  callback: function (value) {
-                    return value + "%";
-                  },
-                },
-              },
-            }
+            },
+          }
           : {},
     },
   };
@@ -255,6 +261,8 @@ async function loadMyMarksData() {
       json.marks || [],
       json.subjects || [],
     );
+    // Attach ranks from API
+    studentData.ranks = json.ranks || {};
     return true;
   } catch (e) {
     console.error("Error loading marks:", e);
@@ -362,6 +370,190 @@ function setupChartToggle() {
   });
 }
 
+// ── Term Pill Switcher ──────────────────────────────────
+function setupTermSwitcher() {
+  const pills = document.querySelectorAll(".term-pill");
+  if (!pills.length) return;
+
+  pills.forEach((pill) => {
+    pill.addEventListener("click", function () {
+      pills.forEach((p) => p.classList.remove("active"));
+      this.classList.add("active");
+      currentTerm = this.dataset.term;
+      renderMarksTable();
+      initChart();
+    });
+  });
+}
+
+// ── Subject Marks Table ─────────────────────────────────
+
+function getGradeLetter(score) {
+  if (score === null || score === undefined || score === 0) return "-";
+  if (score >= 75) return "A";
+  if (score >= 65) return "B";
+  if (score >= 50) return "C";
+  if (score >= 35) return "S";
+  return "W";
+}
+
+function renderMarksTable() {
+  const tbody = document.getElementById("marksTableBody");
+  const tfoot = document.getElementById("marksTableFoot");
+  if (!tbody || !studentData || !studentData.subjects) return;
+
+  const termKeys = ["term1", "term2", "term3"];
+  const subjectCount = studentData.subjects.length;
+  const maxMarks = 100; // per subject per term
+
+  // Accumulators for footer
+  const totals = { term1: 0, term2: 0, term3: 0 };
+
+  // Build body rows
+  tbody.innerHTML = "";
+  studentData.subjects.forEach((subject, idx) => {
+    const tr = document.createElement("tr");
+
+    // ─ Subject name ─
+    const tdName = document.createElement("td");
+    tdName.textContent = subject.name;
+    tr.appendChild(tdName);
+
+    // ─ Term 1 / 2 / 3 marks (always visible, bold if selected) ─
+    const scores = {};
+    termKeys.forEach((tk) => {
+      const td = document.createElement("td");
+      const score = studentData.terms[tk][idx];
+      scores[tk] = score;
+
+      // Accumulate for totals
+      if (score && score > 0) totals[tk] += score;
+
+      const span = document.createElement("span");
+      span.className = "term-mark";
+      if (currentTerm === tk) span.classList.add("selected");
+
+      if (score === null || score === undefined || score === 0) {
+        span.textContent = "—";
+        span.style.color = "#9ca3af";
+      } else {
+        span.textContent = score;
+      }
+      td.appendChild(span);
+      tr.appendChild(td);
+    });
+
+    // ─ Average ─
+    const tdAvg = document.createElement("td");
+    const validScores = termKeys.map((tk) => scores[tk]).filter((s) => s && s > 0);
+    const avg = validScores.length > 0
+      ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length)
+      : 0;
+    const avgSpan = document.createElement("span");
+    avgSpan.className = "avg-cell";
+    avgSpan.textContent = avg > 0 ? avg + "%" : "—";
+    tdAvg.appendChild(avgSpan);
+    tr.appendChild(tdAvg);
+
+    // ─ Grade badge ─
+    const tdGrade = document.createElement("td");
+    let grade = "-";
+    if (currentTerm !== "all" && subject.grades && subject.grades[currentTerm]) {
+      grade = subject.grades[currentTerm];
+    } else {
+      grade = subject.grade || "-";
+    }
+    const badge = document.createElement("span");
+    badge.className = "grade-badge " + (grade === "-" ? "na" : grade);
+    badge.textContent = grade;
+    tdGrade.appendChild(badge);
+    tr.appendChild(tdGrade);
+
+    tbody.appendChild(tr);
+  });
+
+  // ─── Footer rows: Total marks, Average, Class Rank ───
+  if (!tfoot) return;
+  tfoot.innerHTML = "";
+  const totalPossible = subjectCount * maxMarks;
+
+  // Row 1: Total marks
+  const trTotals = document.createElement("tr");
+  trTotals.className = "summary-row";
+  const tdTotalLabel = document.createElement("td");
+  tdTotalLabel.className = "footer-label";
+  tdTotalLabel.textContent = "Total marks";
+  trTotals.appendChild(tdTotalLabel);
+
+  termKeys.forEach((tk) => {
+    const td = document.createElement("td");
+    const span = document.createElement("span");
+    span.className = "footer-val";
+    if (currentTerm === tk) span.classList.add("selected");
+    span.textContent = totals[tk] + " / " + totalPossible;
+    td.appendChild(span);
+    trTotals.appendChild(td);
+  });
+  // Empty cells for Average + Grade columns
+  trTotals.appendChild(document.createElement("td"));
+  trTotals.appendChild(document.createElement("td"));
+  tfoot.appendChild(trTotals);
+
+  // Row 2: Average per term
+  const trAvg = document.createElement("tr");
+  trAvg.className = "summary-row";
+  const tdAvgLabel = document.createElement("td");
+  tdAvgLabel.className = "footer-label";
+  tdAvgLabel.textContent = "Average";
+  trAvg.appendChild(tdAvgLabel);
+
+  termKeys.forEach((tk) => {
+    const td = document.createElement("td");
+    const span = document.createElement("span");
+    span.className = "footer-val";
+    if (currentTerm === tk) span.classList.add("selected");
+    const termAvg = subjectCount > 0 ? Math.round(totals[tk] / subjectCount) : 0;
+    span.textContent = termAvg > 0 ? termAvg + "%" : "—";
+    td.appendChild(span);
+    trAvg.appendChild(td);
+  });
+  trAvg.appendChild(document.createElement("td"));
+  trAvg.appendChild(document.createElement("td"));
+  tfoot.appendChild(trAvg);
+
+  // Row 3: Class Rank (from API data)
+  const trRank = document.createElement("tr");
+  trRank.className = "summary-row";
+  const tdRankLabel = document.createElement("td");
+  tdRankLabel.className = "footer-label";
+  tdRankLabel.textContent = "Class Rank";
+  trRank.appendChild(tdRankLabel);
+
+  const totalStudents = studentData.ranks && studentData.ranks.totalStudents
+    ? studentData.ranks.totalStudents
+    : null;
+
+  termKeys.forEach((tk) => {
+    const td = document.createElement("td");
+    const span = document.createElement("span");
+    span.className = "footer-val";
+    if (currentTerm === tk) span.classList.add("selected");
+    const rank = studentData.ranks && studentData.ranks[tk] ? studentData.ranks[tk] : null;
+    if (rank && totalStudents) {
+      span.textContent = rank + " / " + totalStudents;
+    } else if (rank) {
+      span.textContent = rank;
+    } else {
+      span.textContent = "—";
+    }
+    td.appendChild(span);
+    trRank.appendChild(td);
+  });
+  trRank.appendChild(document.createElement("td"));
+  trRank.appendChild(document.createElement("td"));
+  tfoot.appendChild(trRank);
+}
+
 // Search functionality
 function setupSearch() {
   const searchInput = document.getElementById("searchInput");
@@ -443,10 +635,9 @@ function addBehaviorReportCard(report) {
         </span>
       </div>
     </div>
-    ${
-      report.title
-        ? `<div class="report-title">${escapeHtml(report.title)}</div>`
-        : ""
+    ${report.title
+      ? `<div class="report-title">${escapeHtml(report.title)}</div>`
+      : ""
     }
     <div class="report-content">
       <p>${escapeHtml(report.description)}</p>
@@ -543,8 +734,10 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   loadMyMarksData().finally(() => {
+    renderMarksTable();
     initChart();
     setupChartToggle();
+    setupTermSwitcher();
   });
 
   setupSearch();
@@ -555,5 +748,6 @@ document.addEventListener("DOMContentLoaded", function () {
 // Export functions for external use
 window.reportModule = {
   initChart,
+  renderMarksTable,
   addBehaviorUpdate,
 };

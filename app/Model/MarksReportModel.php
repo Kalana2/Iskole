@@ -20,7 +20,8 @@ class MarksReportModel
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['uid' => $userId]);
         $row = $stmt->fetch();
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         return [
             'studentID' => $row['studentID'],
@@ -115,7 +116,8 @@ class MarksReportModel
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['parentUserId' => $parentUserId]);
         $row = $stmt->fetch();
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         return [
             'studentID' => $row['studentID'],
@@ -158,5 +160,69 @@ class MarksReportModel
             'marks' => array_values($marks),
             'average' => $average,
         ];
+    }
+
+    /**
+     * Get the student's class rank for each term (1, 2, 3).
+     * Ranks all students in the same class by total marks per term.
+     * Returns ['term1' => rank, 'term2' => rank, 'term3' => rank, 'totalStudents' => count].
+     */
+    public function getClassRanksForStudent(int $studentId, int $classId): array
+    {
+        // Sum marks per student per term for all students in this class
+        $sql = "SELECT m.studentID, m.term, SUM(m.marks) AS totalMarks
+                FROM marks m
+                JOIN students st ON st.studentID = m.studentID
+                WHERE st.classID = :classId
+                GROUP BY m.studentID, m.term
+                ORDER BY m.term ASC, totalMarks DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['classId' => intval($classId)]);
+        $rows = $stmt->fetchAll();
+
+        // Count distinct students in class
+        $sqlCount = "SELECT COUNT(*) FROM students WHERE classID = :classId";
+        $stmtCount = $this->pdo->prepare($sqlCount);
+        $stmtCount->execute(['classId' => intval($classId)]);
+        $totalStudents = intval($stmtCount->fetchColumn());
+
+        // Group by term and rank
+        $termData = []; // term => [ [studentID, totalMarks], ... ] sorted desc
+        foreach ($rows as $r) {
+            $term = strval($r['term']);
+            if (!isset($termData[$term])) {
+                $termData[$term] = [];
+            }
+            $termData[$term][] = [
+                'studentID' => intval($r['studentID']),
+                'totalMarks' => floatval($r['totalMarks']),
+            ];
+        }
+
+        $ranks = ['term1' => null, 'term2' => null, 'term3' => null, 'totalStudents' => $totalStudents];
+
+        foreach (['1' => 'term1', '2' => 'term2', '3' => 'term3'] as $termNum => $termKey) {
+            if (!isset($termData[$termNum]))
+                continue;
+
+            // Already sorted by totalMarks DESC from SQL
+            $position = 1;
+            $prevTotal = null;
+            $prevRank = 1;
+            foreach ($termData[$termNum] as $i => $entry) {
+                if ($prevTotal !== null && $entry['totalMarks'] < $prevTotal) {
+                    $position = $i + 1;
+                }
+                if ($entry['studentID'] === $studentId) {
+                    $ranks[$termKey] = $position;
+                    break;
+                }
+                $prevTotal = $entry['totalMarks'];
+                $prevRank = $position;
+            }
+        }
+
+        return $ranks;
     }
 }
