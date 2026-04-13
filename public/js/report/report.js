@@ -189,35 +189,35 @@ function initChart() {
       scales:
         currentChartType === "line" || currentChartType === "bar"
           ? {
-            x: {
-              grid: {
-                display: false,
-              },
-              ticks: {
-                font: {
-                  size: 11,
-                  weight: "600",
+              x: {
+                grid: {
+                  display: false,
                 },
-                maxRotation: 45,
-                minRotation: 45,
-              },
-            },
-            y: {
-              beginAtZero: true,
-              max: 100,
-              grid: {
-                color: "rgba(0, 0, 0, 0.05)",
-              },
-              ticks: {
-                font: {
-                  size: 11,
-                },
-                callback: function (value) {
-                  return value + "%";
+                ticks: {
+                  font: {
+                    size: 11,
+                    weight: "600",
+                  },
+                  maxRotation: 45,
+                  minRotation: 45,
                 },
               },
-            },
-          }
+              y: {
+                beginAtZero: true,
+                max: 100,
+                grid: {
+                  color: "rgba(0, 0, 0, 0.05)",
+                },
+                ticks: {
+                  font: {
+                    size: 11,
+                  },
+                  callback: function (value) {
+                    return value + "%";
+                  },
+                },
+              },
+            }
           : {},
     },
   };
@@ -245,12 +245,31 @@ async function loadMyMarksData() {
       return false;
     }
 
-    // If parent view, update the child's name display
-    if (json.isParentView && json.student) {
+    // Populate header badge fields when student data is available
+    if (json.student) {
       const childNameEl = document.getElementById("childName");
+      const childClassEl = document.getElementById("childClass");
+      const childAcademicYearEl = document.getElementById("childAcademicYear");
+
       if (childNameEl) {
         childNameEl.textContent = json.student.name || "—";
       }
+
+      if (childClassEl) {
+        childClassEl.textContent =
+          json.student.classLabel ||
+          json.student.className ||
+          json.student.class ||
+          "—";
+      }
+
+      if (childAcademicYearEl) {
+        childAcademicYearEl.textContent =
+          json.student.academicYear || json.student.year || "—";
+      }
+    }
+
+    if (json.isParentView) {
       const childInfoBadge = document.getElementById("childInfoBadge");
       if (childInfoBadge) {
         childInfoBadge.style.display = "flex";
@@ -406,6 +425,20 @@ function renderMarksTable() {
   const subjectCount = studentData.subjects.length;
   const maxMarks = 100; // per subject per term
 
+  function setSplitSummaryValue(el, mainValue, denominator) {
+    el.textContent = "";
+
+    const main = document.createElement("span");
+    main.className = "footer-main";
+    main.textContent = String(mainValue);
+    el.appendChild(main);
+
+    const denom = document.createElement("span");
+    denom.className = "footer-max";
+    denom.textContent = " / " + String(denominator);
+    el.appendChild(denom);
+  }
+
   // Accumulators for footer
   const totals = { term1: 0, term2: 0, term3: 0 };
 
@@ -445,10 +478,15 @@ function renderMarksTable() {
 
     // ─ Average ─
     const tdAvg = document.createElement("td");
-    const validScores = termKeys.map((tk) => scores[tk]).filter((s) => s && s > 0);
-    const avg = validScores.length > 0
-      ? Math.round(validScores.reduce((a, b) => a + b, 0) / validScores.length)
-      : 0;
+    const validScores = termKeys
+      .map((tk) => scores[tk])
+      .filter((s) => s && s > 0);
+    const avg =
+      validScores.length > 0
+        ? Math.round(
+            validScores.reduce((a, b) => a + b, 0) / validScores.length,
+          )
+        : 0;
     const avgSpan = document.createElement("span");
     avgSpan.className = "avg-cell";
     avgSpan.textContent = avg > 0 ? avg + "%" : "—";
@@ -458,7 +496,11 @@ function renderMarksTable() {
     // ─ Grade badge ─
     const tdGrade = document.createElement("td");
     let grade = "-";
-    if (currentTerm !== "all" && subject.grades && subject.grades[currentTerm]) {
+    if (
+      currentTerm !== "all" &&
+      subject.grades &&
+      subject.grades[currentTerm]
+    ) {
       grade = subject.grades[currentTerm];
     } else {
       grade = subject.grade || "-";
@@ -490,7 +532,7 @@ function renderMarksTable() {
     const span = document.createElement("span");
     span.className = "footer-val";
     if (currentTerm === tk) span.classList.add("selected");
-    span.textContent = totals[tk] + " / " + totalPossible;
+    setSplitSummaryValue(span, totals[tk], totalPossible);
     td.appendChild(span);
     trTotals.appendChild(td);
   });
@@ -512,7 +554,8 @@ function renderMarksTable() {
     const span = document.createElement("span");
     span.className = "footer-val";
     if (currentTerm === tk) span.classList.add("selected");
-    const termAvg = subjectCount > 0 ? Math.round(totals[tk] / subjectCount) : 0;
+    const termAvg =
+      subjectCount > 0 ? Math.round(totals[tk] / subjectCount) : 0;
     span.textContent = termAvg > 0 ? termAvg + "%" : "—";
     td.appendChild(span);
     trAvg.appendChild(td);
@@ -529,18 +572,20 @@ function renderMarksTable() {
   tdRankLabel.textContent = "Class Rank";
   trRank.appendChild(tdRankLabel);
 
-  const totalStudents = studentData.ranks && studentData.ranks.totalStudents
-    ? studentData.ranks.totalStudents
-    : null;
+  const totalStudents =
+    studentData.ranks && studentData.ranks.totalStudents
+      ? studentData.ranks.totalStudents
+      : null;
 
   termKeys.forEach((tk) => {
     const td = document.createElement("td");
     const span = document.createElement("span");
     span.className = "footer-val";
     if (currentTerm === tk) span.classList.add("selected");
-    const rank = studentData.ranks && studentData.ranks[tk] ? studentData.ranks[tk] : null;
+    const rank =
+      studentData.ranks && studentData.ranks[tk] ? studentData.ranks[tk] : null;
     if (rank && totalStudents) {
-      span.textContent = rank + " / " + totalStudents;
+      setSplitSummaryValue(span, rank, totalStudents);
     } else if (rank) {
       span.textContent = rank;
     } else {
@@ -635,9 +680,10 @@ function addBehaviorReportCard(report) {
         </span>
       </div>
     </div>
-    ${report.title
-      ? `<div class="report-title">${escapeHtml(report.title)}</div>`
-      : ""
+    ${
+      report.title
+        ? `<div class="report-title">${escapeHtml(report.title)}</div>`
+        : ""
     }
     <div class="report-content">
       <p>${escapeHtml(report.description)}</p>

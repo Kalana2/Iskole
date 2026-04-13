@@ -21,6 +21,14 @@ $isParent = ($userRole == 4);
           <span class="info-label">Student name</span>
           <span class="info-value" id="childName">—</span>
         </div>
+        <div class="info-item">
+          <span class="info-label">Class</span>
+          <span class="info-value" id="childClass">—</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Academic Year</span>
+          <span class="info-value" id="childAcademicYear">—</span>
+        </div>
       </div>
     </header>
 
@@ -34,7 +42,7 @@ $isParent = ($userRole == 4);
             <button class="term-pill" data-term="term1">Term 1</button>
             <button class="term-pill" data-term="term2">Term 2</button>
             <button class="term-pill" data-term="term3">Term 3</button>
-            <button class="term-pill active" data-term="all">All</button>
+            <button class="term-pill active" data-term="all">All terms</button>
           </div>
         </div>
         <div class="marks-table-wrapper">
