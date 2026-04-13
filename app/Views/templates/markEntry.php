@@ -4,7 +4,6 @@ $teacherInfo = $teacherInfo ?? ['name' => '', 'subject' => ''];
 $grades = $grades ?? [];
 $classes = $classes ?? [];
 $terms = $terms ?? [];
-//$examTypes = $examTypes ?? [];
 $selectedGrade = $selectedGrade ?? '';
 $selectedClass = $selectedClass ?? '';
 $selectedTerm = $selectedTerm ?? '';
@@ -12,7 +11,7 @@ $selectedExamType = $selectedExamType ?? '';
 $students = $students ?? [];
 $message = $message ?? null;
 
-// Calculate statistics from supplied students if controller didn't
+// Calculate statistics from supplied students
 $totalStudents = $totalStudents ?? count($students);
 $marksEntered = $marksEntered ?? count(array_filter($students, function ($s) {
     return isset($s['previous_marks']) && $s['previous_marks'] !== null && $s['previous_marks'] !== '';
@@ -39,16 +38,6 @@ if (empty($classAverage)) {
                     <h1 class="heading-text" id="marks-entry-title">Enter Student Marks</h1>
                     <p class="sub-heding-text">Record and manage examination marks for your students</p>
                 </div>
-                <!-- <div class="teacher-info-badge">
-                        <div class="info-item">
-                            <span class="info-label">Teacher:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['name']); ?></span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Subject:</span>
-                            <span class="info-value"><?php echo htmlspecialchars($teacherInfo['subject']); ?></span>
-                        </div>
-                    </div> -->
             </div>
         </div>
 
@@ -133,15 +122,6 @@ if (empty($classAverage)) {
                     }
                 }
             }
-            /*$examTypeLabel = '-';
-                if (!empty($examTypes) && $selectedExamType !== '') {
-                    foreach ($examTypes as $et) {
-                        if (isset($et['value']) && (string)$et['value'] === (string)$selectedExamType) {
-                            $examTypeLabel = $et['label'];
-                            break;
-                        }
-                    }
-                }*/
             ?>
             <div class="selection-summary" id="selectionSummary">
                 <div class="summary-badge">
@@ -149,7 +129,6 @@ if (empty($classAverage)) {
                     <span class="summary-text">
                         Showing: <strong>Grade <?php echo $selectedGrade; ?>-<?php echo $selectedClass; ?></strong> •
                         <strong><?php echo htmlspecialchars($termLabel); ?></strong>
-                        <!--<strong><?php echo htmlspecialchars($examTypeLabel); ?></strong>-->marks
                     </span>
                 </div>
             </div>
@@ -281,10 +260,10 @@ if (empty($classAverage)) {
                             <span class="btn-icon">🗑️</span>
                             <span class="btn-text">Clear All</span>
                         </button>
-                        <!--<button type="button" class="btn btn-secondary" onclick="saveDraft()">
+                        <button type="button" class="btn btn-secondary" onclick="saveDraft()">
                                 <span class="btn-icon">💾</span>
                                 <span class="btn-text">Save Draft</span>
-                            </button>-->
+                        </button>
                         <button type="submit" class="btn btn-primary">
                             <span class="btn-icon">✓</span>
                             <span class="btn-text">Submit Marks</span>
@@ -390,7 +369,7 @@ if (empty($classAverage)) {
                     alert('Error: ' + (data.error || 'Unknown error'));
                     return;
                 }
-                // Update the row UI: clear previous/current marks + remove the Remove button
+                // clear previous/current marks + remove the Remove button
                 const input = document.querySelector('.marks-input[data-student-id="' + studentId + '"]');
                 const row = input ? input.closest('tr') : (document.querySelector('button.status-remove[onclick*="removeMarks(' + studentId + '"]')?.closest('tr') || null);
 
@@ -428,11 +407,73 @@ if (empty($classAverage)) {
         }
     }
 
-    // Save as draft
-    function saveDraft() {
-        console.log('Saving draft...');
-        // TODO: Implement AJAX save functionality
-        alert('Draft saved successfully! (This is a demo)');
+    let draftSaveInProgress = false;
+
+    // Save current marks as draft without final submission
+    function saveDraft(silent = false) {
+        const form = document.getElementById('marksForm');
+        if (!form) {
+            if (!silent) alert('Load students before saving a draft.');
+            return Promise.resolve(false);
+        }
+
+        const grade = form.querySelector('input[name="grade"]')?.value || '';
+        const classVal = form.querySelector('input[name="class"]')?.value || '';
+        const term = form.querySelector('input[name="term"]')?.value || '';
+
+        if (!grade || !classVal || !term) {
+            if (!silent) alert('Grade, Class, and Term are required to save draft.');
+            return Promise.resolve(false);
+        }
+
+        if (draftSaveInProgress) {
+            return Promise.resolve(false);
+        }
+
+        const formData = new FormData();
+        formData.append('grade', grade);
+        formData.append('class', classVal);
+        formData.append('term', term);
+
+        const inputs = form.querySelectorAll('.marks-input[data-student-id]');
+        inputs.forEach((input) => {
+            const sid = input.dataset.studentId;
+            if (!sid) return;
+            formData.append('marks[' + sid + ']', input.value || '');
+        });
+
+        draftSaveInProgress = true;
+
+        return fetch('/index.php?url=markEntry/saveDraft', {
+                method: 'POST',
+                body: formData
+            })
+            .then(r => {
+                const ct = r.headers.get('Content-Type') || '';
+                if (!ct.includes('application/json')) return r.text().then(t => {
+                    throw new Error('Unexpected response: ' + t.substring(0, 120));
+                });
+                return r.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to save draft');
+                }
+                if (!silent) {
+                    showFlashMessage(data.message || 'Draft saved successfully.');
+                }
+                return true;
+            })
+            .catch(err => {
+                console.error('Draft save error:', err);
+                if (!silent) {
+                    alert('Draft save failed: ' + err.message);
+                }
+                return false;
+            })
+            .finally(() => {
+                draftSaveInProgress = false;
+            });
     }
 
     // Form submission handled via AJAX (delegated) so page does not reload
@@ -484,10 +525,9 @@ if (empty($classAverage)) {
             });
     });
 
-    // Auto-save functionality (every 2 minutes)
+    // Auto-save draft every 2 minutes (silent)
     setInterval(function() {
-        console.log('Auto-saving draft...');
-        // TODO: Implement auto-save via AJAX
+        saveDraft(true);
     }, 120000);
 
     // Re-enabled AJAX loading to prevent page refresh
@@ -553,16 +593,6 @@ if (empty($classAverage)) {
                 const termLabel = termOption ? termOption.textContent : ('Term ' + (data.selectedTerm || '-'));
                 summary.querySelector('.summary-text').innerHTML = 'Showing: <strong>Grade ' + escapeHtml(data.selectedGrade) + '-' + escapeHtml(data.selectedClass) + '</strong> • <strong>' + escapeHtml(termLabel) + '</strong>';
             }
-            // Stats
-            /*if (data.stats) {
-                const statValues = document.querySelectorAll('.stat-card .stat-value');
-                if (statValues.length >= 4) {
-                    statValues[0].textContent = data.stats.totalStudents;
-                    statValues[1].textContent = data.stats.marksEntered;
-                    statValues[2].textContent = data.stats.marksPending;
-                    statValues[3].textContent = (data.stats.classAverage || 0) + '%';
-                }
-            }*/
 
             // Stats Section
             if (data.stats) {
@@ -640,7 +670,7 @@ if (empty($classAverage)) {
                 tableContainer = document.createElement('div');
                 tableContainer.className = 'marks-table-container';
                 tableContainer.id = 'marksTableContainer';
-                tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Student ID</th><th>Student Name</th><th>Previous marks</th><th>Current Marks</th><th>Grade</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
+                tableContainer.innerHTML = '<form action="/index.php?url=markEntry" method="POST" id="marksForm">\n<input type="hidden" name="grade"/>\n<input type="hidden" name="class"/>\n<input type="hidden" name="term"/>\n<div class="table-wrapper"><table class="marks-table"><thead><tr><th>#</th><th>Student ID</th><th>Student Name</th><th>Previous marks</th><th>Current Marks</th><th>Grade</th><th>Action</th></tr></thead><tbody></tbody></table></div><div class="action-buttons"><button type="button" class="btn btn-secondary" onclick="clearAllMarks()"><span class="btn-icon">🗑️</span><span class="btn-text">Clear All</span></button><button type="button" class="btn btn-secondary" onclick="saveDraft()"><span class="btn-icon">💾</span><span class="btn-text">Save Draft</span></button><button type="submit" class="btn btn-primary"><span class="btn-icon">✓</span><span class="btn-text">Submit Marks</span></button></div></form>';
                 document.querySelector('.box').appendChild(tableContainer);
             }
             const tbody = tableContainer.querySelector('.marks-table tbody');

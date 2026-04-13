@@ -47,6 +47,205 @@ class MarkEntryModel
 		];
 	}
 
+	private function ensureDraftTable(): void
+	{
+		$sql = "CREATE TABLE IF NOT EXISTS markDrafts (
+			draftID INT NOT NULL AUTO_INCREMENT,
+			teacherID INT NOT NULL,
+			subjectID INT NOT NULL,
+			classID INT NOT NULL,
+			term VARCHAR(10) NOT NULL,
+			studentID INT NOT NULL,
+			marks DECIMAL(5,2) NOT NULL,
+			updatedAt DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+			PRIMARY KEY (draftID),
+			UNIQUE KEY uq_mark_draft_scope (teacherID, subjectID, classID, term, studentID),
+			KEY idx_mark_draft_lookup (teacherID, subjectID, classID, term)
+		) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci";
+
+		$this->pdo->exec($sql);
+	}
+
+	private function resolveClassId($grade, $class)
+	{
+		if ($grade === null || $class === null || $grade === '' || $class === '') {
+			return null;
+		}
+
+		$stmt = $this->pdo->prepare("SELECT classID FROM `class` WHERE grade = :grade AND class = :class LIMIT 1");
+		$stmt->execute([
+			'grade' => $grade,
+			'class' => $class
+		]);
+
+		$row = $stmt->fetch();
+		return $row ? intval($row['classID']) : null;
+	}
+
+	public function getDraftMarks($grade = null, $class = null, $subjectID = null, $term = null, $teacherID = null): array
+	{
+		$teacherID = intval($teacherID);
+		$subjectID = intval($subjectID);
+		$term = $term === null ? null : strval($term);
+
+		if ($teacherID <= 0 || $subjectID <= 0 || !$term) {
+			return [];
+		}
+
+		$classID = $this->resolveClassId($grade, $class);
+		if (!$classID) {
+			return [];
+		}
+
+		$this->ensureDraftTable();
+
+		$stmt = $this->pdo->prepare("SELECT studentID, marks
+			FROM markDrafts
+			WHERE teacherID = :teacherID
+			  AND subjectID = :subjectID
+			  AND classID = :classID
+			  AND term = :term");
+
+		$stmt->execute([
+			'teacherID' => $teacherID,
+			'subjectID' => $subjectID,
+			'classID' => $classID,
+			'term' => $term
+		]);
+
+		$rows = $stmt->fetchAll();
+		$out = [];
+		foreach ($rows as $r) {
+			$sid = intval($r['studentID'] ?? 0);
+			if ($sid <= 0) {
+				continue;
+			}
+			$out[$sid] = $r['marks'];
+		}
+
+		return $out;
+	}
+
+	public function saveDraftMarks(array $marks, array $meta = []): int
+	{
+		$subjectID = intval($meta['subjectID'] ?? 0);
+		$teacherID = intval($meta['teacherID'] ?? 0);
+		$term = isset($meta['term']) ? strval($meta['term']) : null;
+		$grade = $meta['grade'] ?? null;
+		$class = $meta['class'] ?? null;
+
+		if ($subjectID <= 0 || $teacherID <= 0 || !$term) {
+			throw new Exception('Missing subject, teacher, or term for draft save');
+		}
+
+		$classID = $this->resolveClassId($grade, $class);
+		if (!$classID) {
+			throw new Exception('Invalid grade/class for draft save');
+		}
+
+		$this->ensureDraftTable();
+
+		$upsert = $this->pdo->prepare("INSERT INTO markDrafts
+			(teacherID, subjectID, classID, term, studentID, marks)
+			VALUES
+			(:teacherID, :subjectID, :classID, :term, :studentID, :marks)
+			ON DUPLICATE KEY UPDATE
+			marks = VALUES(marks),
+			updatedAt = NOW()");
+
+		$delete = $this->pdo->prepare("DELETE FROM markDrafts
+			WHERE teacherID = :teacherID
+			  AND subjectID = :subjectID
+			  AND classID = :classID
+			  AND term = :term
+			  AND studentID = :studentID");
+
+		$savedCount = 0;
+
+		try {
+			$this->pdo->beginTransaction();
+
+			foreach ($marks as $studentId => $m) {
+				$sid = intval($studentId);
+				if ($sid <= 0) {
+					continue;
+				}
+
+				if ($m === '' || $m === null) {
+					$delete->execute([
+						'teacherID' => $teacherID,
+						'subjectID' => $subjectID,
+						'classID' => $classID,
+						'term' => $term,
+						'studentID' => $sid,
+					]);
+					continue;
+				}
+
+				if (!is_numeric($m)) {
+					continue;
+				}
+
+				$marksVal = floatval($m);
+				if ($marksVal < 0 || $marksVal > 100) {
+					continue;
+				}
+
+				$upsert->execute([
+					'teacherID' => $teacherID,
+					'subjectID' => $subjectID,
+					'classID' => $classID,
+					'term' => $term,
+					'studentID' => $sid,
+					'marks' => $marksVal,
+				]);
+
+				$savedCount++;
+			}
+
+			$this->pdo->commit();
+			return $savedCount;
+		} catch (Exception $e) {
+			if ($this->pdo->inTransaction()) {
+				$this->pdo->rollBack();
+			}
+			throw $e;
+		}
+	}
+
+	public function clearDraftMarks(array $meta = []): bool
+	{
+		$subjectID = intval($meta['subjectID'] ?? 0);
+		$teacherID = intval($meta['teacherID'] ?? 0);
+		$term = isset($meta['term']) ? strval($meta['term']) : null;
+		$grade = $meta['grade'] ?? null;
+		$class = $meta['class'] ?? null;
+
+		if ($subjectID <= 0 || $teacherID <= 0 || !$term) {
+			return false;
+		}
+
+		$classID = $this->resolveClassId($grade, $class);
+		if (!$classID) {
+			return false;
+		}
+
+		$this->ensureDraftTable();
+
+		$stmt = $this->pdo->prepare("DELETE FROM markDrafts
+			WHERE teacherID = :teacherID
+			  AND subjectID = :subjectID
+			  AND classID = :classID
+			  AND term = :term");
+
+		return $stmt->execute([
+			'teacherID' => $teacherID,
+			'subjectID' => $subjectID,
+			'classID' => $classID,
+			'term' => $term
+		]);
+	}
+
 	/*public function getExamTypes()
 	{
 		return [
@@ -82,7 +281,7 @@ class MarkEntryModel
 		];
 	}
 
-	public function getStudents($grade = null, $class = null, $subjectID = null, $term = null)
+	public function getStudents($grade = null, $class = null, $subjectID = null, $term = null, array $draftMarks = [])
 	{
 		// Fetch students for given grade & class
 		$sql = "SELECT st.studentID, st.userID, un.firstName, un.lastName, st.classID
@@ -106,6 +305,11 @@ class MarkEntryModel
 		foreach ($students as $s) {
 			$sid = $s['studentID'];
 			$current = null;
+			if (array_key_exists(intval($sid), $draftMarks)) {
+				$current = $draftMarks[intval($sid)];
+			} elseif (array_key_exists(strval($sid), $draftMarks)) {
+				$current = $draftMarks[strval($sid)];
+			}
 			$previous = null;
 			if ($getPreviousMarks) {
 				$getPreviousMarks->execute(['sid' => $sid, 'subjectID' => $subjectID, 'term' => $term]);

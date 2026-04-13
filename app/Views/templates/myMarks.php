@@ -15,7 +15,7 @@ $isParent = ($userRole == 4);
           <?= $isParent ? "Your child's marks and progress across all subjects" : "marks and progress across all subjects" ?>
         </p>
       </div>
-      <!-- Child info badge - shown for parents -->
+      <!-- Child info badge for parents -->
       <div class="student-info-badge" id="childInfoBadge" style="display: <?= $isParent ? 'flex' : 'none' ?>;">
         <div class="info-item">
           <span class="info-label">Student name</span>
@@ -58,16 +58,16 @@ $isParent = ($userRole == 4);
               </tr>
             </thead>
             <tbody id="marksTableBody">
-              <!-- Populated by JS -->
+              <!--JS -->
             </tbody>
             <tfoot id="marksTableFoot">
-              <!-- Populated by JS -->
+              <!--JS -->
             </tfoot>
           </table>
         </div>
       </div>
 
-      <!-- Performance Chart (below table) -->
+      <!-- Performance Chart -->
       <div class="performance-report">
         <h3 class="report-title">Performance Trend</h3>
 

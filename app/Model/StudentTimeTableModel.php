@@ -313,6 +313,7 @@ class StudentTimeTableModel
             'reg_no' => ($regNo !== '' ? $regNo : ($studentId !== '' ? $studentId : '—')),
             // Used by studentTimeTable template for the "ID" badge.
             'stu_id' => ($studentId !== '' ? $studentId : ($regNo !== '' ? $regNo : '—')),
+            'year' => date('Y'),
             'classID' => $classId,
         ];
 
@@ -332,6 +333,7 @@ class StudentTimeTableModel
                 'class' => '—',
                 'reg_no' => '—',
                 'stu_id' => '—',
+                'year' => date('Y'),
                 'classID' => 0,
             ];
         }
@@ -354,6 +356,7 @@ class StudentTimeTableModel
             'class' => $classLabel !== '' ? $classLabel : '—',
             'reg_no' => ($regNo !== '' ? $regNo : ($studentId !== '' ? $studentId : '—')),
             'stu_id' => ($studentId !== '' ? $studentId : ($regNo !== '' ? $regNo : '—')),
+            'year' => date('Y'),
             'classID' => $classId,
         ];
     }
@@ -410,6 +413,7 @@ class StudentTimeTableModel
             'class' => $classLabel !== '' ? $classLabel : '—',
             'reg_no' => ($regNo !== '' ? $regNo : ($studentIdVal !== '' ? $studentIdVal : '—')),
             'stu_id' => ($studentIdVal !== '' ? $studentIdVal : ($regNo !== '' ? $regNo : '—')),
+            'year' => date('Y'),
             'classID' => $classId,
         ];
 
@@ -570,6 +574,7 @@ class StudentTimeTableModel
             'name' => $fullName !== '' ? $fullName : ('Student ' . $studentId),
             'class' => $classLabel !== '' ? $classLabel : '—',
             'stu_id' => (string) $studentId,
+            'year' => date('Y'),
             'classID' => $classId,
         ];
 

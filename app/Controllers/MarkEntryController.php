@@ -7,7 +7,7 @@ class MarkEntryController extends Controller
 	{
 		$model = $this->model('MarkEntryModel');
 
-		// Defaults (empty/select state)
+		// Defaults
 		$selectedGrade = '';
 		$selectedClass = '';
 		$selectedTerm = '';
@@ -29,6 +29,13 @@ class MarkEntryController extends Controller
 
 			try {
 				$ok = $model->saveMarks($marks, $meta);
+				if ($ok) {
+					try {
+						$model->clearDraftMarks($meta);
+					} catch (Exception $e) {
+						error_log('MarkEntry draft clear error: ' . $e->getMessage());
+					}
+				}
 				$message = $ok ? 'Marks saved successfully.' : 'Failed to save marks.';
 			} catch (Exception $e) {
 				$message = 'Error saving marks: ' . $e->getMessage();
@@ -51,11 +58,29 @@ class MarkEntryController extends Controller
 		$grades = $model->getGrades();
 		$classes = $model->getClasses($selectedGrade ?: null);
 		$terms = $model->getTerms();
-		//$examTypes = $model->getExamTypes();
 
 		$students = [];
 		if ($selectedGrade && $selectedClass) {
-			$students = $model->getStudents($selectedGrade, $selectedClass, $teacherInfo['subjectID'] ?? null, $selectedTerm ?: null);
+			$draftMarks = [];
+			try {
+				$draftMarks = $model->getDraftMarks(
+					$selectedGrade,
+					$selectedClass,
+					$teacherInfo['subjectID'] ?? null,
+					$selectedTerm ?: null,
+					$teacherInfo['teacher_id'] ?? null
+				);
+			} catch (Exception $e) {
+				error_log('MarkEntry draft load error: ' . $e->getMessage());
+			}
+
+			$students = $model->getStudents(
+				$selectedGrade,
+				$selectedClass,
+				$teacherInfo['subjectID'] ?? null,
+				$selectedTerm ?: null,
+				$draftMarks
+			);
 		}
 
 		$stats = $model->calculateStatistics($students);
@@ -65,11 +90,9 @@ class MarkEntryController extends Controller
 			'grades' => $grades,
 			'classes' => $classes,
 			'terms' => $terms,
-			//'examTypes' => $examTypes,
 			'selectedGrade' => $selectedGrade,
 			'selectedClass' => $selectedClass,
 			'selectedTerm' => $selectedTerm,
-			//'selectedExamType' => $selectedExamType,
 			'students' => $students,
 			'totalStudents' => $stats['totalStudents'],
 			'marksEntered' => $stats['marksEntered'],
@@ -108,7 +131,27 @@ class MarkEntryController extends Controller
 
 		$model = $this->model('MarkEntryModel');
 		$teacherInfo = $model->getTeacherInfo($this->session->get('user_id'));
-		$students = $model->getStudents($grade, $class, $teacherInfo['subjectID'] ?? null, $term ?: null);
+
+		$draftMarks = [];
+		try {
+			$draftMarks = $model->getDraftMarks(
+				$grade,
+				$class,
+				$teacherInfo['subjectID'] ?? null,
+				$term ?: null,
+				$teacherInfo['teacher_id'] ?? null
+			);
+		} catch (Exception $e) {
+			error_log('MarkEntry draft load error: ' . $e->getMessage());
+		}
+
+		$students = $model->getStudents(
+			$grade,
+			$class,
+			$teacherInfo['subjectID'] ?? null,
+			$term ?: null,
+			$draftMarks
+		);
 		$stats = $model->calculateStatistics($students);
 
 		echo json_encode([
@@ -119,6 +162,59 @@ class MarkEntryController extends Controller
 			'selectedClass' => $class,
 			'selectedTerm' => $term
 		]);
+	}
+
+	public function saveDraft()
+	{
+		// AJAX endpoint: save current mark inputs as draft
+		header('Content-Type: application/json');
+
+		if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'error' => 'Invalid request method']);
+			return;
+		}
+
+		if (!isset($_POST['marks']) || !is_array($_POST['marks'])) {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'error' => 'Missing marks data']);
+			return;
+		}
+
+		$grade = $_POST['grade'] ?? null;
+		$class = $_POST['class'] ?? null;
+		$term = $_POST['term'] ?? null;
+		$marks = $_POST['marks'];
+
+		if (!$grade || !$class || !$term) {
+			http_response_code(400);
+			echo json_encode(['success' => false, 'error' => 'Grade, class, and term are required']);
+			return;
+		}
+
+		$model = $this->model('MarkEntryModel');
+		$teacherInfo = $model->getTeacherInfo($this->session->get('user_id'));
+
+		$meta = [
+			'grade' => $grade,
+			'class' => $class,
+			'term' => $term,
+			'teacherID' => $teacherInfo['teacher_id'] ?? null,
+			'subjectID' => $teacherInfo['subjectID'] ?? null,
+		];
+
+		try {
+			$savedCount = $model->saveDraftMarks($marks, $meta);
+			echo json_encode([
+				'success' => true,
+				'message' => 'Draft saved successfully.',
+				'savedCount' => $savedCount,
+				'savedAt' => date('H:i:s')
+			]);
+		} catch (Exception $e) {
+			http_response_code(500);
+			echo json_encode(['success' => false, 'error' => 'Error saving draft: ' . $e->getMessage()]);
+		}
 	}
 
 	public function submitMarks()
@@ -157,6 +253,13 @@ class MarkEntryController extends Controller
 
 		try {
 			$ok = $model->saveMarks($marks, $meta);
+			if ($ok) {
+				try {
+					$model->clearDraftMarks($meta);
+				} catch (Exception $e) {
+					error_log('MarkEntry draft clear error: ' . $e->getMessage());
+				}
+			}
 		} catch (Exception $e) {
 			http_response_code(500);
 			echo json_encode(['success' => false, 'error' => 'Error saving marks: ' . $e->getMessage()]);
@@ -166,7 +269,7 @@ class MarkEntryController extends Controller
 		// Fetch updated list + stats and return to client for UI update
 		$students = [];
 		if ($grade && $class) {
-			$students = $model->getStudents($grade, $class, $teacherInfo['subjectID'] ?? null, $term ?: null);
+			$students = $model->getStudents($grade, $class, $teacherInfo['subjectID'] ?? null, $term ?: null, []);
 		}
 
 		$stats = $model->calculateStatistics($students);

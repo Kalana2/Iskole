@@ -9,10 +9,7 @@ class AcademicOverviewModel
 		$this->pdo = Database::getInstance();
 	}
 
-	/**
-	 * Returns grades for the grade buttons.
-	 * Source table: class(classID, grade, class)
-	 */
+	/*Returns grades for the grade buttons.*/
 	public function getGrades(): array
 	{
 		$sql = "SELECT DISTINCT grade AS value, grade AS label FROM class ORDER BY grade";
