@@ -48,6 +48,12 @@ $roleLabel = $roleLabels[$role] ?? 'User';
 // echo '$nic: ' . var_export($nic, true) . "\n";
 // echo '$relationship: ' . var_export($relationship, true) . "\n";
 // echo '</pre>';
+
+
+// echo '<pre>';
+// var_dump($user);
+// echo '</pre>';
+
 ?>
 
 <section class="profile-clean" aria-labelledby="profile-title">
