@@ -173,7 +173,8 @@ class UserModel
                 {$this->userAddressTable}.address_line3,
                 students.studentID,
                 students.classID,
-                students.gradeID
+                students.gradeID,
+                teachers.subjectID
         FROM {$this->userTable}
         LEFT JOIN {$this->userNameTable}
         ON {$this->userTable}.userID = {$this->userNameTable}.userID
@@ -181,6 +182,8 @@ class UserModel
         ON {$this->userTable}.userID = {$this->userAddressTable}.userID
         LEFT JOIN students
         ON {$this->userTable}.userID = students.userID
+        LEFT JOIN teachers
+        ON {$this->userTable}.userID = teachers.userID
         WHERE {$this->userTable}.userID = :userId";
 
         $stmt = $this->pdo->prepare($sql);
@@ -292,6 +295,20 @@ class UserModel
                 'userId' => $userId
             ]);
         }
+
+        // Update teacher subject if applicable
+        if (isset($data['subjectID']) && $data['subjectID'] !== '') {
+            $subjectId = (int) $data['subjectID'];
+            if ($subjectId > 0) {
+                $sql = "UPDATE teachers SET subjectID = :subjectID WHERE userID = :userId";
+                $stmt = $this->pdo->prepare($sql);
+                $stmt->execute([
+                    'subjectID' => $subjectId,
+                    'userId' => $userId
+                ]);
+            }
+        }
+
 
         return true;
     }

@@ -120,6 +120,13 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
           <input type="date" id="edit-dob" name="dateOfBirth">
         </div>
 
+        <div class="form-group" id="edit-teacher-subject-group" style="display:none;">
+          <label for="edit-subject">Subject</label>
+          <select id="edit-subject" name="subjectID">
+            <option value="">Select Subject</option>
+          </select>
+</div>
+
         <div class="form-group" id="edit-student-id-group" style="display: none;">
           <label for="edit-student-id">Student ID</label>
           <input type="text" id="edit-student-id" name="studentID" readonly>
@@ -267,25 +274,44 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
     // Dynamic Grade/Class logic for Edit Modal
     const editGradeSelect = document.getElementById('edit-grade');
     const editClassSelect = document.getElementById('edit-class');
+
+    const editSubjectSelect = document.getElementById('edit-subject');
+    const editTeacherSubjectGroup = document.getElementById('edit-teacher-subject-group');
+    let editAllSubjectData = [];
+    
     let editAllClassData = [];
 
     async function initEditDynamicSelection() {
-      try {
-        const response = await fetch('/addNewUser/getGradesAndClasses');
-        const data = await response.json();
-        editAllClassData = data.classes || [];
+  try {
+    const response = await fetch('/addNewUser/getGradesAndClasses');
+    const data = await response.json();
 
-        const grades = [...new Set(editAllClassData.map(item => item.grade))].sort((a, b) => a - b);
-        grades.forEach(grade => {
-          const opt = document.createElement('option');
-          opt.value = grade;
-          opt.textContent = grade;
-          editGradeSelect.appendChild(opt);
-        });
-      } catch (err) {
-        console.error('Error fetching dynamic modal data:', err);
-      }
+    editAllClassData = data.classes || [];
+    editAllSubjectData = data.subjects || [];
+
+    // Populate subjects
+    if (editSubjectSelect) {
+      editSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+      editAllSubjectData.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.subjectID;
+        opt.textContent = s.subjectName;
+        editSubjectSelect.appendChild(opt);
+      });
     }
+
+    // Populate grades
+    const grades = [...new Set(editAllClassData.map(item => item.grade))].sort((a, b) => a - b);
+    grades.forEach(grade => {
+      const opt = document.createElement('option');
+      opt.value = grade;
+      opt.textContent = grade;
+      editGradeSelect.appendChild(opt);
+    });
+  } catch (err) {
+    console.error('Error fetching dynamic modal data:', err);
+  }
+}
 
     function updateEditClassOptions(selectedClassId = null) {
       const selectedGrade = editGradeSelect.value;
@@ -360,6 +386,16 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
             editGradeSelect.value = userData.gradeID || '';
             updateEditClassOptions(userData.classID);
           }
+
+
+          const isTeacher = userData.role === 'Teacher';
+
+if (editTeacherSubjectGroup) {
+  editTeacherSubjectGroup.style.display = isTeacher ? 'block' : 'none';
+  if (isTeacher && editSubjectSelect) {
+    editSubjectSelect.value = userData.subjectID || '';
+  }
+}
 
           openModal(editModal);
         })

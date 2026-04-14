@@ -73,6 +73,7 @@ class ApiController extends Controller
                     'address_line3' => $user['address_line3'] ?? '',
                     'gradeID' => $user['gradeID'] ?? '',
                     'classID' => $user['classID'] ?? '',
+                    'subjectID' => $user['subjectID'] ?? '',
                     'role' => $user['role'] ?? ''
                 ]);
             } else {
