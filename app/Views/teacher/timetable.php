@@ -51,31 +51,6 @@
                 </div>
             </div>
 
-            <!-- Summary Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">📚</div>
-                    <div class="stat-content">
-                        <div class="stat-value"><?php echo $totalClasses; ?></div>
-                        <div class="stat-label">Classes This Week</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">📅</div>
-                    <div class="stat-content">
-                        <div class="stat-value"><?php echo isset($classesPerDay[$currentDay]) ? $classesPerDay[$currentDay] : 0; ?></div>
-                        <div class="stat-label">Classes Today</div>
-                    </div>
-                </div>
-                <!--<div class="stat-card">
-                    <div class="stat-icon">🎯</div>
-                    <div class="stat-content">
-                        <div class="stat-value"><?php echo round($totalClasses / 5, 1); ?></div>
-                        <div class="stat-label">Avg. Classes/Day</div>
-                    </div>
-                </div>_-->
-            </div>
-
             <!-- Current Day Indicator -->
             <div class="current-day-indicator">
                 <span class="indicator-icon">📍</span>
@@ -123,15 +98,24 @@
                                                 <?php
                                                 $class = isset($timetable[$day][$slot['period']]) ? $timetable[$day][$slot['period']] : null;
                                                 if ($class):
+                                                    $isRelief = !empty($class['isRelief']);
                                                 ?>
-                                                    <div class="class-card">
+                                                    <div class="class-card <?php echo $isRelief ? 'relief-card' : ''; ?>">
                                                         <div class="class-name"><?php echo htmlspecialchars($class['class']); ?></div>
                                                         <div class="class-details">
                                                             <span class="subject-info">
-                                                                <span class="subject-icon">📘</span>
+                                                                <span class="subject-icon"><?php echo $isRelief ? '🛟' : '📘'; ?></span>
                                                                 <?php echo htmlspecialchars($class['subject'] ?? ''); ?>
                                                             </span>
                                                         </div>
+                                                        <?php if ($isRelief): ?>
+                                                            <div class="relief-meta">
+                                                                <span class="relief-chip">Relief</span>
+                                                                <?php if (!empty($class['absentTeacher'])): ?>
+                                                                    <span class="relief-note">for <?php echo htmlspecialchars($class['absentTeacher']); ?></span>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                        <?php endif; ?>
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="free-period">
@@ -155,6 +139,10 @@
                     <div class="legend-item">
                         <span class="legend-box class-box"></span>
                         <span class="legend-label">Scheduled Class</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-box relief-box"></span>
+                        <span class="legend-label">Relief Period</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-box free-box"></span>

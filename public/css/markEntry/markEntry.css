@@ -22,7 +22,7 @@
 /* Main container */
 .marks-entry-section {
   min-height: 100vh;
-  padding: 1rem;
+  padding: 0rem 1rem;
 }
 
 .box {
@@ -343,7 +343,7 @@
 }
 
 .col-marks {
-  width: 200px;
+  width: 160px;
 }
 
 /* Table Body */
@@ -371,6 +371,12 @@
 .marks-table td {
   padding: 1rem 0.75rem;
   color: var(--text);
+  font-size: 0.98rem;
+}
+
+.marks-table tbody td:nth-child(3) strong {
+  font-size: 1.08rem;
+  font-weight: 700;
 }
 
 /* Table Cell Styles */
@@ -398,7 +404,7 @@
   color: var(--info);
   border-radius: 6px;
   font-weight: 600;
-  font-size: 0.85rem;
+  font-size: 1rem;
 }
 
 /* Marks Input */
@@ -409,7 +415,7 @@
 }
 
 .marks-input {
-  flex: 1;
+  flex: 0 0 82px;
   padding: 0.6rem 0.8rem;
   border: 2px solid var(--border);
   border-radius: 8px;
@@ -417,7 +423,8 @@
   font-weight: 600;
   color: var(--text);
   transition: all 0.25s ease;
-  width: 50px;
+  width: 82px;
+  text-align: center;
 }
 
 .marks-input:hover {
@@ -738,7 +745,7 @@
   }
 
   .marks-table {
-    font-size: 0.85rem;
+    font-size: 0.9rem;
   }
 
   .marks-table th,
@@ -768,7 +775,7 @@
   }
 
   .marks-table {
-    font-size: 0.8rem;
+    font-size: 0.85rem;
   }
 
   .col-name {
@@ -776,7 +783,8 @@
   }
 
   .marks-input {
-    width: 80px;
+    width: 72px;
+    flex-basis: 72px;
     padding: 0.5rem;
   }
 

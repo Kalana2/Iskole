@@ -1,8 +1,9 @@
 <div class="teacher-container">
     <?php
     // Provide navigation items and active label for Teacher
-    $items = ['Announcements', 'Attendance', 'Materials', 'Reports', 'Leave', 'Student Absence', 'Relief', 'Time Table', 'Mark Entry', 'Exam Time Table'];
+    $items = ['Announcements', 'Attendance', 'Materials', 'Reports', 'Leave', 'Student Absence', 'Time Table', 'Mark Entry', 'Exam Time Table'];
     $tab = isset($_GET['tab']) ? $_GET['tab'] : 'Announcements';
+
     $active = in_array($tab, $items) ? $tab : 'Announcements';
 
     include_once __DIR__ . '/../templates/navigation.php';
@@ -16,8 +17,6 @@
         include __DIR__ . '/materials.php';
     } else if ($active === 'Leave') {
         include __DIR__ . '/leave.php';
-    } else if ($active === 'Relief') {
-        include __DIR__ . '/relief.php';
     } else if ($active === 'Reports') {
         include __DIR__ . '/report.php';
     } else if ($active === 'Time Table') {
