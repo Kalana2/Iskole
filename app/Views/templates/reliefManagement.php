@@ -96,6 +96,11 @@ if ($demoMode) {
                 $classLabel = trim((string)($row['grade'] ?? '')) !== ''
                   ? ((string)$row['grade'] . ' - ' . (string)($row['section'] ?? ''))
                   : (string)($row['classID'] ?? '');
+                $rawPeriodId = (int)($row['periodID'] ?? 0);
+                $displayPeriod = $rawPeriodId % 8;
+                if ($displayPeriod === 0 && $rawPeriodId > 0) {
+                  $displayPeriod = 8;
+                }
                 $available = $row['availableTeachers'] ?? [];
                 $slotSubjectId = (int)($row['subjectID'] ?? 0);
                 $sameSubject = [];
@@ -113,18 +118,18 @@ if ($demoMode) {
                 data-row-index="<?php echo $idx; ?>"
                 data-timetable-id="<?php echo (int)$row['timetableID']; ?>"
                 data-day-id="<?php echo (int)$row['dayID']; ?>"
-                data-period-id="<?php echo (int)$row['periodID']; ?>"
+                data-period-id="<?php echo $rawPeriodId; ?>"
                 class="table-row relief-row"
               >
                 <td class="table-data" data-col="class"><?php echo htmlspecialchars($classLabel); ?></td>
-                <td class="table-data" data-col="period"><?php echo htmlspecialchars((string)$row['periodID']); ?></td>
+                <td class="table-data" data-col="period"><?php echo htmlspecialchars((string)$displayPeriod); ?></td>
                 <td class="table-data" data-col="subject"><?php echo htmlspecialchars((string)($row['subjectName'] ?? '')); ?></td>
                 <td class="table-data" data-col="absent"><?php echo htmlspecialchars((string)($row['absentTeacherName'] ?? '')); ?></td>
                 <td class="table-data" data-col="teacher">
                   <div class="teacher-select-group">
                     <div class="teacher-select-block">
                       <div class="teacher-select-label">Same Subject (Free)</div>
-                      <select class="input input--select teacher-select teacher-select--same" aria-label="Select same-subject teacher for period <?php echo htmlspecialchars((string)$row['periodID']); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($sameSubject) ? 'disabled' : ''; ?>>
+                      <select class="input input--select teacher-select teacher-select--same" aria-label="Select same-subject teacher for period <?php echo htmlspecialchars((string)$displayPeriod); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($sameSubject) ? 'disabled' : ''; ?>>
                         <option value="" selected><?php echo empty($sameSubject) ? 'No same-subject teachers' : 'Select Teacher'; ?></option>
                         <?php foreach ($sameSubject as $t): ?>
                           <option value="<?php echo (int)$t['teacherID']; ?>">
@@ -136,7 +141,7 @@ if ($demoMode) {
 
                     <div class="teacher-select-block">
                       <div class="teacher-select-label">Other Free Teachers</div>
-                      <select class="input input--select teacher-select teacher-select--other" aria-label="Select other free teacher for period <?php echo htmlspecialchars((string)$row['periodID']); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($otherSubject) ? 'disabled' : ''; ?>>
+                      <select class="input input--select teacher-select teacher-select--other" aria-label="Select other free teacher for period <?php echo htmlspecialchars((string)$displayPeriod); ?> class <?php echo htmlspecialchars($classLabel); ?>" <?php echo empty($otherSubject) ? 'disabled' : ''; ?>>
                         <option value="" selected><?php echo empty($otherSubject) ? 'No other free teachers' : 'Select Teacher'; ?></option>
                         <?php foreach ($otherSubject as $t): ?>
                           <option value="<?php echo (int)$t['teacherID']; ?>">
