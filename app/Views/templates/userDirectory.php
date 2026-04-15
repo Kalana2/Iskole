@@ -20,8 +20,18 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
   <div class="card">
     <form id="user-search-form" class="toolbar" role="search" novalidate>
       <div class="search-input">
-        <input type="text" id="user-search-input" name="q" placeholder="Search users... (name, type, email)"
+        <input type="text" id="user-search-input" name="q" placeholder="Search users... (name, email, student ID)"
           aria-label="Search users">
+      </div>
+      <div class="search-select">
+        <select id="user-role-filter" name="role" aria-label="Filter by role">
+          <option value="">All Roles</option>
+          <option value="Admin">Admin</option>
+          <option value="Manager">Manager</option>
+          <option value="Teacher">Teacher</option>
+          <option value="Student">Student</option>
+          <option value="Parent">Parent</option>
+        </select>
       </div>
       <button class="btn btn-ghost" type="reset" id="user-search-clear">Clear</button>
       <button class="btn btn-primary" type="submit">Search</button>
@@ -195,21 +205,26 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
   (function () {
     const form = document.getElementById('user-search-form');
     const input = document.getElementById('user-search-input');
+    const roleSelector = document.getElementById('user-role-filter');
     const clearBtn = document.getElementById('user-search-clear');
     const tableBody = document.getElementById('user-table-body');
     let isSearching = false;
 
     // Perform server-side search
-    function performSearch(query) {
-      if (!query.trim()) {
+    function performSearch(query, role) {
+      if (!query.trim() && !role) {
         // Reload page to show initial 5 users
         location.reload();
         return;
       }
 
       isSearching = true;
+      const params = new URLSearchParams();
+      params.append('action', 'search');
+      if (query.trim()) params.append('q', query);
+      if (role) params.append('role', role);
 
-      fetch(`/api/users?action=search&q=${encodeURIComponent(query)}`)
+      fetch(`/api/users?${params.toString()}`)
         .then(response => {
           if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
@@ -262,12 +277,13 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!isSearching) {
-        performSearch(input.value);
+        performSearch(input.value, roleSelector.value);
       }
     });
 
     clearBtn.addEventListener('click', () => {
       input.value = '';
+      roleSelector.value = '';
       location.reload(); // Reload to show initial 5 users
     });
 

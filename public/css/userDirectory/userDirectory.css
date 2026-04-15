@@ -61,8 +61,30 @@
   flex-wrap: wrap;
 }
 .toolbar .search-input {
-  flex: 1 1 320px;
-  min-width: 220px;
+  flex: 1 1 200px;
+  min-width: 150px;
+}
+.toolbar .search-select {
+  flex: 0 1 180px;
+  min-width: 140px;
+}
+.toolbar select {
+  width: 100%;
+  padding: 0.7rem 0.9rem;
+  border-radius: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.14);
+  background: #fff;
+  color: #111827;
+  font-size: 0.95rem;
+  outline: none;
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+.toolbar select:focus {
+  border-color: var(--ring);
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
 }
 .toolbar input[type="text"] {
   width: 100%;

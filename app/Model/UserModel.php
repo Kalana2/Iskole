@@ -6,7 +6,7 @@ class UserModel
     protected $userAddressTable = 'userAddress';
     protected $userNameTable = 'userName'; // fName, lName
 
-    protected $userRoleMap = ['admin' => 0, 'mp' => 1, 'teacher' => 2, 'student' => 3, 'parent' => 4];
+    protected $userRoleMap = ['admin' => 0, 'manager' => 1, 'teacher' => 2, 'student' => 3, 'parent' => 4];
 
     public function __construct()
     {
@@ -191,7 +191,7 @@ class UserModel
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    public function searchUsers($query)
+    public function searchUsers($query, $role = null)
     {
         $query = trim(preg_replace('/\s+/', ' ', (string) $query));
         $searchTerm = '%' . $query . '%';
@@ -225,11 +225,22 @@ class UserModel
             ) LIKE :search
             OR {$this->userTable}.email LIKE :search
             OR students.studentID LIKE :search
-        )
-        ORDER BY {$this->userTable}.userID DESC";
+        )";
+
+        $params = ['search' => $searchTerm];
+
+        if ($role !== null && $role !== '') {
+            $roleValue = $this->userRoleMap[strtolower((string) $role)] ?? null;
+            if ($roleValue !== null) {
+                $sql .= " AND {$this->userTable}.role = :role";
+                $params['role'] = $roleValue;
+            }
+        }
+
+        $sql .= " ORDER BY {$this->userTable}.userID DESC";
 
         $stmt = $this->pdo->prepare($sql);
-        $stmt->execute(['search' => $searchTerm]);
+        $stmt->execute($params);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
