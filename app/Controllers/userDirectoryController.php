@@ -37,14 +37,8 @@ class UserDirectoryController extends Controller
     {
         $model = $this->model('UserModel');
 
-        if ($query) {
-            // Convert role name (Admin) → role ID (0)
-            $roleKey = array_search($query, $this->userRoleMap);
-            var_dump("roleKey");
-            // var_dump($roleKey);
-            if ($roleKey !== false) {
-                $query = $roleKey;
-            }
+        if ($query && isset($this->userRoleMap[$query])) {
+            $query = $this->userRoleMap[$query];
         }
 
         $users = $model->searchUsers($query);
