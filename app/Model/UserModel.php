@@ -193,6 +193,7 @@ class UserModel
 
     public function searchUsers($query)
     {
+        $query = trim(preg_replace('/\s+/', ' ', (string) $query));
         $searchTerm = '%' . $query . '%';
 
         $sql = "SELECT {$this->userTable}.*, 
@@ -217,6 +218,11 @@ class UserModel
         AND (
             {$this->userNameTable}.firstName LIKE :search
             OR {$this->userNameTable}.lastName LIKE :search
+            OR CONCAT(
+                COALESCE({$this->userNameTable}.firstName, ''),
+                ' ',
+                COALESCE({$this->userNameTable}.lastName, '')
+            ) LIKE :search
             OR {$this->userTable}.email LIKE :search
             OR students.studentID LIKE :search
         )
