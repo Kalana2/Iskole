@@ -14,7 +14,7 @@ class reliefModel
 	{
 		$sql = "SELECT COUNT(DISTINCT ta.teacherID) AS cnt
 				FROM teacherAttendance ta
-				WHERE ta.attendance_date = ? AND ta.status = 'present'";
+				WHERE ta.attendance_date = ? AND LOWER(ta.status) = 'present'";
 		$stmt = $this->pdo->prepare($sql);
 		$stmt->execute([$date]);
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -27,7 +27,12 @@ class reliefModel
 	 */
 	public function getPendingReliefSlots(string $date): array
 	{
-		$dayId = $this->dateToDayId($date);
+		$dayIds = $this->getDayIdsForDate($date);
+		if (empty($dayIds)) {
+			return [];
+		}
+
+		$dayPlaceholders = implode(',', array_fill(0, count($dayIds), '?'));
 
 		$sql = "SELECT
 					ct.id AS timetableID,
@@ -44,13 +49,13 @@ class reliefModel
 				JOIN teacherAttendance ta
 					ON ta.teacherID = ct.teacherID
 					AND ta.attendance_date = ?
-					AND ta.status IN ('absent', 'leave')
+					AND LOWER(ta.status) IN ('absent', 'leave')
 				LEFT JOIN class c ON c.classID = ct.classID
 				LEFT JOIN subject s ON s.subjectID = ct.subjectID
 				LEFT JOIN teachers t ON t.teacherID = ct.teacherID
 				LEFT JOIN user u ON u.userID = t.userID
 				LEFT JOIN userName un ON un.userID = u.userID
-				WHERE ct.dayID = ?
+				WHERE ct.dayID IN ($dayPlaceholders)
 				  AND NOT EXISTS (
 					  SELECT 1
 					  FROM reliefAssignments ra
@@ -61,7 +66,8 @@ class reliefModel
 				ORDER BY ct.periodID ASC, c.grade ASC, c.class ASC";
 
 		$stmt = $this->pdo->prepare($sql);
-		$stmt->execute([$date, $dayId, $date]);
+		$params = array_merge([$date], $dayIds, [$date]);
+		$stmt->execute($params);
 		$slots = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 
 		foreach ($slots as &$slot) {
@@ -90,7 +96,7 @@ class reliefModel
 				JOIN teacherAttendance ta
 					ON ta.teacherID = t.teacherID
 					AND ta.attendance_date = ?
-					AND ta.status = 'present'
+					AND LOWER(ta.status) = 'present'
 				WHERE u.active = 1
 				  AND t.teacherID <> ?
 				  AND NOT EXISTS (
@@ -119,7 +125,7 @@ class reliefModel
 	public function isTeacherFree(string $date, int $teacherId, int $dayId, int $periodId): bool
 	{
 		// Must be present
-		$stmt = $this->pdo->prepare("SELECT 1 FROM teacherAttendance WHERE teacherID = ? AND attendance_date = ? AND status = 'present' LIMIT 1");
+		$stmt = $this->pdo->prepare("SELECT 1 FROM teacherAttendance WHERE teacherID = ? AND attendance_date = ? AND LOWER(status) = 'present' LIMIT 1");
 		$stmt->execute([$teacherId, $date]);
 		if (!$stmt->fetchColumn()) {
 			return false;
@@ -195,13 +201,37 @@ class reliefModel
 		return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
 	}
 
-	private function dateToDayId(string $date): int
+	private function getDayIdsForDate(string $date): array
 	{
 		$ts = strtotime($date);
 		if ($ts === false) {
-			return (int)date('N');
+			$ts = time();
 		}
-		return (int)date('N', $ts); // 1=Mon ... 7=Sun
+
+		$isoDayId = (int)date('N', $ts); // 1=Mon ... 7=Sun
+		$dayName = date('l', $ts);
+		$shortDayName = date('D', $ts);
+
+		if ($this->tableExists('schoolDays')) {
+			$stmt = $this->pdo->prepare("SELECT id FROM schoolDays WHERE LOWER(day) IN (?, ?) ORDER BY id");
+			$stmt->execute([strtolower($dayName), strtolower($shortDayName)]);
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+			$dayIds = array_map(static fn($r) => (int)($r['id'] ?? 0), $rows);
+			$dayIds = array_values(array_filter($dayIds, static fn($v) => $v > 0));
+
+			if (!empty($dayIds)) {
+				return $dayIds;
+			}
+		}
+
+		return [$isoDayId];
+	}
+
+	private function tableExists(string $table): bool
+	{
+		$stmt = $this->pdo->prepare("SHOW TABLES LIKE ?");
+		$stmt->execute([$table]);
+		return (bool)$stmt->fetchColumn();
 	}
 }
-

@@ -100,22 +100,18 @@
                                                 if ($class):
                                                     $isRelief = !empty($class['isRelief']);
                                                 ?>
-                                                    <div class="class-card <?php echo $isRelief ? 'relief-card' : ''; ?>">
+                                                    <?php $reliefTitle = $isRelief && !empty($class['absentTeacher']) ? ('Relief for ' . $class['absentTeacher']) : ''; ?>
+                                                    <div class="class-card <?php echo $isRelief ? 'relief-card' : ''; ?>" title="<?php echo htmlspecialchars($reliefTitle); ?>">
                                                         <div class="class-name"><?php echo htmlspecialchars($class['class']); ?></div>
                                                         <div class="class-details">
                                                             <span class="subject-info">
                                                                 <span class="subject-icon"><?php echo $isRelief ? '🛟' : '📘'; ?></span>
                                                                 <?php echo htmlspecialchars($class['subject'] ?? ''); ?>
                                                             </span>
-                                                        </div>
-                                                        <?php if ($isRelief): ?>
-                                                            <div class="relief-meta">
+                                                            <?php if ($isRelief): ?>
                                                                 <span class="relief-chip">Relief</span>
-                                                                <?php if (!empty($class['absentTeacher'])): ?>
-                                                                    <span class="relief-note">for <?php echo htmlspecialchars($class['absentTeacher']); ?></span>
-                                                                <?php endif; ?>
-                                                            </div>
-                                                        <?php endif; ?>
+                                                            <?php endif; ?>
+                                                        </div>
                                                     </div>
                                                 <?php else: ?>
                                                     <div class="free-period">
@@ -184,7 +180,11 @@
                 .map(s => {
                     const start = toMinutes(s.startTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[0].trim()) : null);
                     const end = toMinutes(s.endTime) ?? (String(s.time || '').includes('-') ? toMinutes(String(s.time).split('-')[1].trim()) : null);
-                    return { start, end, period: s.period };
+                    return {
+                        start,
+                        end,
+                        period: s.period
+                    };
                 })
                 .filter(p => typeof p.period === 'number' && p.start !== null && p.end !== null);
 
