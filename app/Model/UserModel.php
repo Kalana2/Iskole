@@ -216,6 +216,7 @@ class UserModel
             OR {$this->userNameTable}.lastName LIKE :search
             OR {$this->userTable}.email LIKE :search
             OR students.studentID LIKE :search
+            OR {$this->userTable}.role LIKE :search
         )
         ORDER BY {$this->userTable}.userID DESC";
 
