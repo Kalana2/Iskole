@@ -43,6 +43,7 @@ class UserDirectoryController extends Controller
 
             if ($roleKey !== false) {
                 $query = $roleKey;
+                var_dump($query);
             }
         }
 
