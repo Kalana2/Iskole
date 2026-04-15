@@ -85,16 +85,15 @@ class TeacherModel extends UserModel
             throw new Exception("Error fetching all teachers: " . $e->getMessage());
         }
     }
-
     public function getGradeByUserID($userId)
     {
-        $sql = "SELECT grade FROM {$this->teacherTable} WHERE userID = :uid LIMIT 1";
+        $sql = "SELECT classID, grade FROM {$this->teacherTable} WHERE userID = :uid LIMIT 1";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':uid' => $userId]);
             return $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (PDOException $e) {
-            throw new Exception("Error fetching teacher grade: " . $e->getMessage());
+            throw new Exception("Error fetching teacher classID and grade: " . $e->getMessage());
         }
     }
 }
