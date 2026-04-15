@@ -241,4 +241,37 @@ class MarksReportModel
 
         return $ranks;
     }
+
+
+    public function getStudentByStudentId($studentId)
+    {
+        $sql = "SELECT st.studentID, st.userID, st.classID, st.gradeID,
+                   un.firstName, un.lastName,
+                   CASE
+                       WHEN c.classID IS NULL THEN NULL
+                       ELSE CONCAT('Grade ', c.grade, '-', c.class)
+                   END AS classLabel,
+                   YEAR(CURDATE()) AS academicYear
+            FROM students st
+            LEFT JOIN userName un ON un.userID = st.userID
+            LEFT JOIN class c ON c.classID = st.classID
+            WHERE st.studentID = :sid
+            LIMIT 1";
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['sid' => $studentId]);
+        $row = $stmt->fetch();
+        if (!$row) return null;
+
+        return [
+            'studentID' => $row['studentID'],
+            'userID' => $row['userID'],
+            'classID' => $row['classID'],
+            'gradeID' => $row['gradeID'],
+            'firstName' => $row['firstName'] ?? '',
+            'lastName' => $row['lastName'] ?? '',
+            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? '')),
+            'classLabel' => $row['classLabel'] ?? null,
+            'academicYear' => isset($row['academicYear']) ? strval($row['academicYear']) : date('Y')
+        ];
+    }
 }

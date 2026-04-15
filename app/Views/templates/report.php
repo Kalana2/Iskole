@@ -14,6 +14,7 @@ $formTitle    = $isEdit ? ($editReport['title'] ?? '') : '';
 $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 
 ?>
+<link rel="stylesheet" href="/css/myMarks/myMarks.css">
 
 <section class="reports-entry tab-panel mp-management">
   <div class="reports-section">
@@ -133,39 +134,59 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
             </div>
           </div>
 
-          <!-- ✅ Chart section -->
+          <!-- ✅ Marks + Chart section -->
           <input type="hidden" id="studentId" value="<?= htmlspecialchars($studentInfo['stu_id']) ?>">
+          <input type="hidden" id="isParentView" value="0">
 
-          <div class="center-container card" style="margin-top:16px;">
-            <div class="stats-overview">
-              <div class="stat-card">
-                <div class="stat-icon">🏆</div>
-                <div class="stat-content">
-                  <h4>Section Rank</h4>
-                  <p class="stat-value">#5</p>
-                </div>
-              </div>
-              <div class="stat-card">
-                <div class="stat-icon">⭐</div>
-                <div class="stat-content">
-                  <h4>Class Rank</h4>
-                  <p class="stat-value">#1</p>
-                </div>
-              </div>
-            </div>
+            
+     
 
-            <div class="performance-report">
-              <h3 class="report-title">
-                <span>Performance Report</span>
-              </h3>
+  <!-- Subject Marks Card -->
+  <div class="marks-card" style="margin-top:20px;">
+    <div class="marks-card-header">
+      <h3 class="marks-card-title">Subject Marks</h3>
+      <div class="term-pill-switcher" id="termSwitcher">
+        <button class="term-pill" data-term="term1">Term 1</button>
+        <button class="term-pill" data-term="term2">Term 2</button>
+        <button class="term-pill" data-term="term3">Term 3</button>
+        <button class="term-pill active" data-term="all">All terms</button>
+      </div>
+    </div>
 
-              <div class="chart-controls"></div>
+    <div class="marks-table-wrapper">
+      <table class="marks-table" id="marksTable">
+        <thead>
+          <tr>
+            <th>Subject</th>
+            <th data-term="term1">Term 1</th>
+            <th data-term="term2">Term 2</th>
+            <th data-term="term3">Term 3</th>
+            <th>Average</th>
+            <th>Grade</th>
+          </tr>
+        </thead>
+        <tbody id="marksTableBody">
+          <!-- JS loads marks here -->
+        </tbody>
+        <tfoot id="marksTableFoot">
+          <!-- JS loads summary here -->
+        </tfoot>
+      </table>
+    </div>
+  </div>
 
-              <div class="chart-container">
-                <canvas id="performanceChart"></canvas>
-              </div>
-            </div>
-          </div>
+  <!-- Performance Chart -->
+  <div class="performance-report" style="margin-top:20px;">
+    <h3 class="report-title">Performance Trend</h3>
+
+    <div class="chart-controls"></div>
+
+    <div class="chart-container">
+      <canvas id="performanceChart"></canvas>
+    </div>
+  </div>
+
+</div>
 
           <!-- ✅ Behavior Section -->
           <div class="behavior-section" style="margin-top: 22px;">
