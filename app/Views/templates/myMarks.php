@@ -4,7 +4,7 @@ $userRole = $this->session->get('userRole') ?? $this->session->get('user_role') 
 $isParent = ($userRole == 4);
 ?>
 <section class="reports-entry tab-panel mp-management">
-  <input type="hidden" id="studentId" value="<?= $this->session->get('user_id') ?>">
+  <input type="hidden" id="studentId" data-id-type="user" value="<?= $this->session->get('user_id') ?>">
   <input type="hidden" id="isParentView" value="<?= $isParent ? '1' : '0' ?>">
   <div class="reports-section">
     <header class="mgmt-header">

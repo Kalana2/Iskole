@@ -135,7 +135,7 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
           </div>
 
           <!-- ✅ Marks + Chart section -->
-          <input type="hidden" id="studentId" value="<?= htmlspecialchars($studentInfo['stu_id']) ?>">
+          <input type="hidden" id="studentId" data-id-type="student" value="<?= htmlspecialchars($studentInfo['stu_id']) ?>">
           <input type="hidden" id="isParentView" value="0">
 
             

@@ -1,26 +1,3 @@
-// Fallback/dummy data (used on dashboards that don't yet fetch marks)
-const fallbackStudentData = {
-  subjects: [
-    { name: "Religion", score: 89, grade: "A" },
-    { name: "Sinhala", score: 77, grade: "A" },
-    { name: "Mathematics", score: 92, grade: "A" },
-    { name: "Science", score: 88, grade: "A" },
-    { name: "English", score: 85, grade: "A" },
-    { name: "History", score: 60, grade: "C" },
-    { name: "Geography", score: 73, grade: "B" },
-    { name: "Health & PE", score: 74, grade: "B" },
-    { name: "Tamil", score: 99, grade: "A" },
-    { name: "Aesthetics", score: 55, grade: "C" },
-    { name: "Citizenship", score: 30, grade: "W" },
-    { name: "Practical Skills", score: 45, grade: "S" },
-  ],
-  terms: {
-    term1: [85, 70, 88, 82, 80, 55, 68, 70, 95, 50, 25, 40],
-    term2: [87, 74, 90, 85, 83, 58, 70, 72, 97, 53, 28, 42],
-    term3: [89, 77, 92, 88, 85, 60, 73, 74, 99, 55, 30, 45],
-  },
-};
-
 // Live student marks data (loaded from DB for My Marks)
 let studentData = null;
 
@@ -231,9 +208,16 @@ async function loadMyMarksData() {
   try {
     let url = "/marksReport/myMarks";
 
-    // Teacher report page ekedi searched student ID thiyenawa
-    if (studentIdEl && studentIdEl.value) {
-      const selectedStudentId = studentIdEl.value.trim();
+    const selectedStudentId = studentIdEl?.value?.trim() || "";
+    const idType = String(studentIdEl?.dataset?.idType || "").toLowerCase();
+    const isTeacherReportView = Boolean(
+      document.getElementById("report-title"),
+    );
+    const useStudentIdEndpoint =
+      selectedStudentId &&
+      (idType === "student" || (!idType && isTeacherReportView));
+
+    if (useStudentIdEndpoint) {
       url = `/marksReport/studentMarks?studentID=${encodeURIComponent(selectedStudentId)}`;
     }
 
@@ -246,7 +230,11 @@ async function loadMyMarksData() {
 
     if (!res.ok || !json || !json.success) {
       console.error("Failed to load marks:", json);
-      studentData = fallbackStudentData;
+      studentData = {
+        subjects: [],
+        terms: { term1: [], term2: [], term3: [] },
+        ranks: {},
+      };
       return false;
     }
 
@@ -290,7 +278,11 @@ async function loadMyMarksData() {
     return true;
   } catch (e) {
     console.error("Error loading marks:", e);
-    studentData = fallbackStudentData;
+    studentData = {
+      subjects: [],
+      terms: { term1: [], term2: [], term3: [] },
+      ranks: {},
+    };
     return false;
   }
 }
