@@ -243,9 +243,11 @@
   place-items: center;
   flex-shrink: 0;
   font-size: 1.5rem;
-  background: linear-gradient(135deg,
-      rgba(102, 126, 234, 0.18),
-      rgba(118, 75, 162, 0.12));
+  background: linear-gradient(
+    135deg,
+    rgba(102, 126, 234, 0.18),
+    rgba(118, 75, 162, 0.12)
+  );
   border: 1px solid rgba(17, 24, 39, 0.06);
 }
 
@@ -290,7 +292,7 @@
   font-size: 1.5rem;
   font-weight: 700;
   color: #1a1a2e;
-  margin-bottom: 1.0rem;
+  margin-bottom: 1rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -326,7 +328,6 @@
 }
 
 /* Chart Controls */
-
 
 .term-selector {
   display: flex;
@@ -712,6 +713,40 @@
   line-height: 1.6;
 }
 
+/* Empty state blocks (No Student Found / No Behavior Reports) */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 0.45rem;
+  padding: 2rem 1.25rem;
+  border-radius: 16px;
+  border: 1px dashed rgba(102, 126, 234, 0.35);
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.empty-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.empty-state h3 {
+  margin: 0.15rem 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.empty-state p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.95rem;
+  max-width: 520px;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .behavior-section {
@@ -722,6 +757,18 @@
 @media (max-width: 768px) {
   .reports-entry {
     padding: 1rem;
+  }
+
+  .empty-state {
+    padding: 1.5rem 1rem;
+  }
+
+  .empty-state h3 {
+    font-size: 1.05rem;
+  }
+
+  .empty-state p {
+    font-size: 0.9rem;
   }
 
   .mgmt-header {
@@ -855,7 +902,6 @@
   color: currentColor;
 }
 
-
 .delete-btn {
   padding: 12px 22px;
   border-radius: 16px;
@@ -883,7 +929,6 @@
     inset 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-
 .edit-btn {
   padding: 12px 22px;
   border-radius: 16px;
@@ -901,7 +946,6 @@
   transform: translateY(-2px);
 }
 
-
 .cancel-edit-btn {
   margin-left: 10px;
   text-decoration: none;
@@ -912,7 +956,6 @@
   font-weight: 600;
   display: inline-block;
 }
-
 
 /* Add Report button */
 .cancel-btn {
@@ -927,7 +970,10 @@
   font-weight: 700;
   cursor: pointer;
   box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
-  transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
   text-decoration: none;
 }
 
