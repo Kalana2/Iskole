@@ -23,11 +23,13 @@ class LeaveRequestModel
 
     public function getByTeacher(int $teacherUserID, int $limit = 6): array
     {
-        $sql = "SELECT *
-                FROM leaveRequests
-                WHERE teacherUserID = :tid
-                ORDER BY createdAt DESC, id DESC
-                LIMIT :lim";
+        $sql = "SELECT lr.*
+            FROM leaveRequests lr
+            LEFT JOIN teachers t ON t.teacherID = lr.teacherUserID
+            WHERE lr.teacherUserID = :tid
+               OR t.userID = :tid
+            ORDER BY lr.createdAt DESC, lr.id DESC
+            LIMIT :lim";
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindValue(':tid', $teacherUserID, PDO::PARAM_INT);
@@ -37,12 +39,48 @@ class LeaveRequestModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function getAnnualLeaveLimit(): int
+    {
+        return $this->annualLeaveLimit;
+    }
+
+    public function getLeaveBalanceByTeacher(int $teacherUserID): array
+    {
+        $sql = "SELECT COUNT(*) AS used_leave_days
+            FROM teacherAttendance ta
+            JOIN teachers t ON t.teacherID = ta.teacherID
+            WHERE t.userID = :tid
+              AND LOWER(ta.status) = 'absent'
+              AND YEAR(ta.attendance_date) = YEAR(CURDATE())";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->bindValue(':tid', $teacherUserID, PDO::PARAM_INT);
+        $stmt->execute();
+
+        $used = (int)($stmt->fetchColumn() ?: 0);
+        $remaining = max($this->annualLeaveLimit - $used, 0);
+
+        return [
+            'used_leave_days' => $used,
+            'remaining_leave_days' => $remaining,
+            'annual_limit' => $this->annualLeaveLimit,
+        ];
+    }
+
     public function cancel(int $leaveId, int $teacherUserID): bool
     {
         $sql = "UPDATE leaveRequests
                 SET status = 'cancelled'
                 WHERE id = :id
-                  AND teacherUserID = :tid
+                  AND (
+                        teacherUserID = :tid
+                        OR teacherUserID = (
+                            SELECT t.teacherID
+                            FROM teachers t
+                            WHERE t.userID = :tid
+                            LIMIT 1
+                        )
+                  )
                   AND status = 'pending'";
 
         $stmt = $this->pdo->prepare($sql);
@@ -93,20 +131,22 @@ class LeaveRequestModel
                     CONCAT(un.firstName, ' ', un.lastName) AS teacher_name,
 
                     COALESCE((
-                        SELECT SUM(DATEDIFF(lr2.dateTo, lr2.dateFrom) + 1)
-                        FROM leaveRequests lr2
-                        WHERE lr2.teacherUserID = lr.teacherUserID
-                          AND lr2.status = 'approved'
-                          AND YEAR(lr2.dateFrom) = YEAR(CURDATE())
+                                                SELECT COUNT(*)
+                                                FROM teacherAttendance ta2
+                                                JOIN teachers t2 ON t2.teacherID = ta2.teacherID
+                                                WHERE t2.userID = lr.teacherUserID
+                                                    AND LOWER(ta2.status) = 'absent'
+                                                    AND YEAR(ta2.attendance_date) = YEAR(CURDATE())
                     ), 0) AS used_leave_days,
 
                     GREATEST(
                         :annualLimit - COALESCE((
-                            SELECT SUM(DATEDIFF(lr3.dateTo, lr3.dateFrom) + 1)
-                            FROM leaveRequests lr3
-                            WHERE lr3.teacherUserID = lr.teacherUserID
-                              AND lr3.status = 'approved'
-                              AND YEAR(lr3.dateFrom) = YEAR(CURDATE())
+                                                        SELECT COUNT(*)
+                                                        FROM teacherAttendance ta3
+                                                        JOIN teachers t3 ON t3.teacherID = ta3.teacherID
+                                                        WHERE t3.userID = lr.teacherUserID
+                                                            AND LOWER(ta3.status) = 'absent'
+                                                            AND YEAR(ta3.attendance_date) = YEAR(CURDATE())
                         ), 0),
                         0
                     ) AS remaining_leave_days
@@ -139,7 +179,7 @@ class LeaveRequestModel
         $stmt->execute([
             ':status' => $status,
             ':mid'    => $managerUserID,
-            ':comment'=> $comment,
+            ':comment' => $comment,
             ':id'     => $id
         ]);
 

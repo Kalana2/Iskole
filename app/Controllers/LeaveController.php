@@ -14,10 +14,12 @@ class LeaveController extends Controller
 
         $leaveModel = $this->model('LeaveRequestModel');
         $leaveRequests = $leaveModel->getByTeacher((int)$teacherUserId);
+        $leaveBalance = $leaveModel->getLeaveBalanceByTeacher((int)$teacherUserId);
 
         $this->view('teacher/index', [
             'tab' => 'Leave',
-            'leaveRequests' => $leaveRequests
+            'leaveRequests' => $leaveRequests,
+            'leaveBalance' => $leaveBalance,
         ]);
     }
 
@@ -77,7 +79,7 @@ class LeaveController extends Controller
             exit;
         }
 
-        $teacherUserId = $_SESSION['userId'] ?? 0;
+        $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
         $leaveId = (int)($_POST['leave_id'] ?? 0);
 
         $leaveModel = $this->model('LeaveRequestModel');

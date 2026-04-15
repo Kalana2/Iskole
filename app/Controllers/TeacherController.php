@@ -26,6 +26,11 @@ class TeacherController extends Controller
         $behaviorReports = [];
         $student = null;
         $leaveRequests = [];
+        $leaveBalance = [
+            'used_leave_days' => 0,
+            'remaining_leave_days' => 25,
+            'annual_limit' => 25,
+        ];
         $suggestions = [];
 
         $editReport = $_SESSION['edit_report'] ?? null;
@@ -75,17 +80,17 @@ class TeacherController extends Controller
                 }
             }
 
-			// Performance stats (overall average + ranks)
-			$performance = null;
-			$availableTerms = [];
-			$selectedTerm = null;
-			if ($student && !empty($student['studentID'])) {
-				$marksModel = $this->model('MarksReportModel');
-				$selectedTerm = isset($_GET['term']) ? trim((string)$_GET['term']) : null;
-				$availableTerms = $marksModel->getAvailableTermsForStudent((int)$student['studentID']);
-				$performance = $marksModel->getStudentPerformanceStats((int)$student['studentID'], $selectedTerm);
-				$selectedTerm = $performance['term'] ?? $selectedTerm;
-			}
+            // Performance stats (overall average + ranks)
+            $performance = null;
+            $availableTerms = [];
+            $selectedTerm = null;
+            if ($student && !empty($student['studentID'])) {
+                $marksModel = $this->model('MarksReportModel');
+                $selectedTerm = isset($_GET['term']) ? trim((string)$_GET['term']) : null;
+                $availableTerms = $marksModel->getAvailableTermsForStudent((int)$student['studentID']);
+                $performance = $marksModel->getStudentPerformanceStats((int)$student['studentID'], $selectedTerm);
+                $selectedTerm = $performance['term'] ?? $selectedTerm;
+            }
         }
 
         if ($tab === 'Leave') {
@@ -93,6 +98,7 @@ class TeacherController extends Controller
 
             $leaveModel = $this->model('LeaveRequestModel');
             $leaveRequests = $leaveModel->getByTeacher($teacherUserId);
+            $leaveBalance = $leaveModel->getLeaveBalanceByTeacher($teacherUserId);
         }
 
         // ✅ IMPORTANT: pass data to the view
@@ -102,6 +108,7 @@ class TeacherController extends Controller
             'student' => $student,
             'flash' => $flash,
             'leaveRequests' => $leaveRequests,
+            'leaveBalance' => $leaveBalance,
             'suggestions' => $suggestions,
             'editReport' => $editReport,
         ]);
@@ -187,6 +194,4 @@ class TeacherController extends Controller
                 break;
         }
     }
-
-  
 }

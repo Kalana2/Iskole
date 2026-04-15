@@ -26,6 +26,25 @@ class Mpcontroller extends UserController
             $data['pendingLeaves'] = $leaveModel->getPending();
         }
 
+        // ✅ Assign Class Teacher tab → load classes and teachers
+        if ($tab === 'Assign Class Teacher') {
+            $ctModel = $this->model('ClassTeacherModel');
+            $data['classesWithTeachers'] = $ctModel->getAllClassesWithTeachers();
+            $data['teachers'] = $ctModel->getAllTeachers();
+            $data['flash'] = $_SESSION['ct_msg'] ?? null;
+            unset($_SESSION['ct_msg']);
+        }
+
+        // ✅ Relief tab → load pending relief slots and stats
+        if ($tab === 'Relief') {
+            require_once __DIR__ . '/../Model/reliefModel.php';
+            $reliefModel = new reliefModel();
+            $date = $_GET['date'] ?? date('Y-m-d');
+            $data['pendingRelief'] = $reliefModel->getPendingReliefSlots($date);
+            $data['presentTeacherCount'] = $reliefModel->getPresentTeacherCount($date);
+            $data['selectedDate'] = $date;
+        }
+
         // ✅ pass $data to view
         $this->view('mp/index', $data);
     }
