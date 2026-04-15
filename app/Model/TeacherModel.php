@@ -87,7 +87,15 @@ class TeacherModel extends UserModel
     }
     public function getGradeByUserID($userId)
     {
-        $sql = "SELECT classID, grade FROM {$this->teacherTable} WHERE userID = :uid LIMIT 1";
+        $sql = "
+        SELECT 
+            t.classID,
+            COALESCE(t.grade, c.grade) AS grade
+        FROM {$this->teacherTable} t
+        LEFT JOIN class c ON c.classID = t.classID
+        WHERE t.userID = :uid
+        LIMIT 1
+    ";
         try {
             $stmt = $this->pdo->prepare($sql);
             $stmt->execute([':uid' => $userId]);
