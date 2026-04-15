@@ -19,8 +19,8 @@ class ApiController extends Controller
 
         if ($action === 'get' && isset($_GET['id'])) {
             $this->getUserById($_GET['id']);
-        } elseif ($action === 'search' && isset($_GET['q'])) {
-            $this->searchUsers($_GET['q']);
+        } elseif ($action === 'search' && (isset($_GET['q']) || isset($_GET['role']))) {
+            $this->searchUsers($_GET['q'] ?? '', $_GET['role'] ?? null);
         } elseif ($action === 'update' && $_SERVER['REQUEST_METHOD'] === 'POST') {
             $this->updateUser();
         } elseif ($action === 'delete' && $_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -30,7 +30,7 @@ class ApiController extends Controller
         }
     }
 
-    private function searchUsers($query)
+    private function searchUsers($query, $role = null)
     {
         try {
             if (!isset($_SESSION['user_id'])) {
@@ -39,7 +39,7 @@ class ApiController extends Controller
             }
 
             $userDirectory = new UserDirectoryController();
-            $users = $userDirectory->searchUsers($query);
+            $users = $userDirectory->searchUsers($query, $role);
 
             echo json_encode([
                 'success' => true,

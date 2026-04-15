@@ -33,10 +33,10 @@ class UserDirectoryController extends Controller
         return $user;
     }
 
-    public function searchUsers($query)
+    public function searchUsers($query, $role = null)
     {
         $model = $this->model('UserModel');
-        $users = $model->searchUsers($query);
+        $users = $model->searchUsers($query, $role);
         foreach ($users as &$user) {
             $user['role'] = array_search($user['role'], $this->userRoleMap);
         }
