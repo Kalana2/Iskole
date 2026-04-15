@@ -168,47 +168,64 @@ class TimeTableController extends Controller
 		if (!is_array($cells)) {
 			$cells = [];
 		}
-
-		$dayNameToId = $model->getSchoolDayNameToIdMap();
-		$periodNumToId = $model->getPeriodNumberToIdMap();
-		$rowToPeriodNum = $this->rowIndexToPeriodNumberMap();
-
-		$entries = [];
-		foreach ($cells as $dayName => $rows) {
-			if (!is_array($rows)) {
-				continue;
-			}
-			$dayID = $dayNameToId[(string)$dayName] ?? null;
-			if (!$dayID) {
-				continue;
-			}
-			foreach ($rows as $rowIndex => $cell) {
-				if (!is_array($cell)) {
-					continue;
-				}
-				$periodNum = $rowToPeriodNum[(int)$rowIndex] ?? null;
-				if (!$periodNum) {
-					continue;
-				}
-				$periodID = $periodNumToId[$periodNum] ?? null;
-				if (!$periodID) {
-					continue;
-				}
-				$subjectID = (int)($cell['subject'] ?? 0);
-				$teacherID = (int)($cell['teacher'] ?? 0);
-				if ($subjectID <= 0 || $teacherID <= 0) {
-					continue;
-				}
-				$entries[] = [
-					'dayID' => (int)$dayID,
-					'periodID' => (int)$periodID,
-					'subjectID' => $subjectID,
-					'teacherID' => $teacherID,
-				];
-			}
-		}
-
 		try {
+			$dayNameToId = $model->getSchoolDayNameToIdMap();
+			$periodNumToId = $model->getPeriodNumberToIdMap();
+			$rowToPeriodNum = $this->rowIndexToPeriodNumberMap();
+
+			$entries = [];
+			$hasAnySelection = false;
+
+			foreach ($cells as $dayName => $rows) {
+				if (!is_array($rows)) {
+					continue;
+				}
+
+				$dayKey = (string)$dayName;
+				$dayID = $dayNameToId[$dayKey] ?? ($dayNameToId[strtolower($dayKey)] ?? null);
+				if (!$dayID) {
+					continue;
+				}
+
+				foreach ($rows as $rowIndex => $cell) {
+					if (!is_array($cell)) {
+						continue;
+					}
+
+					$rawSubject = trim((string)($cell['subject'] ?? ''));
+					$rawTeacher = trim((string)($cell['teacher'] ?? ''));
+					if ($rawSubject !== '' || $rawTeacher !== '') {
+						$hasAnySelection = true;
+					}
+
+					$periodNum = $rowToPeriodNum[(int)$rowIndex] ?? null;
+					if (!$periodNum) {
+						continue;
+					}
+					$periodID = $periodNumToId[$periodNum] ?? null;
+					if (!$periodID) {
+						continue;
+					}
+
+					$subjectID = (int)$rawSubject;
+					$teacherID = (int)$rawTeacher;
+					if ($subjectID <= 0 || $teacherID <= 0) {
+						continue;
+					}
+
+					$entries[] = [
+						'dayID' => (int)$dayID,
+						'periodID' => (int)$periodID,
+						'subjectID' => $subjectID,
+						'teacherID' => $teacherID,
+					];
+				}
+			}
+
+			if ($hasAnySelection && empty($entries)) {
+				throw new RuntimeException('No valid timetable entries generated. Please check day/period setup and teacher selections.');
+			}
+
 			$model->saveClassTimetable($classID, $entries);
 			$_SESSION['tt_msg'] = 'Timetable saved.';
 		} catch (Throwable $e) {

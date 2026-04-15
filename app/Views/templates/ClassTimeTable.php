@@ -3,6 +3,8 @@
 $grades = $grades ?? [];
 $classes = $classes ?? [];
 $subjects = $subjects ?? [];
+$ttMsg = $_SESSION['tt_msg'] ?? null;
+unset($_SESSION['tt_msg']);
 $days = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 $periods = [
     ['time' => '07:50 - 08:30', 'label' => '1'],
@@ -18,6 +20,14 @@ $periods = [
 ?>
 <link rel="stylesheet" href="/css/CreateTimeTable/CreateTimeTable.css">
 <link rel="stylesheet" href="/css/studentTimetable/studentTimetable.css">
+
+<?php if (!empty($ttMsg)): ?>
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  alert(<?php echo json_encode((string)$ttMsg, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
+});
+</script>
+<?php endif; ?>
 
 <section class="admin-timetable-builder student-timetable-section">
   <div class="timetable-container">
