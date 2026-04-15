@@ -71,11 +71,10 @@ class AcademicOverviewModel
 				s.subjectName,
 				COALESCE(ROUND(AVG(m.marks), 1), 0) AS averageMarks
 			FROM subject s
-			LEFT JOIN teachers t
-				ON t.subjectID = s.subjectID
-				AND t.classID = :classID
+			LEFT JOIN students st
+				ON st.classID = :classID
 			LEFT JOIN marks m
-				ON m.teacherID = t.teacherID
+				ON m.studentID = st.studentID
 				AND m.subjectID = s.subjectID
 				$termSql
 			GROUP BY s.subjectID, s.subjectName
