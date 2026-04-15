@@ -15,7 +15,6 @@ class TimeTableModel
 
 	private function detectNameTable()
 	{
-		// Some environments use `userName`, others `username`
 		$tables = $this->pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_NUM);
 		$flat = array_map(fn($r) => (string)$r[0], $tables);
 		if (in_array('userName', $flat, true)) {
@@ -24,13 +23,12 @@ class TimeTableModel
 		if (in_array('username', $flat, true)) {
 			return 'username';
 		}
-		// Fallback to what the codebase mostly uses
 		return 'userName';
 	}
 
 	private function detectNameColumns($table)
 	{
-		// Common variants: (firstName,lastName) vs (fName,lName)
+		//(firstName,lastName)
 		$cols = $this->pdo->query("DESCRIBE `{$table}`")->fetchAll(PDO::FETCH_ASSOC);
 		$names = array_map(fn($c) => (string)$c['Field'], $cols);
 		$first = in_array('firstName', $names, true) ? 'firstName' : (in_array('fName', $names, true) ? 'fName' : 'firstName');
