@@ -42,12 +42,24 @@ class StudentAbsenceReasonController extends Controller
             }
         }
 
+        // Get parent data
+        $student = $parentModel->getStudentInfoByParentUserId($userId);
+        if (!$student) {
+            $_SESSION['mgmt_msg'] = 'Student record not found.';
+            header('Location: ' . ($_SERVER['HTTP_REFERER'] ?? '/'));
+            exit;
+        }
+
         $data = [
             'parentId' => $parent['parentID'] ?? null,
             'reason' => trim($_POST['reason']),
             'fromDate' => $_POST['fromDate'],
             'toDate' => $_POST['toDate'],
+            'classID' => $student['classID'] ?? null,
         ];
+
+        // var_dump($data);
+        // exit;
 
         if ($this->model->submitAbsenceReason($data)) {
             $_SESSION['mgmt_msg'] = 'Absence reason submitted successfully.';
@@ -211,8 +223,10 @@ class StudentAbsenceReasonController extends Controller
     public function viewAbsencesByTeacherUserId($userId)
     {
         $teacherModel = $this->model('TeacherModel');
+
+
         $teacher = $teacherModel->getTeacherByUserId($userId);
-        $absences = $this->model->getAbsenceReasonsByClass($teacher['grade'], $teacher['classID']);
+        $absences = $this->model->getAbsenceReasonsByClass($teacher['classID']);
 
         $studentModel = $this->model('StudentModel');
 

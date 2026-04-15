@@ -12,14 +12,15 @@ class StudentAbsenceReasonModel
     public function submitAbsenceReason($data)
     {
         try {
-            $sql = "INSERT INTO " . $this->table . " (parentID, reason, fromDate, toDate)
-                    VALUES (:parentId, :reason, :fromDate, :toDate)";
+            $sql = "INSERT INTO " . $this->table . " (parentID, reason, fromDate, toDate, classID)
+                    VALUES (:parentId, :reason, :fromDate, :toDate, :classID)";
             $stmt = $this->pdo->prepare($sql);
             $result = $stmt->execute([
                 'parentId' => $data['parentId'],
                 'reason' => $data['reason'],
                 'fromDate' => $data['fromDate'],
                 'toDate' => $data['toDate'],
+                'classID' => $data['classID'],
             ]);
             return $result;
         } catch (PDOException $e) {
@@ -129,7 +130,7 @@ class StudentAbsenceReasonModel
         }
     }
 
-    public function getAbsenceReasonsByClass($grade, $classId)
+    public function getAbsenceReasonsByClass($classId)
     {
         try {
             $stmt = $this->pdo->prepare(
@@ -142,11 +143,10 @@ class StudentAbsenceReasonModel
                  JOIN parents p ON ar.parentID = p.parentID
                  JOIN students s ON p.studentID = s.studentID
                  JOIN user parent_u ON p.userID = parent_u.userID
-                 WHERE s.gradeID = :grade AND s.classID = :classId
+                 WHERE s.classID = :classId
                  ORDER BY ar.submittedAt DESC, ar.reasonID DESC"
             );
             $stmt->execute([
-                'grade' => $grade,
                 'classId' => $classId
             ]);
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
