@@ -51,7 +51,7 @@ $absences = $absenceRequests;
                         <div class="left">
                             <h3 class="heading-name">
                                 <?php echo htmlspecialchars($studentName ?: 'Unknown Student'); ?>
-                                <span class="student-class">(Class <?php echo htmlspecialchars($classStr); ?>)</span>
+                                <!-- <span class="student-class">(Class <?php //echo htmlspecialchars($classStr); ?>)</span> -->
                             </h3>
                             <p class="sub-heading-bolt">
                                 <?php echo htmlspecialchars($fromFmt); ?>
