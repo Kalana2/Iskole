@@ -37,7 +37,7 @@ sort($dbGrades);
         <form action="/teacher/materials?action=create" method="post" enctype="multipart/form-data" id="material-upload-form">
             <div class="form-grid">
                 <div class="field">
-                    <label for="Grade">Select Grade</label>
+                    <label for="Grade" style="color: #000000; font-weight: 600;">Select Grade</label>
                     <select name="grade" id="Grade" required>
                         <option value="" selected disabled>Select Grade</option>
                         <?php foreach ($dbGrades as $g): ?>
@@ -48,7 +48,7 @@ sort($dbGrades);
                 </div>
 
                 <div class="field">
-                    <label for="Class">Select Class</label>
+                    <label for="Class" style="color: #000000; font-weight: 600;">Select Class</label>
                     <select name="class" id="Class" required>
                         <option value="" selected disabled>Select Class</option>
                         <!-- Options dynamically populated by JS based on Grade selection -->
@@ -57,7 +57,7 @@ sort($dbGrades);
                 </div>
 
                 <div class="field span-2">
-                    <label for="subject">Select Subject</label>
+                    <label for="subject" style="color: #000000; font-weight: 600;">Select Subject</label>
                     <select name="subject" id="subject" required>
                         <option value="" selected disabled>Select Subject</option>
                         <?php foreach ($dbSubjects as $s): ?>
@@ -68,19 +68,19 @@ sort($dbGrades);
                 </div>
 
                 <div class="field span-2">
-                    <label for="material-title">Material Title</label>
+                    <label for="material-title" style="color: #000000; font-weight: 600;">Material Title</label>
                     <input type="text" name="material-title" id="material-title" placeholder="Enter the material title" required maxlength="120">
                     <small class="hint"><span id="title-count">0</span>/120</small>
                 </div>
 
                 <div class="field span-2">
-                    <label for="material-description">Description</label>
+                    <label for="material-description" style="color: #000000; font-weight: 600;">Description</label>
                     <textarea name="material-description" id="material-description" rows="6" placeholder="Write a brief description of the material..." required maxlength="500"></textarea>
                     <small class="hint" id="desc-count">0/500</small>
                 </div>
 
                 <div class="field span-2">
-                    <label for="file-upload">Upload File</label>
+                    <label for="file-upload" style="color: #000000; font-weight: 600;">Upload File</label>
                     <input type="file" name="file-upload" id="file-upload" required>
                     <small class="hint">Upload PDF, DOC, DOCX, PPT, PPTX, or image files (max 10MB).</small>
                 </div>

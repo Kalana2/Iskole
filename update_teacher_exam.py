@@ -1,60 +1,17 @@
-<?php
-include_once __DIR__ . '/../../Model/TeacherModel.php';
-require_once __DIR__ . '/../../Model/ExamTimeTableModel.php';
+#!/usr/bin/env python3
 
-$teacherModel = new TeacherModel();
-$gradeData = $teacherModel->getGradeByUserID($_SESSION['user_id']);
-$grade = $gradeData ? $gradeData['grade'] : null;
+file_path = r'd:\Semester 4\SCS2202 - Group Project\Iskole\app\Views\teacher\examTimeTable.php'
 
-// messages
-$msg = $_SESSION['exam_tt_msg'] ?? null;
-unset($_SESSION['exam_tt_msg']);
+with open(file_path, 'r', encoding='utf-8') as f:
+    content = f.read()
 
-// grade options (same as student)
-$gradeOptions = ['6' => 'Grade 6', '7' => 'Grade 7', '8' => 'Grade 8', '9' => 'Grade 9'];
-$selectedGrade = $grade;
+# Replace hidden timetable section
+old_hidden = '''        <?php if ($hidden): ?>
+          <p class="ann-body" style="margin-top:.25rem;">
+            Timetable is currently hidden for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.
+          </p>'''
 
-if (!isset($gradeOptions[$selectedGrade])) {
-  $selectedGrade = array_key_first($gradeOptions);
-}
-
-// timetable
-$examModel = new ExamTimeTableModel();
-$entry = $examModel->getByGrade($selectedGrade);
-
-$imagePath = $entry['file'] ?? null;
-$hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : true;
-?>
-
-<link rel="stylesheet" href="/css/announcements/announcements.css">
-
-<section class="mp-announcements theme-light" aria-labelledby="exam-tt-title">
-  <div class="ann-header">
-    <div class="ann-title-wrap">
-      <h2 id="exam-tt-title">Exam Time Table</h2>
-      <p class="ann-subtitle">View timetable image</p>
-    </div>
-  </div>
-
-  <?php if ($msg): ?>
-    <div class="ann-grid">
-      <article class="ann-card" role="alert">
-        <?= htmlspecialchars($msg) ?>
-      </article>
-    </div>
-  <?php endif; ?>
-
-  <div class="ann-grid" role="list">
-    <article class="ann-card" role="listitem" aria-label="Current timetable preview">
-      <div class="ann-card-header">
-        <div class="ann-badges">
-          <!-- <span class="badge">Preview</span> -->
-          <span class="badge"><?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></span>
-        </div>
-      </div>
-
-      <?php if ($imagePath): ?>
-        <?php if ($hidden): ?>
+new_hidden = '''        <?php if ($hidden): ?>
           <div class="ann-no-timetable">
             <svg class="ann-icon-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -63,15 +20,17 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : true;
             </svg>
             <p class="ann-body">Timetable is currently hidden for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></p>
             <p class="ann-subtext">Contact your administrator to make it visible</p>
-          </div>
-        <?php else: ?>
-          <div style="margin-top:.5rem;">
-            <img src="<?= htmlspecialchars($imagePath) ?>"
-              alt="Exam Timetable - <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>"
-              style="max-width:300%;margin: 0 auto;  height:auto; border-radius:12px; border:1px solid rgba(0,0,0,.08);" />
-          </div>
-        <?php endif; ?>
-      <?php else: ?>
+          </div>'''
+
+content = content.replace(old_hidden, new_hidden)
+
+# Replace no timetable section
+old_no_tt = '''      <?php else: ?>
+        <p class="ann-body" style="margin-top:.25rem;">
+          No exam timetable uploaded yet for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.
+        </p>'''
+
+new_no_tt = '''      <?php else: ?>
         <div class="ann-no-timetable">
           <svg class="ann-icon-empty" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
@@ -81,11 +40,12 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : true;
           </svg>
           <p class="ann-body">No exam timetable uploaded yet for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?></p>
           <p class="ann-subtext">Please check back soon or contact your administrator</p>
-        </div>
-      <?php endif; ?>
-    </article>
-  </div>
+        </div>'''
 
+content = content.replace(old_no_tt, new_no_tt)
+
+# Add CSS styles before closing section tag
+css_block = '''
 <style>
   /* Scope overrides to the Exam Time Table section only */
   section.mp-announcements[aria-labelledby="exam-tt-title"] .ann-grid {
@@ -152,5 +112,11 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : true;
       font-size: 1rem;
     }
   }
-</style>
-</section>
+</style>'''
+
+content = content.replace('</section>', css_block + '\n</section>')
+
+with open(file_path, 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print('File updated successfully!')
