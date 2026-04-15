@@ -68,4 +68,67 @@ class MarksReportController extends Controller
 			echo json_encode(['success' => false, 'message' => 'Server error']);
 		}
 	}
+
+	public function studentMarks()
+{
+    header('Content-Type: application/json');
+
+    $userId = $this->session->get('user_id');
+    if (!$userId) {
+        http_response_code(401);
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        return;
+    }
+
+    $studentId = isset($_GET['studentID']) ? intval($_GET['studentID']) : 0;
+    if ($studentId <= 0) {
+        http_response_code(400);
+        echo json_encode(['success' => false, 'message' => 'Invalid student ID']);
+        return;
+    }
+
+    try {
+        $model = $this->model('MarksReportModel');
+
+        // searched student record
+        $student = $model->getStudentByStudentId($studentId);
+        if (!$student) {
+            http_response_code(404);
+            echo json_encode(['success' => false, 'message' => 'Student record not found']);
+            return;
+        }
+
+        $marks = $model->getMarksForStudent($student['studentID']);
+        $subjects = $model->getAllSubjects();
+        $ranks = $model->getClassRanksForStudent(
+            intval($student['studentID']),
+            intval($student['classID'])
+        );
+
+        echo json_encode([
+            'success' => true,
+            'student' => $student,
+            'subjects' => $subjects,
+            'marks' => $marks,
+            'ranks' => $ranks,
+            'isParentView' => false
+        ]);
+    } catch (Exception $e) {
+        error_log('MarksReport studentMarks API error: ' . $e->getMessage());
+        http_response_code(500);
+        echo json_encode(['success' => false, 'message' => 'Server error']);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
 }

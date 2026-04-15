@@ -227,18 +227,23 @@ function initChart() {
 
 async function loadMyMarksData() {
   const studentIdEl = document.getElementById("studentId");
-  // Only fetch for the student "My Marks" template (it includes #studentId)
-  if (!studentIdEl) {
-    studentData = fallbackStudentData;
-    return true;
-  }
 
   try {
-    const res = await fetch("/marksReport/myMarks", {
+    let url = "/marksReport/myMarks";
+
+    // Teacher report page ekedi searched student ID thiyenawa
+    if (studentIdEl && studentIdEl.value) {
+      const selectedStudentId = studentIdEl.value.trim();
+      url = `/marksReport/studentMarks?studentID=${encodeURIComponent(selectedStudentId)}`;
+    }
+
+    const res = await fetch(url, {
       method: "GET",
       headers: { Accept: "application/json" },
     });
+
     const json = await res.json();
+
     if (!res.ok || !json || !json.success) {
       console.error("Failed to load marks:", json);
       studentData = fallbackStudentData;
@@ -280,7 +285,7 @@ async function loadMyMarksData() {
       json.marks || [],
       json.subjects || [],
     );
-    // Attach ranks from API
+
     studentData.ranks = json.ranks || {};
     return true;
   } catch (e) {
