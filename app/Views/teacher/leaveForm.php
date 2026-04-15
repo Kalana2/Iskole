@@ -12,6 +12,28 @@
         </div>
     </header>
 
+    <?php
+    $usedLeaveDays = isset($leaveBalance['used_leave_days']) ? (int)$leaveBalance['used_leave_days'] : 0;
+    $annualLeaveLimit = isset($leaveBalance['annual_limit']) ? (int)$leaveBalance['annual_limit'] : 25;
+    $remainingLeaveDays = isset($leaveBalance['remaining_leave_days']) ? (int)$leaveBalance['remaining_leave_days'] : max($annualLeaveLimit - $usedLeaveDays, 0);
+    ?>
+
+    <div style="margin:10px 0 14px;display:flex;gap:10px;flex-wrap:wrap;">
+        <div style="flex:1 1 220px;padding:12px 14px;background:#f8fafc;border:1px solid #e5e7eb;border-radius:10px;">
+            <div style="font-size:14px;color:#374151;margin-bottom:4px;">Used leave days this year</div>
+            <div style="font-size:20px;color:#111827;font-weight:700;line-height:1.2;">
+                <?= $usedLeaveDays ?>/<?= $annualLeaveLimit ?>
+            </div>
+        </div>
+
+        <div style="flex:1 1 220px;padding:12px 14px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;">
+            <div style="font-size:14px;color:#166534;margin-bottom:4px;">Remaining leave days</div>
+            <div style="font-size:20px;color:#15803d;font-weight:700;line-height:1.2;">
+                <?= $remainingLeaveDays ?>
+            </div>
+        </div>
+    </div>
+
 
 
     <?php if (!empty($_SESSION['leave_msg'])): $msg = $_SESSION['leave_msg'];
@@ -27,38 +49,38 @@
         <form action="/index.php?url=leave/submit" method="post" novalidate>
             <div class="form-grid">
                 <div class="field">
-                    <label for="date-from">Date From</label>
+                    <label for="date-from" style="color:#000;font-weight:400;">Date From</label>
                     <input type="date" name="dateFrom" id="date-from" required>
                     <small class="hint">Select the start date of your leave.</small>
                 </div>
 
                 <div class="field">
-                    <label for="date-to">Date To</label>
+                    <label for="date-to" style="color:#000;font-weight:400;">Date To</label>
                     <input type="date" name="dateTo" id="date-to" required>
                     <small class="hint">Select the end date of your leave.</small>
                 </div>
 
 
                 <div class="field span-2">
-                    <label>Type of Leave</label>
+                    <label style="color:#000;font-weight:400;">Type of Leave</label>
 
                     <div class="leave-type-group">
-                        <label class="leave-tick">
+                        <label class="leave-tick" style="color:#000;font-weight:400;">
                             <input type="radio" name="leaveType" value="medical" required>
                             <span class="tick-box"></span>
-                            <span class="tick-text">Medical Leave</span>
+                            <span class="tick-text" style="color:#000;font-weight:400;">Medical Leave</span>
                         </label>
 
-                        <label class="leave-tick">
+                        <label class="leave-tick" style="color:#000;font-weight:400;">
                             <input type="radio" name="leaveType" value="personal" required>
                             <span class="tick-box"></span>
-                            <span class="tick-text">Personal Leave</span>
+                            <span class="tick-text" style="color:#000;font-weight:400;">Personal Leave</span>
                         </label>
 
-                        <label class="leave-tick">
+                        <label class="leave-tick" style="color:#000;font-weight:400;">
                             <input type="radio" name="leaveType" value="duty" required>
                             <span class="tick-box"></span>
-                            <span class="tick-text">Duty Leave</span>
+                            <span class="tick-text" style="color:#000;font-weight:400;">Duty Leave</span>
                         </label>
                     </div>
 
@@ -67,7 +89,7 @@
 
 
                 <div class="field span-2">
-                    <label for="reason">Reason</label>
+                    <label for="reason" style="color:#000;font-weight:400;">Reason</label>
                     <textarea
                         name="reason"
                         id="reason"

@@ -132,93 +132,93 @@
 </div>
 
 <script>
-(function () {
-    // ✅ Leave page section
-    const section = document.querySelector('section.mp-announcements');
-    if (!section) return;
+    (function() {
+        // ✅ Leave page section
+        const section = document.querySelector('section.mp-announcements');
+        if (!section) return;
 
-    // =========================
-    // ✅ FILTER (All / Pending / Approved / Rejected)
-    // =========================
-    const grid  = section.querySelector('.ann-grid');
-    const chips = section.querySelectorAll('.chip-group .chip');
+        // =========================
+        // ✅ FILTER (All / Pending / Approved / Rejected)
+        // =========================
+        const grid = section.querySelector('.ann-grid');
+        const chips = section.querySelectorAll('.chip-group .chip');
 
-    const applyFilter = (key) => {
-        const cards = grid.querySelectorAll('.ann-card');
-        cards.forEach(card => {
-            let show = true;
+        const applyFilter = (key) => {
+            const cards = grid.querySelectorAll('.ann-card');
+            cards.forEach(card => {
+                let show = true;
 
-            switch (key) {
-                case 'all':
-                    show = true;
-                    break;
-                case 'pending':
-                    show = card.classList.contains('status-pending');
-                    break;
-                case 'approved':
-                    show = card.classList.contains('status-approved');
-                    break;
-                case 'rejected':
-                    show = card.classList.contains('status-rejected');
-                    break;
-            }
+                switch (key) {
+                    case 'all':
+                        show = true;
+                        break;
+                    case 'pending':
+                        show = card.classList.contains('status-pending');
+                        break;
+                    case 'approved':
+                        show = card.classList.contains('status-approved');
+                        break;
+                    case 'rejected':
+                        show = card.classList.contains('status-rejected');
+                        break;
+                }
 
-            card.style.display = show ? '' : 'none';
-        });
-    };
-
-    chips.forEach(chip => {
-        chip.addEventListener('click', () => {
-            chips.forEach(c => {
-                c.classList.remove('active');
-                c.setAttribute('aria-selected', 'false');
+                card.style.display = show ? '' : 'none';
             });
-            chip.classList.add('active');
-            chip.setAttribute('aria-selected', 'true');
+        };
 
-            applyFilter(chip.dataset.filter);
+        chips.forEach(chip => {
+            chip.addEventListener('click', () => {
+                chips.forEach(c => {
+                    c.classList.remove('active');
+                    c.setAttribute('aria-selected', 'false');
+                });
+                chip.classList.add('active');
+                chip.setAttribute('aria-selected', 'true');
+
+                applyFilter(chip.dataset.filter);
+            });
         });
-    });
 
-    // =========================
-    // ✅ MODAL (View Details)
-    // =========================
-    const modal = document.getElementById('leaveModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const modalDates = document.getElementById('modalDates');
-    const modalReason = document.getElementById('modalReason');
-    const closeBtn = document.getElementById('closeModal');
+        // =========================
+        // ✅ MODAL (View Details)
+        // =========================
+        const modal = document.getElementById('leaveModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDates = document.getElementById('modalDates');
+        const modalReason = document.getElementById('modalReason');
+        const closeBtn = document.getElementById('closeModal');
 
-    // Safety check
-    if (!modal || !modalTitle || !modalDates || !modalReason || !closeBtn) return;
+        // Safety check
+        if (!modal || !modalTitle || !modalDates || !modalReason || !closeBtn) return;
 
-    document.querySelectorAll('.view-details-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            modalTitle.textContent = (btn.dataset.type || '') + ' Leave';
-            modalDates.textContent = `From ${btn.dataset.from || ''} To ${btn.dataset.to || ''}`;
-            modalReason.textContent = btn.dataset.reason || '';
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                modalTitle.textContent = (btn.dataset.type || '') + ' Leave';
+                modalDates.textContent = `From ${btn.dataset.from || ''} To ${btn.dataset.to || ''}`;
+                modalReason.textContent = btn.dataset.reason || '';
 
-            modal.classList.remove('hidden');
+                modal.classList.remove('hidden');
+            });
         });
-    });
 
-    closeBtn.addEventListener('click', () => {
-        modal.classList.add('hidden');
-    });
-
-    // ✅ click outside modal-content -> close
-    modal.addEventListener('click', (e) => {
-        if (e.target === modal) {
+        closeBtn.addEventListener('click', () => {
             modal.classList.add('hidden');
-        }
-    });
+        });
 
-    // ✅ ESC key -> close
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-            modal.classList.add('hidden');
-        }
-    });
+        // ✅ click outside modal-content -> close
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
 
-})();
+        // ✅ ESC key -> close
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                modal.classList.add('hidden');
+            }
+        });
+
+    })();
 </script>
