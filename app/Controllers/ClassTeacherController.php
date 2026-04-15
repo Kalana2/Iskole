@@ -5,7 +5,7 @@ class ClassTeacherController extends Controller
 {
     private function goBackToTab()
     {
-        header('Location: /index.php?url=admin&tab=Assign%20Class%20Teacher');
+        header('Location: /index.php?url=mp&tab=Assign%20Class%20Teacher');
         exit;
     }
 
@@ -25,7 +25,7 @@ class ClassTeacherController extends Controller
         $flash = $_SESSION['ct_msg'] ?? null;
         unset($_SESSION['ct_msg']);
 
-        $this->view('admin/index', [
+        $this->view('mp/index', [
             'tab' => 'Assign Class Teacher',
             'classesWithTeachers' => $classesWithTeachers,
             'teachers' => $teachers,
