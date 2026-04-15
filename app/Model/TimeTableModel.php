@@ -167,19 +167,32 @@ class TimeTableModel
 
 	public function getSchoolDayNameToIdMap()
 	{
+		$this->ensureTimetableReferenceData();
+
 		$sql = "SELECT id, day FROM schoolDays";
 		$stmt = $this->pdo->prepare($sql);
 		$stmt->execute();
 		$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 		$out = [];
 		foreach ($rows as $r) {
-			$out[(string)$r['day']] = (int)$r['id'];
+			$day = trim((string)($r['day'] ?? ''));
+			$id = (int)($r['id'] ?? 0);
+			if ($day === '' || $id <= 0) {
+				continue;
+			}
+
+			$normalized = strtolower($day);
+			$out[$day] = $id;
+			$out[$normalized] = $id;
+			$out[ucfirst($normalized)] = $id;
 		}
 		return $out;
 	}
 
 	public function getPeriodNumberToIdMap()
 	{
+		$this->ensureTimetableReferenceData();
+
 		// Map 1..N -> periodID by ordering periodID.
 		// Assumption: teaching periods are ordered by periodID.
 		$sql = "SELECT periodID FROM periods ORDER BY periodID";
@@ -193,6 +206,55 @@ class TimeTableModel
 			$idx++;
 		}
 		return $out;
+	}
+
+	private function ensureTimetableReferenceData()
+	{
+		$this->ensureSchoolDays();
+		$this->ensurePeriods();
+	}
+
+	private function ensureSchoolDays()
+	{
+		$count = (int)$this->pdo->query("SELECT COUNT(*) FROM schoolDays")->fetchColumn();
+		if ($count > 0) {
+			return;
+		}
+
+		$defaults = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
+		$ins = $this->pdo->prepare("INSERT INTO schoolDays (day) VALUES (:day)");
+
+		foreach ($defaults as $day) {
+			$ins->execute(['day' => $day]);
+		}
+	}
+
+	private function ensurePeriods()
+	{
+		$count = (int)$this->pdo->query("SELECT COUNT(*) FROM periods")->fetchColumn();
+		if ($count > 0) {
+			return;
+		}
+
+		$defaults = [
+			['07:50:00', '08:30:00'],
+			['08:30:00', '09:10:00'],
+			['09:10:00', '09:50:00'],
+			['09:50:00', '10:30:00'],
+			['10:50:00', '11:30:00'],
+			['11:30:00', '12:10:00'],
+			['12:10:00', '12:50:00'],
+			['12:50:00', '13:30:00'],
+		];
+
+		$ins = $this->pdo->prepare("INSERT INTO periods (startTime, endTime) VALUES (:startTime, :endTime)");
+
+		foreach ($defaults as [$startTime, $endTime]) {
+			$ins->execute([
+				'startTime' => $startTime,
+				'endTime' => $endTime,
+			]);
+		}
 	}
 
 	public function saveClassTimetable($classID, array $entries)

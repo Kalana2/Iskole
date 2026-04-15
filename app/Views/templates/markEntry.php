@@ -28,6 +28,14 @@ if (empty($classAverage)) {
 ?>
 <link rel="stylesheet" href="/css/markEntry/markEntry.css">
 
+<?php if (!empty($message)): ?>
+    <script>
+        window.addEventListener('DOMContentLoaded', function() {
+            alert(<?php echo json_encode((string)$message, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
+        });
+    </script>
+<?php endif; ?>
+
 <!--Nav1 : Marks Entry-->
 <section class="marks-entry-section theme-light" aria-labelledby="marks-entry-title">
     <div class="box">
@@ -40,12 +48,6 @@ if (empty($classAverage)) {
                 </div>
             </div>
         </div>
-
-        <?php if (!empty($message)): ?>
-            <div class="flash-message">
-                <?php echo htmlspecialchars($message); ?>
-            </div>
-        <?php endif; ?>
 
         <!-- Filter Form -->
         <div class="filter-container">
@@ -283,24 +285,6 @@ if (empty($classAverage)) {
 </section>
 
 <script>
-    // Utility: show a temporary flash message at top of box
-    function showFlashMessage(text, timeout = 3500) {
-        let flash = document.querySelector('.flash-message');
-        if (!flash) {
-            const box = document.querySelector('.box');
-            flash = document.createElement('div');
-            flash.className = 'flash-message';
-            if (box) box.insertBefore(flash, box.firstChild);
-        }
-        flash.textContent = text;
-        flash.style.display = 'block';
-        setTimeout(() => {
-            try {
-                flash.style.display = 'none';
-            } catch (e) {}
-        }, timeout);
-    }
-
     // Calculate grade based on marks
     function calculateGrade(input) {
         const marks = parseInt(input.value);
@@ -388,7 +372,7 @@ if (empty($classAverage)) {
                     row.classList.remove('completed');
                     row.classList.add('pending');
                 }
-                alert('Marks deleted successfully');
+                alert(data.message || 'Marks deleted successfully');
             })
             .catch(err => {
                 console.error('Delete error:', err);
@@ -460,7 +444,7 @@ if (empty($classAverage)) {
                     throw new Error(data.error || 'Failed to save draft');
                 }
                 if (!silent) {
-                    showFlashMessage(data.message || 'Draft saved successfully.');
+                    alert(data.message || 'Draft saved successfully.');
                 }
                 return true;
             })
@@ -517,7 +501,7 @@ if (empty($classAverage)) {
                 if (typeof updateStudentTable === 'function') {
                     updateStudentTable(data);
                 }
-                showFlashMessage(data.message || 'Marks saved successfully.');
+                alert(data.message || 'Marks saved successfully.');
             })
             .catch(err => {
                 console.error('Submit error:', err);
@@ -703,8 +687,9 @@ if (empty($classAverage)) {
                 }
                 const tr = document.createElement('tr');
                 tr.className = 'student-row ' + (cm === null || cm === undefined || cm === '' ? 'pending' : 'completed');
-                const removeBtn = student.previous_marks !== null && student.previous_marks !== undefined && student.previous_marks !== '' ?
-                    '<button type="button" class="status-badge status-remove" onclick="removeMarks(' + escapeHtml(student.id) + ', \'"+escapeHtml(student.name)+"\')">Delete</button>' : '';
+                const canRemove = student.previous_marks !== null && student.previous_marks !== undefined && student.previous_marks !== '';
+                const removeBtn = canRemove ?
+                    '<button type="button" class="status-badge status-remove">Delete</button>' : '';
                 tr.innerHTML = '<td>' + (index + 1) + '</td>' +
                     '<td><span class="reg-badge">' + escapeHtml(student.reg_number) + '</span></td>' +
                     '<td><strong>' + escapeHtml(student.name) + '</strong></td>' +
@@ -712,6 +697,18 @@ if (empty($classAverage)) {
                     '<td><div class="marks-input-wrapper"><input type="number" name="marks[' + escapeHtml(student.id) + ']" class="marks-input" min="0" max="100" value="' + (cm !== null && cm !== undefined ? escapeHtml(cm) : '') + '" placeholder="0-100" data-student-id="' + escapeHtml(student.id) + '" onchange="calculateGrade(this)"><span class="marks-total">/ 100</span></div></td>' +
                     '<td><span class="grade-badge ' + gradeClass + '" id="grade-' + escapeHtml(student.id) + '">' + (grade || '-') + '</span></td>' +
                     '<td>' + removeBtn + '</td>';
+
+                if (canRemove) {
+                    const removeButton = tr.querySelector('button.status-remove');
+                    if (removeButton) {
+                        const sid = Number(student.id);
+                        const sname = String(student.name || '');
+                        removeButton.addEventListener('click', function() {
+                            removeMarks(sid, sname);
+                        });
+                    }
+                }
+
                 tbody.appendChild(tr);
             });
             // Hidden inputs update
