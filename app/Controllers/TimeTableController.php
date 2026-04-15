@@ -118,7 +118,15 @@ class TimeTableController extends Controller
 
 		$entries = $model->getClassTimetableEntries($classID);
 		$dayNameToId = $model->getSchoolDayNameToIdMap();
-		$dayIdToName = array_flip($dayNameToId);
+		$dayIdToName = [];
+		foreach ($dayNameToId as $dayName => $dayId) {
+			$dayId = (int)$dayId;
+			$normalizedDay = ucfirst(strtolower(trim((string)$dayName)));
+			if ($dayId <= 0 || $normalizedDay === '') {
+				continue;
+			}
+			$dayIdToName[$dayId] = $normalizedDay;
+		}
 		$periodNumToId = $model->getPeriodNumberToIdMap();
 		$periodIdToNum = array_flip($periodNumToId);
 		$periodNumToRow = $this->periodNumberToRowIndexMap();

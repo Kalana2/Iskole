@@ -286,6 +286,32 @@ window.addEventListener('DOMContentLoaded', function () {
     });
   }
 
+  function normalizeDayName(day){
+    const raw = String(day || '').trim();
+    if(!raw) return '';
+    const lower = raw.toLowerCase();
+    return lower.charAt(0).toUpperCase() + lower.slice(1);
+  }
+
+  function findGridSelect(selectClass, day, row){
+    const rawDay = String(day || '').trim();
+    const rowKey = String(row ?? '');
+    const dayCandidates = [
+      rawDay,
+      normalizeDayName(rawDay),
+      rawDay.toLowerCase(),
+      rawDay.toUpperCase()
+    ].filter((d, idx, arr) => d && arr.indexOf(d) === idx);
+
+    for(const dayKey of dayCandidates){
+      const el = document.querySelector(`.${selectClass}[data-day="${CSS.escape(dayKey)}"][data-row="${CSS.escape(rowKey)}"]`);
+      if(el instanceof HTMLSelectElement){
+        return el;
+      }
+    }
+    return null;
+  }
+
   async function loadTimetableForSelectedClass(){
     const classID = sectionSel?.value || '';
     if(!classID) {
@@ -308,7 +334,7 @@ window.addEventListener('DOMContentLoaded', function () {
         Object.keys(rows).forEach(row => {
           const entry = rows[row] || {};
           const subj = String(entry.subjectID || '');
-          const sel = document.querySelector(`.subject-select[data-day="${CSS.escape(day)}"][data-row="${CSS.escape(row)}"]`);
+          const sel = findGridSelect('subject-select', day, row);
           if(sel instanceof HTMLSelectElement && subj){
             sel.value = subj;
           }
@@ -323,9 +349,9 @@ window.addEventListener('DOMContentLoaded', function () {
           const entry = rows[row] || {};
           const subj = String(entry.subjectID || '');
           const tid = String(entry.teacherID || '');
-          const teacherSel = document.querySelector(`.teacher-select[data-day="${CSS.escape(day)}"][data-row="${CSS.escape(row)}"]`);
+          const teacherSel = findGridSelect('teacher-select', day, row);
           if(teacherSel instanceof HTMLSelectElement && subj){
-            const p = loadTeachersForCell(subj, teacherSel, day, row).then(() => {
+            const p = loadTeachersForCell(subj, teacherSel, normalizeDayName(day) || day, row).then(() => {
               if(tid) teacherSel.value = tid;
             });
             tasks.push(p);
@@ -352,6 +378,9 @@ window.addEventListener('DOMContentLoaded', function () {
     clearAllTeacherSelects();
 		clearAllSubjectSelects();
     syncMeta();
+		if(sectionSel?.value){
+			await loadTimetableForSelectedClass();
+		}
   });
   sectionSel?.addEventListener('change', () => {
     teachersCache.clear();
@@ -360,6 +389,10 @@ window.addEventListener('DOMContentLoaded', function () {
 		loadTimetableForSelectedClass();
   });
   syncMeta();
+
+  if(gradeSel?.value && sectionSel?.value){
+    loadTimetableForSelectedClass();
+  }
 
   // Cell subject -> teacher dependent dropdown
   document.addEventListener('change', (e) => {
