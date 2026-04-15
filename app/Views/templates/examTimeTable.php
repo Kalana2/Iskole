@@ -99,7 +99,7 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
           <img src="<?= htmlspecialchars($imagePath) ?>" alt="Exam Timetable - <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>" style="max-width:100%; height:auto; border-radius:12px; border:1px solid rgba(0,0,0,.08);" />
         </div>
       <?php else: ?>
-        <p class="ann-body" style="margin-top:.25rem;">No exam timetable uploaded yet for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.</p>
+        <p class="ann-body empty-state-message">No exam timetable uploaded yet for <?= htmlspecialchars($gradeOptions[$selectedGrade]) ?>.</p>
       <?php endif; ?>
     </article>
   </div>
@@ -137,6 +137,16 @@ $hidden = isset($entry['visibility']) ? !(bool)$entry['visibility'] : false; // 
   section.mp-announcements[aria-labelledby="exam-tt-title"] .toggle-form {
     display: flex;
     flex-wrap: wrap;
+  }
+
+  section.mp-announcements[aria-labelledby="exam-tt-title"] .empty-state-message {
+    margin-top: 0.25rem;
+    padding: 0.75rem 0.9rem;
+    border-radius: 10px;
+    border: 1px dashed rgba(59, 130, 246, 0.35);
+    background: rgba(59, 130, 246, 0.08);
+    color: #1d4ed8;
+    font-weight: 500;
   }
 
   @media (max-width: 700px) {
