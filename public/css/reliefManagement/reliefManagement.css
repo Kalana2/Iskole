@@ -513,6 +513,17 @@
   margin: 0 0 6px;
 }
 
+/* Empty state row in relief table */
+.relief-form .table td.relief-empty-state {
+  text-align: center;
+  font-weight: 700;
+  color: #1d4ed8;
+  background: rgba(59, 130, 246, 0.08);
+  border: 1px dashed rgba(59, 130, 246, 0.35);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+}
+
 /* Responsive tweaks match user directory */
 @media (max-width: 720px) {
   .teacher-select-group {
@@ -545,5 +556,15 @@
     font-weight: 700;
     color: var(--muted);
     margin-right: 0.75rem;
+  }
+
+  .relief-form .table td.relief-empty-state {
+    display: block;
+    text-align: left;
+    padding: 0.9rem 1rem;
+  }
+
+  .relief-form .table td.relief-empty-state::before {
+    content: none;
   }
 }

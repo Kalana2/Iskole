@@ -87,7 +87,7 @@ if ($demoMode) {
           <tbody>
             <?php if (empty($pendingRelief)): ?>
               <tr class="table-row">
-                <td class="table-data" colspan="6">No pending relief slots for the selected date.</td>
+                <td class="table-data relief-empty-state" colspan="6">No pending relief slots for the selected date.</td>
               </tr>
             <?php endif; ?>
 

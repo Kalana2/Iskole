@@ -9,9 +9,9 @@ class ClassTeacherModel
         $this->db = Database::getInstance();
     }
 
-    /**
-     * Get all classes with their assigned class teachers
-     */
+
+    // Get all classes with their assigned class teachers
+
     public function getAllClassesWithTeachers(): array
     {
         $sql = "SELECT 
@@ -31,9 +31,9 @@ class ClassTeacherModel
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Get all teachers who are active (role = 2)
-     */
+
+    // Get all teachers who are active (role = 2)
+
     public function getAllTeachers(): array
     {
         $sql = "SELECT 
@@ -76,9 +76,8 @@ class ClassTeacherModel
         }
     }
 
-    /**
-     * Remove class teacher assignment from a class
-     */
+
+    // Remove class teacher assignment from a class
     public function removeClassTeacher(int $classId): bool
     {
         try {
@@ -91,9 +90,9 @@ class ClassTeacherModel
         }
     }
 
-    /**
-     * Get teacher details by teacherID
-     */
+
+    //  Get teacher details by teacherID
+
     public function getTeacherById(int $teacherId): ?array
     {
         $sql = "SELECT 
