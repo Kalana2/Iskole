@@ -125,7 +125,7 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
           <select id="edit-subject" name="subjectID">
             <option value="">Select Subject</option>
           </select>
-</div>
+        </div>
 
         <div class="form-group" id="edit-student-id-group" style="display: none;">
           <label for="edit-student-id">Student ID</label>
@@ -135,13 +135,13 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
         <div class="form-row" id="edit-student-grade-class-group" style="display: none;">
           <div class="form-group">
             <label for="edit-grade">Grade</label>
-            <select id="edit-grade" name="gradeID" required>
+            <select id="edit-grade" name="gradeID">
               <option value="">Select Grade</option>
             </select>
           </div>
           <div class="form-group">
             <label for="edit-class">Class</label>
-            <select id="edit-class" name="classID" required>
+            <select id="edit-class" name="classID">
               <option value="">Select Class</option>
             </select>
           </div>
@@ -278,40 +278,40 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
     const editSubjectSelect = document.getElementById('edit-subject');
     const editTeacherSubjectGroup = document.getElementById('edit-teacher-subject-group');
     let editAllSubjectData = [];
-    
+
     let editAllClassData = [];
 
     async function initEditDynamicSelection() {
-  try {
-    const response = await fetch('/addNewUser/getGradesAndClasses');
-    const data = await response.json();
+      try {
+        const response = await fetch('/addNewUser/getGradesAndClasses');
+        const data = await response.json();
 
-    editAllClassData = data.classes || [];
-    editAllSubjectData = data.subjects || [];
+        editAllClassData = data.classes || [];
+        editAllSubjectData = data.subjects || [];
 
-    // Populate subjects
-    if (editSubjectSelect) {
-      editSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
-      editAllSubjectData.forEach(s => {
-        const opt = document.createElement('option');
-        opt.value = s.subjectID;
-        opt.textContent = s.subjectName;
-        editSubjectSelect.appendChild(opt);
-      });
+        // Populate subjects
+        if (editSubjectSelect) {
+          editSubjectSelect.innerHTML = '<option value="">Select Subject</option>';
+          editAllSubjectData.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s.subjectID;
+            opt.textContent = s.subjectName;
+            editSubjectSelect.appendChild(opt);
+          });
+        }
+
+        // Populate grades
+        const grades = [...new Set(editAllClassData.map(item => item.grade))].sort((a, b) => a - b);
+        grades.forEach(grade => {
+          const opt = document.createElement('option');
+          opt.value = grade;
+          opt.textContent = grade;
+          editGradeSelect.appendChild(opt);
+        });
+      } catch (err) {
+        console.error('Error fetching dynamic modal data:', err);
+      }
     }
-
-    // Populate grades
-    const grades = [...new Set(editAllClassData.map(item => item.grade))].sort((a, b) => a - b);
-    grades.forEach(grade => {
-      const opt = document.createElement('option');
-      opt.value = grade;
-      opt.textContent = grade;
-      editGradeSelect.appendChild(opt);
-    });
-  } catch (err) {
-    console.error('Error fetching dynamic modal data:', err);
-  }
-}
 
     function updateEditClassOptions(selectedClassId = null) {
       const selectedGrade = editGradeSelect.value;
@@ -382,6 +382,10 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
           studentIdGroup.style.display = isStudent ? 'block' : 'none';
           studentGradeClassGroup.style.display = isStudent ? 'grid' : 'none';
 
+          // Dynamically set required attributes for students
+          editGradeSelect.required = isStudent;
+          editClassSelect.required = isStudent;
+
           if (isStudent) {
             editGradeSelect.value = userData.gradeID || '';
             updateEditClassOptions(userData.classID);
@@ -390,12 +394,12 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
 
           const isTeacher = userData.role === 'Teacher';
 
-if (editTeacherSubjectGroup) {
-  editTeacherSubjectGroup.style.display = isTeacher ? 'block' : 'none';
-  if (isTeacher && editSubjectSelect) {
-    editSubjectSelect.value = userData.subjectID || '';
-  }
-}
+          if (editTeacherSubjectGroup) {
+            editTeacherSubjectGroup.style.display = isTeacher ? 'block' : 'none';
+            if (isTeacher && editSubjectSelect) {
+              editSubjectSelect.value = userData.subjectID || '';
+            }
+          }
 
           openModal(editModal);
         })

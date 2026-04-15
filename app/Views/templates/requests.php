@@ -15,7 +15,11 @@ $list = isset($pendingLeaves) && is_array($pendingLeaves) ? $pendingLeaves : [];
         </div>
 
         <?php if (empty($list)): ?>
-            <p style="padding:20px;">No pending leave requests.</p>
+            <div class="request-empty-state" role="status" aria-live="polite">
+                <div class="request-empty-icon" aria-hidden="true">📭</div>
+                <h3 class="request-empty-title">No pending leave requests</h3>
+                <p class="request-empty-description">All leave requests have been reviewed. New requests will appear here automatically.</p>
+            </div>
         <?php else: ?>
 
             <?php foreach ($list as $req): ?>
