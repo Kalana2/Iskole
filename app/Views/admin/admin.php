@@ -29,7 +29,7 @@
         case 'Time Tables':
             include __DIR__ . '/timeTable.php';
             break;
-        case 'puClass & Subjects':
+        case 'Class & Subjects':
             include __DIR__ . '/classSubjects.php';
             break;
         case 'Assign Class Teacher':
