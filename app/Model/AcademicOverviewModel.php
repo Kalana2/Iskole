@@ -35,7 +35,7 @@ class AcademicOverviewModel
 
 		$out = [];
 		foreach ($rows as $row) {
-			$term = (string)($row['term'] ?? '');
+			$term = (string) ($row['term'] ?? '');
 			if ($term === '') {
 				continue;
 			}
