@@ -263,6 +263,51 @@ class TeacherTimeTableModel
         return ($gradeLabel !== '' && $section !== '') ? ($gradeLabel . '-' . $section) : trim($gradeLabel . ' ' . $section);
     }
 
+    private function getReliefAssignmentsForTeacherDate(int $teacherId, string $reliefDate): array
+    {
+        if ($teacherId <= 0) {
+            return [];
+        }
+
+        if (!$this->tableExists('reliefAssignments') || !$this->tableExists('classTimetable')) {
+            return [];
+        }
+
+        $nameSelect = "'' AS absentTeacherName";
+        $nameJoin = '';
+        if ($this->tableExists($this->nameTable)) {
+            $nameTable = $this->nameTable;
+            $first = $this->firstNameCol;
+            $last = $this->lastNameCol;
+            $nameSelect = "TRIM(CONCAT(COALESCE(un.`{$first}`, ''), ' ', COALESCE(un.`{$last}`, ''))) AS absentTeacherName";
+            $nameJoin = "LEFT JOIN `{$nameTable}` un ON un.userID = tAbs.userID";
+        }
+
+        $sql = "
+            SELECT
+                ra.dayID,
+                ra.periodID,
+                ct.classID,
+                ct.subjectID,
+                {$nameSelect}
+            FROM reliefAssignments ra
+            JOIN classTimetable ct ON ct.id = ra.timetableID
+            LEFT JOIN teachers tAbs ON tAbs.teacherID = ct.teacherID
+            {$nameJoin}
+            WHERE ra.reliefTeacherID = :teacherID
+              AND ra.reliefDate = :reliefDate
+              AND (ra.status IS NULL OR ra.status <> 'cancelled')
+        ";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute([
+            'teacherID' => $teacherId,
+            'reliefDate' => $reliefDate,
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC) ?: [];
+    }
+
     public function getTeacherTimetableContext(int $userId): array
     {
         $userId = (int) $userId;
@@ -365,6 +410,50 @@ class TeacherTimeTableModel
             }
         }
 
+        $selectedDate = date('Y-m-d');
+        $reliefCount = 0;
+
+        $dayIdToName = $this->getDayIdToName();
+        $periodIdToNum = $this->getPeriodIdToNumber();
+        $reliefRows = $this->getReliefAssignmentsForTeacherDate($teacherId, $selectedDate);
+
+        foreach ($reliefRows as $r) {
+            $dayId = (int) ($r['dayID'] ?? 0);
+            $periodId = (int) ($r['periodID'] ?? 0);
+            $classId = (int) ($r['classID'] ?? 0);
+            $subjectId = (int) ($r['subjectID'] ?? 0);
+
+            $dayName = $dayIdToName[$dayId] ?? null;
+            $periodNum = $periodIdToNum[$periodId] ?? null;
+
+            if (!$dayName || !$periodNum) {
+                continue;
+            }
+
+            if (!in_array($dayName, $days, true) || $periodNum < 1 || $periodNum > 8) {
+                continue;
+            }
+
+            // Keep scheduled classes intact; relief should occupy free slots.
+            if (!empty($schedule[$dayName][$periodNum])) {
+                continue;
+            }
+
+            $classLabel = $this->getClassLabelById($classId);
+            $subjectName = $this->getSubjectNameById($subjectId);
+
+            $schedule[$dayName][$periodNum] = [
+                'class' => $classLabel !== '' ? $classLabel : ('Class ' . $classId),
+                'subject' => $subjectName !== '' ? $subjectName : ('Subject ' . $subjectId),
+                'classID' => $classId,
+                'subjectID' => $subjectId,
+                'isRelief' => true,
+                'absentTeacher' => trim((string) ($r['absentTeacherName'] ?? '')),
+            ];
+
+            $reliefCount++;
+        }
+
         $teacherSubjectId = (int) ($teacher['subject_id'] ?? 0);
         $teacherSubjectName = $teacherSubjectId > 0 ? $this->getSubjectNameById($teacherSubjectId) : '';
 
@@ -393,6 +482,8 @@ class TeacherTimeTableModel
             'days' => $days,
             'totalClasses' => $totalClasses,
             'classesPerDay' => $classesPerDay,
+            'reliefCount' => $reliefCount,
+            'selectedDate' => $selectedDate,
         ];
     }
 }

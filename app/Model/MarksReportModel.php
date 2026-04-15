@@ -12,15 +12,22 @@ class MarksReportModel
     public function getStudentByUserId($userId)
     {
         $sql = "SELECT st.studentID, st.userID, st.classID, st.gradeID,
-                       un.firstName, un.lastName
+                       un.firstName, un.lastName,
+                       CASE
+                           WHEN c.classID IS NULL THEN NULL
+                           ELSE CONCAT('Grade ', c.grade, '-', c.class)
+                       END AS classLabel,
+                       YEAR(CURDATE()) AS academicYear
                 FROM students st
                 LEFT JOIN userName un ON un.userID = st.userID
+                LEFT JOIN class c ON c.classID = st.classID
                 WHERE st.userID = :uid
                 LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['uid' => $userId]);
         $row = $stmt->fetch();
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         return [
             'studentID' => $row['studentID'],
@@ -29,7 +36,9 @@ class MarksReportModel
             'gradeID' => $row['gradeID'],
             'firstName' => $row['firstName'] ?? '',
             'lastName' => $row['lastName'] ?? '',
-            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? ''))
+            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? '')),
+            'classLabel' => $row['classLabel'] ?? null,
+            'academicYear' => isset($row['academicYear']) ? strval($row['academicYear']) : date('Y')
         ];
     }
 
@@ -106,16 +115,23 @@ class MarksReportModel
     public function getChildStudentByParentUserId($parentUserId)
     {
         $sql = "SELECT st.studentID, st.userID, st.classID, st.gradeID,
-                       un.firstName, un.lastName
+                       un.firstName, un.lastName,
+                       CASE
+                           WHEN c.classID IS NULL THEN NULL
+                           ELSE CONCAT('Grade ', c.grade, '-', c.class)
+                       END AS classLabel,
+                       YEAR(CURDATE()) AS academicYear
                 FROM parents p
                 JOIN students st ON p.studentID = st.studentID
                 LEFT JOIN userName un ON un.userID = st.userID
+                LEFT JOIN class c ON c.classID = st.classID
                 WHERE p.userID = :parentUserId
                 LIMIT 1";
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute(['parentUserId' => $parentUserId]);
         $row = $stmt->fetch();
-        if (!$row) return null;
+        if (!$row)
+            return null;
 
         return [
             'studentID' => $row['studentID'],
@@ -124,7 +140,9 @@ class MarksReportModel
             'gradeID' => $row['gradeID'],
             'firstName' => $row['firstName'] ?? '',
             'lastName' => $row['lastName'] ?? '',
-            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? ''))
+            'name' => trim(($row['firstName'] ?? '') . ' ' . ($row['lastName'] ?? '')),
+            'classLabel' => $row['classLabel'] ?? null,
+            'academicYear' => isset($row['academicYear']) ? strval($row['academicYear']) : date('Y')
         ];
     }
 
@@ -158,5 +176,69 @@ class MarksReportModel
             'marks' => array_values($marks),
             'average' => $average,
         ];
+    }
+
+    /**
+     * Get the student's class rank for each term (1, 2, 3).
+     * Ranks all students in the same class by total marks per term.
+     * Returns ['term1' => rank, 'term2' => rank, 'term3' => rank, 'totalStudents' => count].
+     */
+    public function getClassRanksForStudent(int $studentId, int $classId): array
+    {
+        // Sum marks per student per term for all students in this class
+        $sql = "SELECT m.studentID, m.term, SUM(m.marks) AS totalMarks
+                FROM marks m
+                JOIN students st ON st.studentID = m.studentID
+                WHERE st.classID = :classId
+                GROUP BY m.studentID, m.term
+                ORDER BY m.term ASC, totalMarks DESC";
+
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute(['classId' => intval($classId)]);
+        $rows = $stmt->fetchAll();
+
+        // Count distinct students in class
+        $sqlCount = "SELECT COUNT(*) FROM students WHERE classID = :classId";
+        $stmtCount = $this->pdo->prepare($sqlCount);
+        $stmtCount->execute(['classId' => intval($classId)]);
+        $totalStudents = intval($stmtCount->fetchColumn());
+
+        // Group by term and rank
+        $termData = []; // term => [ [studentID, totalMarks], ... ] sorted desc
+        foreach ($rows as $r) {
+            $term = strval($r['term']);
+            if (!isset($termData[$term])) {
+                $termData[$term] = [];
+            }
+            $termData[$term][] = [
+                'studentID' => intval($r['studentID']),
+                'totalMarks' => floatval($r['totalMarks']),
+            ];
+        }
+
+        $ranks = ['term1' => null, 'term2' => null, 'term3' => null, 'totalStudents' => $totalStudents];
+
+        foreach (['1' => 'term1', '2' => 'term2', '3' => 'term3'] as $termNum => $termKey) {
+            if (!isset($termData[$termNum]))
+                continue;
+
+            // Already sorted by totalMarks DESC from SQL
+            $position = 1;
+            $prevTotal = null;
+            $prevRank = 1;
+            foreach ($termData[$termNum] as $i => $entry) {
+                if ($prevTotal !== null && $entry['totalMarks'] < $prevTotal) {
+                    $position = $i + 1;
+                }
+                if ($entry['studentID'] === $studentId) {
+                    $ranks[$termKey] = $position;
+                    break;
+                }
+                $prevTotal = $entry['totalMarks'];
+                $prevRank = $position;
+            }
+        }
+
+        return $ranks;
     }
 }

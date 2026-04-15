@@ -105,7 +105,7 @@ $periods = [
                           </select>
                         </div>
                         <div class="class-details">
-                          <span class="teacher-name">
+                          <span class="teacher-name teacher-select-wrap">
                             <i class="fas fa-user-tie"></i>
                             <select class="teacher-select" data-day="<?= $d ?>" data-row="<?= $rowIndex ?>" name="cells[<?= $d ?>][<?= $rowIndex ?>][teacher]" disabled>
                               <option value="">Select Teacher</option>
@@ -123,7 +123,7 @@ $periods = [
         </table>
       </div>
 
-      <div class="builder-actions" style="margin-top:16px; display:flex; gap:12px;">
+      <div class="builder-actions" style="margin-top:16px; margin-bottom:16px; display:flex; gap:12px;">
         <button type="button" id="previewBtn" class="btn primary">Preview</button>
         <button type="submit" class="btn success">Save</button>
         <button type="reset" class="btn">Clear</button>

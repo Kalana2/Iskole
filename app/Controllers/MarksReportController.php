@@ -49,12 +49,17 @@ class MarksReportController extends Controller
 
 			$marks = $model->getMarksForStudent($student['studentID']);
 			$subjects = $model->getAllSubjects();
+			$ranks = $model->getClassRanksForStudent(
+				intval($student['studentID']),
+				intval($student['classID'])
+			);
 
 			echo json_encode([
 				'success' => true,
 				'student' => $student,
 				'subjects' => $subjects,
 				'marks' => $marks,
+				'ranks' => $ranks,
 				'isParentView' => ($userRole == 4)
 			]);
 		} catch (Exception $e) {

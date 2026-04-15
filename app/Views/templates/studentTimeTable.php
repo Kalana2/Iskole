@@ -4,6 +4,7 @@ $studentInfo = $studentInfo ?? [
     'name' => '—',
     'class' => '—',
     'stu_id' => '—',
+    'year' => date('Y'),
 ];
 
 $currentDay = date('l'); // Get current day name
@@ -34,20 +35,16 @@ $stats = $stats ?? [
                     <h1 class="header-title">Weekly Timetable</h1>
                     <p class="header-subtitle">View complete class schedule for the week</p>
                 </div>
-                <!-- <div class="student-info-badge">
-                    <div class="info-item">
-                        <span class="info-label">Student</span>
-                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['name'] ?? '—'); ?></span>
-                    </div>
+                <div class="student-info-badge">
                     <div class="info-item">
                         <span class="info-label">Class</span>
                         <span class="info-value"><?php echo htmlspecialchars($studentInfo['class'] ?? '—'); ?></span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">ID</span>
-                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['stu_id'] ?? '—'); ?></span>
+                        <span class="info-label">Academic Year</span>
+                        <span class="info-value"><?php echo htmlspecialchars($studentInfo['year'] ?? date('Y')); ?></span>
                     </div>
-                </div> -->
+                </div>
             </div>
         </div>
 

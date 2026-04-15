@@ -32,6 +32,46 @@
   align-items: center;
 }
 
+/* Keep teacher dropdown width equal to subject dropdown width */
+.admin-timetable-builder .class-details .teacher-name.teacher-select-wrap {
+  display: block;
+  width: 100%;
+  overflow: visible;
+  white-space: normal;
+  text-overflow: clip;
+}
+
+.admin-timetable-builder .class-details .teacher-name.teacher-select-wrap i,
+.admin-timetable-builder
+  .class-details
+  .teacher-name.teacher-select-wrap::after {
+  display: none;
+}
+
+.admin-timetable-builder
+  .class-details
+  .teacher-name.teacher-select-wrap
+  .teacher-select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+/* Keep teacher dropdown width aligned with subject dropdown width */
+.admin-timetable-builder .teacher-name {
+  grid-template-columns: 16px minmax(0, 1fr) 16px;
+}
+
+.admin-timetable-builder .teacher-select {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  height: 32px;
+  font-size: 13px;
+  border-radius: 6px;
+}
+
 .admin-timetable-builder .timetable-header {
   margin-bottom: 32px;
   margin-top: 0;
