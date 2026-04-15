@@ -36,10 +36,23 @@ class UserDirectoryController extends Controller
     public function searchUsers($query)
     {
         $model = $this->model('UserModel');
+
+        if ($query) {
+            // Convert role name (Admin) → role ID (0)
+            $roleKey = array_search($query, $this->userRoleMap);
+
+            if ($roleKey !== false) {
+                $query = $roleKey;
+            }
+        }
+
         $users = $model->searchUsers($query);
+
+        // Convert back (0 → Admin) for display
         foreach ($users as &$user) {
             $user['role'] = array_search($user['role'], $this->userRoleMap);
         }
+
         return $users;
     }
 

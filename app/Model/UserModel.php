@@ -192,6 +192,7 @@ class UserModel
     {
         $searchTerm = '%' . $query . '%';
 
+
         $sql = "SELECT {$this->userTable}.*, 
                 {$this->userNameTable}.firstName, 
                 {$this->userNameTable}.lastName,
