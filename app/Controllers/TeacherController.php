@@ -99,6 +99,10 @@ class TeacherController extends Controller
             $leaveModel = $this->model('LeaveRequestModel');
             $leaveRequests = $leaveModel->getByTeacher($teacherUserId);
             $leaveBalance = $leaveModel->getLeaveBalanceByTeacher($teacherUserId);
+
+            // ✅ ADD THIS PART (IMPORTANT)
+            $editLeave = $_SESSION['edit_leave'] ?? null;
+            unset($_SESSION['edit_leave']);
         }
 
         // ✅ IMPORTANT: pass data to the view
@@ -111,6 +115,7 @@ class TeacherController extends Controller
             'leaveBalance' => $leaveBalance,
             'suggestions' => $suggestions,
             'editReport' => $editReport,
+            'editLeave' => $editLeave ?? null,
         ]);
     }
 
