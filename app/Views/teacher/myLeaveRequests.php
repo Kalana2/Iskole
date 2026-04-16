@@ -102,7 +102,14 @@
                         </button>
 
                         <div class="spacer"></div>
+
                         <?php if ($status === 'pending'): ?>
+                            <a href="/index.php?url=leave/edit&tab=Leave&leave_id=<?= (int)$req['id'] ?>"
+                                class="btn ghost btn-small"
+                                style="text-decoration:none;margin-right:10px;">
+                                Edit Request
+                            </a>
+
                             <form action="/index.php?url=leave/cancel" method="post" style="display:inline;">
                                 <input type="hidden" name="leave_id" value="<?= (int)$req['id'] ?>">
                                 <button class="btn" type="submit"
@@ -111,7 +118,6 @@
                                 </button>
                             </form>
                         <?php endif; ?>
-
                     </div>
                 </article>
             <?php endforeach; ?>
