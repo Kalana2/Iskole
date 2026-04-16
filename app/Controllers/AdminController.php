@@ -12,6 +12,20 @@ class AdminController extends Controller
         // Provide data for Relief tab
         $data = [];
         $tab = $_GET['tab'] ?? '';
+
+        // Handle Time Tables tab (Admin dashboard)
+        if ($tab === 'Time Tables') {
+            $ttModel = $this->model('TimeTableModel');
+            $data['grades'] = $ttModel->getGrades();
+            $data['subjects'] = $ttModel->getSubjects();
+            $data['classes'] = [];
+            $data['selectedGrade'] = '';
+            $data['selectedClass'] = '';
+
+            $data['tt_msg'] = $_SESSION['tt_msg'] ?? null;
+            unset($_SESSION['tt_msg']);
+        }
+
         if ($tab === 'Relief') {
             $date = $_GET['date'] ?? date('Y-m-d');
             if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
@@ -38,7 +52,7 @@ class AdminController extends Controller
         if ($tab === 'Class & Subjects') {
             $model = $this->model('ClassSubjectModel');
 
-            $data['classes']  = $model->getAllClasses();
+            $data['classes'] = $model->getAllClasses();
             $data['subjects'] = $model->getAllSubjects();
 
             $data['flash'] = $_SESSION['cs_msg'] ?? null;
