@@ -86,6 +86,7 @@ class LeaveController extends Controller
         }
 
         $leaveId = (int)($_GET['leave_id'] ?? 0);
+
         if ($leaveId <= 0) {
             $_SESSION['leave_msg'] = [
                 'type' => 'error',
