@@ -142,6 +142,28 @@ With all of this in place — the grades, classes, subjects, teachers, students,
 
 ---
 
+### Timetables Module
+
+_(Navigate to Timetable management — log in as Management)_
+
+The timetable module allows management to **create and manage both student class timetables and teacher timetables**.
+
+Management can create a full weekly timetable for a class — assigning subjects and teachers to specific periods on each day. Once the timetable is ready, management can **publish it**, making it immediately visible to students and teachers. They can also **unpublish** it if a revision is needed.
+
+_(Navigate to Teacher Timetable)_
+
+Teacher timetables work in a similar way — each teacher can see their own schedule clearly. This also feeds into the **relief teacher / substitution management** module, where management can assign a substitute teacher when the regular teacher is on approved leave.
+
+---
+
+### Exam Timetable
+
+_(Navigate to Exam Timetable)_
+
+Separately, management can **upload the examination timetable** — typically as an image, which students and parents can view directly through their portals. This is one of the most accessed features in the lead-up to exam season.
+
+---
+
 ### Transition to Speaker 3
 
 The admin has built the foundation. Now let me pass the demonstration over to [Speaker 3 Name], who will show you how the **Management Panel, Teachers, and the Attendance and Announcement modules** work in action.
@@ -291,28 +313,6 @@ These results are then locked into a **comprehensive student result report**, wh
 _(Show the result report view)_
 
 Here is what a result report looks like. Subject-wise marks, totals, averages, and class rank — all in one clean view.
-
----
-
-### Timetables Module
-
-_(Navigate to Timetable management — log in as Management)_
-
-The timetable module allows management to **create and manage both student class timetables and teacher timetables**.
-
-Management can create a full weekly timetable for a class — assigning subjects and teachers to specific periods on each day. Once the timetable is ready, management can **publish it**, making it immediately visible to students and teachers. They can also **unpublish** it if a revision is needed.
-
-_(Navigate to Teacher Timetable)_
-
-Teacher timetables work in a similar way — each teacher can see their own schedule clearly. This also feeds into the **relief teacher / substitution management** module, where management can assign a substitute teacher when the regular teacher is on approved leave.
-
----
-
-### Exam Timetable
-
-_(Navigate to Exam Timetable)_
-
-Separately, management can **upload the examination timetable** — typically as an image, which students and parents can view directly through their portals. This is one of the most accessed features in the lead-up to exam season.
 
 ---
 
