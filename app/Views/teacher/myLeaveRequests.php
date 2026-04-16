@@ -105,8 +105,8 @@
 
                         <?php if ($status === 'pending'): ?>
                             <a href="/index.php?url=leave/edit&tab=Leave&leave_id=<?= (int)$req['id'] ?>"
-                                class="btn ghost"
-                                style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;margin-right:10px;">
+                                class="btn ghost btn-small"
+                                style="text-decoration:none;margin-right:10px;">
                                 Edit Request
                             </a>
 

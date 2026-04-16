@@ -614,3 +614,10 @@ select.form-control {
   background-color: #ccc;
   cursor: not-allowed;
 }
+
+.btn-small {
+    font-size: 14px;      /* same as other buttons */
+    padding: 8px 14px;    /* adjust button size */
+    border-radius: 8px;
+    line-height: 1.2;
+}
