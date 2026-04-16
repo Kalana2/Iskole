@@ -1,33 +1,89 @@
-\documentclass[12pt,a4paper]{report}
+\documentclass[12pt, a4paper]{report}
+
+% ── Packages ─────────────────────────────────────────────────
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage{hyperref}
-\usepackage{geometry}
+\usepackage{lmodern}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
 \usepackage{enumitem}
-\usepackage{titlesec}
+\usepackage{hyperref}
 \usepackage{xcolor}
+\usepackage{titlesec}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{colortbl}
 
-\geometry{margin=1in}
+% ── Light Blue Color Theme ───────────────────────────────────
+\definecolor{themeblue}{HTML}{2B7BBF}
+\definecolor{themelightblue}{HTML}{D6EAF8}
+\definecolor{themedarkblue}{HTML}{1A5276}
+\definecolor{themeaccent}{HTML}{3498DB}
 
+% ── Page Style ───────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{themedarkblue} IskolE – School Management System}
+\fancyhead[R]{\small\color{themedarkblue} User Manual}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% ── Hyperlink Style ──────────────────────────────────────────
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan,
+    linkcolor=themedarkblue,
+    urlcolor=themeaccent,
+    citecolor=themedarkblue
 }
 
-\titleformat{\chapter}[display]
-  {\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+% ── Spacing ──────────────────────────────────────────────────
+\setstretch{1.5}
 
-\title{Iskole - School Management System\\User Manual}
-\author{Iskole Development Team}
-\date{\today}
+% ── Chapter/Section Formatting (Light Blue Theme) ────────────
+\titleformat{\chapter}[display]
+  {\normalfont\huge\bfseries\color{themeblue}}{\chaptertitlename\ \thechapter}{20pt}{\Huge\color{themedarkblue}}
+\titlespacing*{\chapter}{0pt}{-20pt}{30pt}
+
+\titleformat{\section}
+  {\normalfont\Large\bfseries\color{themeblue}}{\thesection}{1em}{}
+\titleformat{\subsection}
+  {\normalfont\large\bfseries\color{themedarkblue}}{\thesubsection}{1em}{}
 
 \begin{document}
 
-\maketitle
+% ────────────────────────────────────────────────────────────
+%                     COVER PAGE
+% ────────────────────────────────────────────────────────────
+\begin{titlepage}
+    \centering
+    \vspace*{0.2cm}
 
+    {\Huge\textbf{\color{themedarkblue}IskolE}}\\[0.3cm]
+    {\LARGE\textbf{\color{themeblue}School Management System}}\\[0.8cm]
+
+    {\Large\textbf{\color{themedarkblue}USER MANUAL}}\\[0.5cm]
+
+    {\color{themeblue}\rule{0.8\textwidth}{0.4pt}}\\[0.6cm]
+
+    {\large\textbf{\color{themedarkblue}Iskole Development Team}}\\[0.2cm]
+    {\large \today}
+
+    \vfill
+\end{titlepage}
+
+% ────────────────────────────────────────────────────────────
+%                   TABLE OF CONTENTS
+% ────────────────────────────────────────────────────────────
 \tableofcontents
+\newpage
 
 \chapter{Introduction}
 Iskole is a modern, integrated School Management System (SMS) designed to digitize and streamline school operations. It facilitates seamless communication between administrators, teachers, students, and parents, ensuring that academic and administrative information is easily accessible and manageable.
