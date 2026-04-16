@@ -87,7 +87,13 @@
             if (msg && msgCount) msgCount.textContent = `${msg.value.length}/${msg.maxLength}`;
         };
         updateCounts();
-        [title, msg].forEach(el => el && el.addEventListener('input', updateCounts));
+        if (title) {
+            title.addEventListener('input', updateCounts);
+        }
+
+        if (msg) {
+            msg.addEventListener('input', updateCounts);
+        }
 
         // Lightweight client-side validation
         const formEl = formSection.querySelector('form');
