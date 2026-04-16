@@ -300,7 +300,7 @@ _(Navigate to Timetable management — log in as Management)_
 
 The timetable module allows management to **create and manage both student class timetables and teacher timetables**.
 
-Management can create a full weekly timetable for a class — assigning subjects and teachers to specific periods on each day. Once the timetable is ready, management can **publish it**, making it immediately visible to students and teachers. They can also **unpublish** it if a revision is needed.
+Management can create a full weekly timetable for a class — assigning subjects and teachers to specific periods on each day. Once the timetable is ready, management can **publish it**, making it immediately visible to students and teachers.
 
 _(Navigate to Teacher Timetable)_
 
