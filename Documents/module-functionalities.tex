@@ -1,0 +1,279 @@
+% IskolE – School Management System
+% Module Functionalities (LaTeX)
+% Date: 2026-04-16
+
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{longtable}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{titlesec}
+
+\geometry{margin=1in}
+\onehalfspacing
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=blue,
+  urlcolor=blue,
+  citecolor=blue
+}
+
+\titleformat{\section}{\large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalsize\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries}{\thesubsubsection}{1em}{}
+
+\title{IskolE -- School Management System\\\vspace{0.25em}\large Module Functionalities Description}
+\author{CS Group 38}
+\date{April 16, 2026}
+
+\begin{document}
+\maketitle
+
+
+\section{R K K Jinendra -- Module Owner}
+
+\subsection{Management Staff Records (CRUD)}
+\textbf{Purpose:} Maintain records of non-teaching management and administrative manager panel used for access control and operational management.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Add manager panel member profiles 
+  \item \textbf{Read:} View manager panel directory, search/filter by name/role/status, and view full profiles.
+  \item \textbf{Update:} Edit profile data, deactivate.
+  \item \textbf{Delete:} Remove manager panel accounts.
+\end{itemize}
+
+\subsubsection*{Typical Fields}
+ Full name, NIC, email, phone, address, role, username, created/updated timestamps.
+
+\subsubsection*{Validations and Rules}
+\begin{itemize}[leftmargin=*]
+  \item Unique identifiers (email).
+  \item Role-based access: only authorized management can perform CRUD.
+\end{itemize}
+
+\subsection{Teacher Records (CRUD)}
+\textbf{Purpose:} Maintain records of teaching management and Teacher panel used for access control and operational management.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Add teacher profiles with qualifications and subject specialties.
+  \item \textbf{Read:} List/search teachers; view teacher profile and assigned classes/subjects.
+  \item \textbf{Update:} Edit Maintain personal data. 
+  \item \textbf{Update:} Assign class to teachers.
+  \item \textbf{Delete:} Remove teacher accounts.
+\end{itemize}
+
+\subsection{Student Records (CRUD)}
+\textbf{Purpose:} Maintain student master data used throughout attendance, results, timetables, and behaviour tracking.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Register admissions and assign student to class/grade.
+  \item \textbf{Read:} List students by class/grade, search, and view full student profile.
+  \item \textbf{Update:} Update details, class transfer.
+  \item \textbf{Delete:} Prefer status changes over hard-delete to preserve historical academic records.
+\end{itemize}
+
+\subsubsection*{Validations and Rules}
+\begin{itemize}[leftmargin=*]
+  \item Unique admission number/student ID.
+  \item Student must be linked to a class .
+
+\end{itemize}
+
+\subsection{Parent/Guardian Records (CRUD)}
+\textbf{Purpose:} Maintain parent/guardian profiles and link them to one or more students for communication and monitoring.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Add guardian profile and link to student(s).
+  \item \textbf{Read:} View guardian directory and linked students.
+  \item \textbf{Update:} Update contact details and manage student links.
+  \item \textbf{Delete:} Prefer deactivate to keep announcement delivery logs and history.
+\end{itemize}
+
+\subsubsection*{Rules}
+A student has only one guardians;
+
+\subsection{Student Absence Reason Management (CRUD + Acknowledgement Workflow)}
+\textbf{Purpose:} Record reasons for student absences and support acknowledgement by class teachers.
+
+\subsubsection*{CRUD Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Submit absence reason for a student and date/period.
+  \item \textbf{Read:} View absence reasons by class teachers.
+  \item \textbf{Update:} Edit pending submissions (before acknowledgement) with restrictions.
+  \item \textbf{Delete:} Remove absence reasons by acknowledgement.
+\end{itemize}
+
+\subsubsection*{Acknowledgement Workflow}
+\begin{itemize}[leftmargin=*]
+  \item Statuses: \textit{Submitted/Pending} $\rightarrow$ \textit{Acknowledged} or \textit{not}.
+  \item An approver can record decision timestamps.
+  \item Optionally notify parent/guardian when acknowladged or not.
+\end{itemize}
+
+\subsubsection*{Integration}
+Linked to student attendance records so that absences can be explained and reported as acknowledged.
+
+\section{Seniru D S Senaweera -- Module Owner}
+
+\subsection{Announcements (CRUD)}
+\textbf{Purpose:} Publish announcements to selected audiences (students, parents, teachers, management).
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Compose  announcements with audience targeting.
+  \item \textbf{Read:} Announcement feed view .
+  \item \textbf{Update:} Edit announcement content, audience..
+  \item \textbf{Delete:} Remove announcements.
+\end{itemize}
+
+\subsubsection*{Rules}
+Only authorized roles can create/update/delete; users see announcements only if they match the target audience.
+
+\subsection{Learning Materials Management (Upload/Update/Delete/Download)}
+\textbf{Purpose:} Manage learning resources per subject/class and provide controlled access for download.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Upload:} Store files with metadata .
+  \item \textbf{Update:} Replace file or update metadata.
+  \item \textbf{Delete:} Remove access to files.
+  \item \textbf{Download:} Allow authorized users to download.
+\end{itemize}
+
+
+\subsection{Teacher Attendance Records (CRUD)}
+\textbf{Purpose:} Maintain daily teacher attendance for operational tracking.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Mark teacher attendance per date (present/absent/late/on leave).
+  \item \textbf{Update:} Correct entries (preferably audited).
+  \item \textbf{Delete:} Remove incorrect entries (rare; update preferred).
+\end{itemize}
+
+
+\subsection{Student Attendance Records (CRUD)}
+\textbf{Purpose:} Track student attendance daily.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Mark attendance for a class .
+  \item \textbf{Read:} Class register view; student-wise history; monthly summaries.
+  \item \textbf{Update:} Corrections.
+  \item \textbf{Delete:} Remove invalid entries (update preferred).
+\end{itemize}
+
+
+\section{S. K. Thasindu Ramsitha -- Module Owner}
+
+\subsection{Marks / Exam Results Management (Create/Read/Update)}
+\textbf{Purpose:} Record and maintain marks for exams per subject and generate academic reporting.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Enter marks per class/subject/exam.
+  \item \textbf{Read:} Student report view, subject analysis, and class summaries.
+  \item \textbf{Update:} Correct marks.
+\end{itemize}
+
+
+\subsection{Student Timetables (CRUD + Publish/Unpublish)}
+\textbf{Purpose:} Maintain class timetables.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Build timetable entries per day/period with subject, teacher.
+  \item \textbf{Read:} Timetable grid view and printable view.
+  \item \textbf{Update:} Edit periods; swap subjects/teachers.
+  \item \textbf{Delete:} Remove entries or entire timetable versions.
+
+\end{itemize}
+
+\end{itemize}
+
+\subsection{Relief / Teacher Substitution Management (CRUD)}
+\textbf{Purpose:} Assign substitute teachers when a scheduled teacher is absent.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Assign relief teacher for a class, date, and period.
+  \item \textbf{Read:} Daily relief schedule (by class and by teacher).
+  \item \textbf{Update:} Replace substitute teacher or adjust period.
+  \item \textbf{Delete:} Cancel relief assignment.
+\end{itemize}
+
+\subsubsection*{Rules}
+Prevent timetable conflicts and optionally prefer substitutes qualified for the subject.
+
+\section{R. S. R. G. A. A. Ananda -- Module Owner}
+
+\subsection{Classes Management (CRUD)}
+\textbf{Purpose:} Maintain the class/section structure used by timetables, attendance, and results.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Define a class for an academic year .
+  \item \textbf{Read:} Class list.
+  \item \textbf{Delete:} Prefer archive when dependent records exist.
+\end{itemize}
+
+\subsection{Exam Timetables (Upload/Update/Delete + Image Handling)}
+\textbf{Purpose:} Upload and publish exam schedules, frequently as images/PDFs.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Upload:} Upload timetable image with exam metadata.
+  \item \textbf{Update:} Replace the uploaded file and/or update metadata.
+  \item \textbf{Delete:} Remove timetable entry and physical file.
+\end{itemize}
+
+
+\subsection{Teacher Leave Requests (CRUD + Approval Workflow)}
+\textbf{Purpose:} Enable teachers to apply for leave and management to approve/reject.
+
+\subsubsection*{CRUD Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Submit leave request (type, date range, reason, attachment).
+  \item \textbf{Read:} Teacher views own requests; management views all pending/processed.
+  \item \textbf{Update:} Teachers can edit pending requests; approvers add notes.
+  \item \textbf{Delete/Cancel:} Cancel pending requests.
+\end{itemize}
+
+\subsubsection*{Approval Workflow}
+\begin{itemize}[leftmargin=*]
+  \item Statuses: \textit{Pending} $\rightarrow$ \textit{Approved} or \textit{Rejected}; optional \textit{Cancelled}.
+\end{itemize}
+
+\subsection{Student Behaviour / Remarks (CRUD)}
+\textbf{Purpose:} Record behavioural incidents, achievements, counselling notes, and general remarks.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Add remark with category and description.
+  \item \textbf{Read:} Student behaviour history and class summaries.
+  \item \textbf{Update:} Edit remarks with authorization controls.
+  \item \textbf{Delete:} Remove incorrect remarks; preserve audit trail when required.
+\end{itemize}
+
+\subsection{Subjects Management (CRUD)}
+\textbf{Purpose:} Maintain subject master data used by timetabling, marks, and materials.
+
+\subsubsection*{Functions}
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Create:} Add subjects with name, grade  type.
+  \item \textbf{Read:} View subject catalogue by grade.
+  \item \textbf{Delete:} Remove subjects.
+\end{itemize}
+
+
+\end{document}
