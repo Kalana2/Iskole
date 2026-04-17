@@ -301,7 +301,7 @@
             submitBtn.disabled = true;
             submitBtn.textContent = 'Saving...';
 
-            console.log('Sending data:', data); // Debug log
+            console.log('Sending data:', data);
 
             // Send update request to server
             fetch(window.location.pathname + '?action=update', {
@@ -312,17 +312,17 @@
                     body: JSON.stringify(data)
                 })
                 .then(response => {
-                    console.log('Response status:', response.status); // Debug log
-                    console.log('Response headers:', response.headers.get('content-type')); // Debug log
+                    console.log('Response status:', response.status);
+                    console.log('Response headers:', response.headers.get('content-type'));
 
                     if (!response.ok) {
                         throw new Error(`HTTP error! status: ${response.status}`);
                     }
 
-                    return response.text(); // Get as text first to debug
+                    return response.text();
                 })
                 .then(text => {
-                    console.log('Raw response:', text); // Debug log
+                    console.log('Raw response:', text);
 
                     try {
                         const result = JSON.parse(text);
@@ -389,7 +389,7 @@
                 }
 
                 if (confirm('Are you sure you want to delete this announcement?')) {
-                    // Disable the delete button during the request
+
                     btn.disabled = true;
                     btn.style.opacity = '0.5';
 

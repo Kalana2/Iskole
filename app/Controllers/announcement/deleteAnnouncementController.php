@@ -32,7 +32,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $_GET['action'] === 'delete') {
     }
     exit;
 }
-//  else {
-//     http_response_code(405);
-//     echo json_encode(['error' => 'Method Not Allowed']);
-// }

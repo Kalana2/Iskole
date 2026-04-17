@@ -1,5 +1,5 @@
 <?php
-// Only process if this is a POST request with update action
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['action'] === 'update') {
     // Suppress any PHP errors/warnings to prevent HTML output
     error_reporting(0);
@@ -66,4 +66,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_GET['action']) && $_GET['ac
     }
     exit;
 }
-// If not a POST request with update action, do nothing (don't output anything)
