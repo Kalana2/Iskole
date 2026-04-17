@@ -105,7 +105,7 @@ $users = $userDirectory->getRecentUsers(5); // Show only 5 items initially
 
         <div class="form-group">
           <label for="edit-email">Email</label>
-          <input type="email" id="edit-email" name="email" required>
+          <input type="email" id="edit-email" name="email" required readonly>
         </div>
 
         <div class="form-row">
