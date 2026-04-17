@@ -1,0 +1,147 @@
+% ============================================================
+% IskolE – Individual Contribution Report
+% CS Group 38 | SCS2202 – Group Project
+% ============================================================
+\documentclass[11pt, a4paper]{article}
+
+% ── Packages ─────────────────────────────────────────────────
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[margin=2cm]{geometry}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{tabularx}
+\usepackage{colortbl}
+\usepackage{array}
+
+% ── Light Blue Color Theme ───────────────────────────────────
+\definecolor{themeblue}{HTML}{2B7BBF}
+\definecolor{themelightblue}{HTML}{D6EAF8}
+\definecolor{themedarkblue}{HTML}{1A5276}
+\definecolor{themeaccent}{HTML}{3498DB}
+
+% ── Page Style ───────────────────────────────────────────────
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{themedarkblue} IskolE – Individual Contribution Report}
+\fancyhead[R]{\small\color{themedarkblue} CS Group 38}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+
+% ============================================================
+\begin{document}
+
+% ────────────────────────────────────────────────────────────
+%                        TITLE PAGE
+% ────────────────────────────────────────────────────────────
+\begin{center}
+    \vspace*{0.5cm}
+    {\LARGE\textbf{\color{themedarkblue}IskolE}}\\[0.2cm]
+    {\large\textbf{\color{themeblue}Individual Contribution Report}}\\[0.8cm]
+    {\normalsize SCS2202 – Group Project}\\[0.2cm]
+    {\normalsize CS Group: 38}\\[1.5cm]
+\end{center}
+% ────────────────────────────────────────────────────────────
+%                    EXECUTIVE SUMMARY
+% ────────────────────────────────────────────────────────────
+\section*{Executive Summary}
+
+This report documents the individual contributions of each team member to the IskolE School Management System project. The project encompasses 19 functional modules with 100\% completion rate. All team members contributed equally (25\% each) to system design, database design, frontend development, backend development, testing, and integration. Module ownership and technical implementation details are documented below.
+
+\vspace{0.2cm}
+
+% ────────────────────────────────────────────────────────────
+%                 INDIVIDUAL CONTRIBUTIONS
+% ────────────────────────────────────────────────────────────
+\section*{Individual Member Contributions}
+
+\subsection*{1. R K K Jinendra (25\% Contribution) -- Module Owner}
+
+\textbf{Assigned \& Completed Functionalities:}
+\begin{enumerate}[itemsep=1pt, topsep=2pt, leftmargin=15pt]
+    \item \textbf{Management Staff Records (CRUD):} Maintain non-teaching management profiles for access control; unique email identifiers, role-based access.
+    \item \textbf{Teacher Records (CRUD):} Teacher profiles with qualifications, subject specialties, and class assignments.
+    \item \textbf{Student Records (CRUD):} Master data for admission, class assignment, status tracking (prefer status changes over hard-delete for historical records).
+    \item \textbf{Parent/Guardian Records (CRUD):} Guardian profiles linked to students; one-to-one relationship maintenance.
+    \item \textbf{Student Absence Reason Management (CRUD + Workflow):} Absence submission, acknowledgement workflow (Pending → Acknowledged/Not Acknowledged), integration with attendance records.
+\end{enumerate}
+
+\textbf{Status:} All 5 modules \textbf{100\% completed} \quad \textbf{Test Pass Rate:} 100\%
+
+\vspace{0.3cm}
+
+\subsection*{2. Seniru D S Senaweera (25\% Contribution) -- Module Owner}
+
+\textbf{Assigned \& Completed Functionalities:}
+\begin{enumerate}[itemsep=1pt, topsep=2pt, leftmargin=15pt]
+    \item \textbf{Announcements (CRUD):} Audience targeting (students/parents/teachers/management); role-based create/update/delete; feed filtering by audience.
+    \item \textbf{Learning Materials Management:} File upload/update/delete with metadata; download authorization control per subject/class.
+    \item \textbf{Teacher Attendance Records (CRUD):} Daily attendance marking; summaries.
+    \item \textbf{Student Attendance Records (CRUD):} Daily attendance marking; summaries, student can see history, monthly summaries, entry correction within that date.
+    \item \textbf{Assign Class Teacher Module:} Assign class teachers to classes; maintain one active assignment per class; read/update assignments.
+\end{enumerate}
+
+\textbf{Status:} All 5 modules \textbf{100\% completed} \quad \textbf{Test Pass Rate:} 100\%
+
+\vspace{0.3cm}
+
+\subsection*{3. S. K. Thasindu Ramsitha (25\% Contribution) -- Module Owner}
+
+\textbf{Assigned \& Completed Functionalities:}
+\begin{enumerate}[itemsep=1pt, topsep=2pt, leftmargin=15pt]
+    \item \textbf{Marks / Exam Results Management:} Record marks per class/subject/exam; generate reports, subject analysis, class summaries; mark correction capability.
+    \item \textbf{Student Timetables (CRUD + Publish/Unpublish):} Build timetable entries per day/period; subject/teacher assignment; printable versions; versioning support.
+    \item \textbf{Teacher Timetables (CRUD + Publish/Unpublish):} Manage class timetables; period swaps; daily and grid views.
+    \item \textbf{Relief / Teacher Substitution Management (CRUD):} Assign substitute teachers for absent scheduled teachers; conflict prevention; subject qualification preference.
+\end{enumerate}
+
+\textbf{Status:} All 4 modules \textbf{100\% completed} \quad \textbf{Test Pass Rate:} 100\%
+
+\vspace{0.3cm}
+
+\subsection*{4. R. S. R. G. A. A. Ananda (25\% Contribution) -- Module Owner}
+
+\textbf{Assigned \& Completed Functionalities:}
+\begin{enumerate}[itemsep=1pt, topsep=2pt, leftmargin=15pt]
+    \item \textbf{Classes Management (CRUD):} Define classes per academic year; maintain class/section structure; archiving support for classes with dependent records.
+    \item \textbf{Exam Timetables (Upload/Update/Delete + Image Handling):} Upload timetable images/PDFs with metadata; update and deletion support; file management.
+    \item \textbf{Teacher Leave Requests (CRUD + Approval Workflow):} Leave submission (type, dates, reason, attachment); workflow states (Pending → Approved/Rejected); cancellation support.
+    \item \textbf{Student Behaviour / Remarks (CRUD):} Record behavioural incidents, achievements, counselling notes; view history; authorization-controlled updates; audit trail preservation.
+    \item \textbf{Subjects Management (CRUD):} Subject master data; grade classification; used by timetabling, marks, and materials modules.
+\end{enumerate}
+
+\textbf{Status:} All 5 modules \textbf{100\% completed} \quad \textbf{Test Pass Rate:} 100\%
+
+\vspace{0.2cm}
+
+\section*{Contribution Summary}
+
+\begin{table}[h]
+\centering
+\small
+\renewcommand{\arraystretch}{1.3}
+\begin{tabularx}{\textwidth}{l c c c c}
+\toprule
+\rowcolor{themelightblue}
+\textbf{Team Member} & \textbf{Modules} & \textbf{Status} & \textbf{Tests} & \textbf{Contribution} \\
+\midrule
+R K K Jinendra & 5 & 100\% & 100\% & 25\% \\
+Seniru D S Senaweera & 5 & 100\% & 100\% & 25\% \\
+S. K. Thasindu Ramsitha & 4 & 100\% & 100\% & 25\% \\
+R. S. R. G. A. A. Ananda & 5 & 100\% & 100\% & 25\% \\
+\midrule
+\rowcolor{themelightblue}
+\textbf{Total Project} & \textbf{18*} & \textbf{100\%} & \textbf{100\%} & \textbf{100\%} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\end{document}
