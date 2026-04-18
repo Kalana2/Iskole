@@ -209,7 +209,7 @@ class ParentModel extends UserModel
                     'subject' => $row['subjectName'] ?? 'N/A',
                     'email' => $row['email'] ?? '',
                     'phone' => $row['phone'] ?? 'N/A',
-                    'is_class_teacher' => false  // ✅ FALSE for teachers from classTimetable
+                    'is_class_teacher' => false  //  FALSE for teachers from classTimetable
                 ];
             }
 
