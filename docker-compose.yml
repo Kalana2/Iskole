@@ -26,7 +26,7 @@ services:
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: iskole_db
+      MYSQL_DATABASE: iskole_database
     volumes:
       - db_data:/var/lib/mysql
     ports:
