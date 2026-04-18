@@ -169,7 +169,7 @@ class ParentModel extends UserModel
                     'subject' => $row['subjectName'] ?? 'N/A',
                     'email' => $row['email'] ?? '',
                     'phone' => $row['phone'] ?? 'N/A',
-                    'is_class_teacher' => $isClassTeacher  // ✅ TRUE only if classID matches
+                    'is_class_teacher' => $isClassTeacher  // TRUE only if classID matches
                 ];
             }
 
