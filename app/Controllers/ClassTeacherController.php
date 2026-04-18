@@ -3,9 +3,26 @@ require_once __DIR__ . '/../Core/Controller.php';
 
 class ClassTeacherController extends Controller
 {
+    private function getCurrentUserRole(): int
+    {
+        return (int) ($_SESSION['userRole'] ?? ($_SESSION['user_role'] ?? -1));
+    }
+
+    private function getDashboardBasePath(): string
+    {
+        $role = $this->getCurrentUserRole();
+
+        if ($role === 0) {
+            return '/index.php?url=admin';
+        }
+
+        return '/index.php?url=mp';
+    }
+
     private function goBackToTab()
     {
-        header('Location: /index.php?url=mp&tab=Assign%20Class%20Teacher');
+        $basePath = $this->getDashboardBasePath();
+        header('Location: ' . $basePath . '&tab=Assign%20Class%20Teacher');
         exit;
     }
 
@@ -25,7 +42,9 @@ class ClassTeacherController extends Controller
         $flash = $_SESSION['ct_msg'] ?? null;
         unset($_SESSION['ct_msg']);
 
-        $this->view('mp/index', [
+        $view = $this->getCurrentUserRole() === 0 ? 'admin/index' : 'mp/index';
+
+        $this->view($view, [
             'tab' => 'Assign Class Teacher',
             'classesWithTeachers' => $classesWithTeachers,
             'teachers' => $teachers,
