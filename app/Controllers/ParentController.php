@@ -13,7 +13,7 @@ class ParentController extends Controller
 
         $tab = $_GET['tab'] ?? 'Dashboard';
 
-        // ✅ If Behavior tab -> load reports and view parentBehavior
+        // If Behavior tab -> load reports and view parentBehavior
         if ($tab === 'Behavior') {
             $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
 
@@ -26,8 +26,7 @@ class ParentController extends Controller
             ]);
             return;
         }
-
-        // ✅ If Teachers tab -> load student info and teachers
+        //  If Teachers tab -> load student info and teachers
         if ($tab === 'Teachers') {
             $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
 
@@ -60,7 +59,7 @@ class ParentController extends Controller
             return;
         }
 
-        // ✅ If Time Table tab -> load child's timetable for parent
+        // If Time Table tab -> load child's timetable for parent
         if ($tab === 'Time Table') {
             $parentUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
 

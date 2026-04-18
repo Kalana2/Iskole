@@ -120,12 +120,6 @@ class ParentModel extends UserModel
     public function getTeachersForClass($classID)
     {
         try {
-            // First, identify who is the CLASS TEACHER (from teachers table where classID matches)
-            $classTeacherIdSql = "SELECT teacherID FROM teachers WHERE classID = :classID LIMIT 1";
-            $stmt = $this->pdo->prepare($classTeacherIdSql);
-            $stmt->execute(['classID' => $classID]);
-            $classTeacherRow = $stmt->fetch(PDO::FETCH_ASSOC);
-            $classTeacherID = $classTeacherRow ? $classTeacherRow['teacherID'] : null;
 
             $teachers = [];
             $seenTeacherSubject = []; // Track unique teacher-subject combinations
@@ -169,7 +163,7 @@ class ParentModel extends UserModel
                     'subject' => $row['subjectName'] ?? 'N/A',
                     'email' => $row['email'] ?? '',
                     'phone' => $row['phone'] ?? 'N/A',
-                    'is_class_teacher' => $isClassTeacher  // ✅ TRUE only if classID matches
+                    'is_class_teacher' => $isClassTeacher  // TRUE only if classID matches
                 ];
             }
 
@@ -209,7 +203,7 @@ class ParentModel extends UserModel
                     'subject' => $row['subjectName'] ?? 'N/A',
                     'email' => $row['email'] ?? '',
                     'phone' => $row['phone'] ?? 'N/A',
-                    'is_class_teacher' => false  // ✅ FALSE for teachers from classTimetable
+                    'is_class_teacher' => false  //  FALSE for teachers from classTimetable
                 ];
             }
 

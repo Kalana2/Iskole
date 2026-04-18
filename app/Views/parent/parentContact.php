@@ -25,7 +25,6 @@ $stats = [
             <div class="header-content">
                 <div>
                     <h1 class="header-title">
-                        <i class="fas fa-address-book"></i>
                         Teachers Directory
                     </h1>
                     <p class="header-subtitle">Contact information for <?php echo $studentInfo['student_name']; ?>'s
