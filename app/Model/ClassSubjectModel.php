@@ -51,9 +51,14 @@ class ClassSubjectModel
 
     public function deleteClass(int $classId): bool
     {
-        $sql = "DELETE FROM class WHERE classID = ?";
-        $stmt = $this->db->prepare($sql);
-        return $stmt->execute([$classId]);
+        try {
+            $sql = "DELETE FROM class WHERE classID = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$classId]);
+        } catch (PDOException $e) {
+            // Foreign key constraint violation (students still assigned to this class)
+            return false;
+        }
     }
 
     /* ===================== SUBJECTS ===================== */
@@ -86,9 +91,13 @@ class ClassSubjectModel
 
     public function deleteSubject(int $subjectId): bool
     {
-        $sql = "DELETE FROM subject WHERE subjectID = ?";
-        $stmt = $this->db->prepare($sql);
-
-        return $stmt->execute([$subjectId]);
+        try {
+            $sql = "DELETE FROM subject WHERE subjectID = ?";
+            $stmt = $this->db->prepare($sql);
+            return $stmt->execute([$subjectId]);
+        } catch (PDOException $e) {
+            // Foreign key constraint violation
+            return false;
+        }
     }
 }

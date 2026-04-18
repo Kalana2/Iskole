@@ -81,32 +81,6 @@ class StudentAttendance extends StudentModel
     }
 
     /**
-     * Get attendance statistics for a specific class and date
-     */
-    public function getAttendanceStats($classID, $date)
-    {
-        try {
-            $sql = "SELECT 
-                        COUNT(DISTINCT s.studentID) as total,
-                        SUM(CASE WHEN a.status = 'Present' THEN 1 ELSE 0 END) as present,
-                        SUM(CASE WHEN a.status = 'Absent' THEN 1 ELSE 0 END) as absent,
-                        SUM(CASE WHEN a.status = 'Late' THEN 1 ELSE 0 END) as late,
-                        SUM(CASE WHEN a.status = 'Excused' THEN 1 ELSE 0 END) as excused
-                    FROM students s
-                    JOIN user u ON s.userID = u.userID
-                    LEFT JOIN " . $this->table . " a ON s.studentID = a.studentID AND a.attendance_date = ?
-                    WHERE s.classID = ? AND u.active = 1";
-
-            $stmt = $this->pdo->prepare($sql);
-            $stmt->execute([$date, $classID]);
-            return $stmt->fetch(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            error_log("Error fetching attendance stats: " . $e->getMessage());
-            throw $e;
-        }
-    }
-
-    /**
      * Update attendance status for a student
      */
     public function updateAttendance($studentID, $classID, $date, $status, $markedBy = null)

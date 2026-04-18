@@ -1,5 +1,5 @@
 <?php
-// Management Panel - Student Attendance - Fetches real data from database
+// Student Attendance - Fetches students data from database
 require_once __DIR__ . '/../../Model/StudentAttendance.php';
 
 $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
@@ -218,7 +218,6 @@ try {
                         <div class="stat-label">Absent</div>
                     </div>
                 </div>
-                <!-- Late stat removed (feature deprecated) -->
                 <div class="stat-card total-stat">
                     <div class="stat-icon">👥</div>
                     <div class="stat-content">
@@ -287,14 +286,6 @@ try {
                                                     <strong class="student-name"><?php echo htmlspecialchars($student['name'] ?? 'Unknown'); ?></strong>
                                                 </div>
                                             </td>
-                                            <!-- <td class="col-rate">
-                                                <div class="rate-display">
-                                                    <div class="rate-bar-container">
-                                                        <div class="rate-bar" style="width: <?php echo $student['attendance_rate'] ?? 0; ?>%"></div>
-                                                    </div>
-                                                    <span class="rate-value"><?php echo $student['attendance_rate'] ?? 0; ?>%</span>
-                                                </div>
-                                            </td> -->
                                             <td class="col-status">
                                                 <span class="status-badge status-<?php echo htmlspecialchars($student['status']); ?>" id="status-<?php echo $student['id']; ?>">
                                                     <?php echo ucfirst($student['status']); ?>

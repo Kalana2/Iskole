@@ -1,29 +1,8 @@
 <?php
-
-/**
- * Student Attendance View Controller
- * 
- * This controller fetches attendance data for the logged-in student or parent's child
- * and provides it to the studentAttendance.php template.
- * 
- * Session variables used:
- * - $_SESSION['user_id']: The logged-in user's ID
- * - $_SESSION['user_role']: The user's role (3=student, 4=parent)
- * 
- * Supported roles:
- * - Student (role=3): Fetches attendance for the logged-in student
- * - Parent (role=4): Fetches attendance for the parent's child
- */
-
 require_once __DIR__ . '/../../Core/Database.php';
 require_once __DIR__ . '/../../Model/StudentAttendance.php';
 
-/**
- * Get student attendance data for the view
- * Supports both student and parent roles
- * 
- * @return array Contains studentInfo, attendanceStats, and monthlyData
- */
+
 function getStudentAttendanceData()
 {
     // Check if user is logged in
