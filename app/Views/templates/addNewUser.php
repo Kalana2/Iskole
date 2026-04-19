@@ -76,7 +76,8 @@
                 <div class="field role role-mp role-teacher role-parent span-2 hidden" data-role="nic">
                     <label for="nic">NIC number</label>
                     <input type="text" id="nic" name="nic" placeholder="xxxxxxxxxxxx"
-                        title="Enter NIC number (xxxxxxxxxxxx)">
+                        title="Enter NIC number (xxxxxxxxxxxx)" minlength="12" maxlength="12" pattern="^\d{12}$"
+                        inputmode="numeric">
                 </div>
 
                 <!-- Grade & Class (Teacher / Student) -->
