@@ -12,21 +12,21 @@ class Mpcontroller extends UserController
             return;
         }
 
-        // ✅ add tab handling
+        // add tab handling
         $tab = $_GET['tab'] ?? 'Announcements';
 
-        // ✅ default data array
+        // default data array
         $data = [
             'tab' => $tab
         ];
 
-        // ✅ Requests tab → load pending leave requests
+        // Requests tab → load pending leave requests
         if ($tab === 'Requests') {
             $leaveModel = $this->model('LeaveRequestModel');
             $data['pendingLeaves'] = $leaveModel->getPending();
         }
 
-        // ✅ Assign Class Teacher tab → load classes and teachers
+        // Assign Class Teacher tab → load classes and teachers
         if ($tab === 'Assign Class Teacher') {
             $ctModel = $this->model('ClassTeacherModel');
             $data['classesWithTeachers'] = $ctModel->getAllClassesWithTeachers();
@@ -35,7 +35,7 @@ class Mpcontroller extends UserController
             unset($_SESSION['ct_msg']);
         }
 
-        // ✅ Relief tab → load pending relief slots and stats
+        // Relief tab → load pending relief slots and stats
         if ($tab === 'Relief') {
             require_once __DIR__ . '/../Model/reliefModel.php';
             $reliefModel = new reliefModel();
@@ -45,7 +45,7 @@ class Mpcontroller extends UserController
             $data['selectedDate'] = $date;
         }
 
-        // ✅ pass $data to view
+        // pass $data to view
         $this->view('mp/index', $data);
     }
 

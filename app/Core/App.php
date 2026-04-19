@@ -11,9 +11,12 @@ class App
 
         $controllerPath = null;
 
-        // Support both:
-        // 1) /Foo/bar   => app/Controllers/FooController.php
-        // 2) /foo/bar   => app/Controllers/foo/FooController.php (feature folders)
+        /**
+         * Support both:
+         * 1) /Foo/bar   => app/Controllers/FooController.php
+         * 2) /foo/bar   => app/Controllers/foo/FooController.php (feature folders)
+         */
+
         if ($url && isset($url[0]) && $url[0] !== '') {
             $segment0 = $url[0];
 

@@ -21,6 +21,7 @@ class TeacherAttendance extends TeacherModel
         }
     }
 
+    // Create
     public function recordAttendance($teacherID, $date, $status)
     {
         try {
@@ -48,11 +49,6 @@ class TeacherAttendance extends TeacherModel
             error_log("Error recording attendance: " . $e->getMessage());
             throw $e;
         }
-    }
-
-    public function getConnectionStatus()
-    {
-        return $this->pdo !== null;
     }
 
     /**

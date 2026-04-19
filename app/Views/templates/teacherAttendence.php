@@ -5,8 +5,8 @@ require_once __DIR__ . '/../../Model/teacherAttendance.php';
 $selectedDate = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $today = date('Y-m-d');
 $searchQuery = isset($_GET['search']) ? trim($_GET['search']) : '';
-$isToday = ($selectedDate === $today); // Check if viewing today's attendance
-$isReadOnly = !$isToday; // Read-only mode for past dates
+$isToday = ($selectedDate === $today);
+$isReadOnly = !$isToday;
 
 // Check if form was explicitly submitted (has 'load' parameter)
 $formSubmitted = isset($_GET['load']) && $_GET['load'] === '1';
@@ -136,13 +136,6 @@ if ($formSubmitted) {
                         <div class="stat-label">Absent</div>
                     </div>
                 </div>
-                <!-- <div class="stat-card leave-stat">
-                <div class="stat-icon">📝</div>
-                <div class="stat-content">
-                    <div class="stat-value"><?php echo $leaveCount; ?></div>
-                    <div class="stat-label">On Leave</div>
-                </div>
-            </div> -->
                 <div class="stat-card total-stat">
                     <div class="stat-icon">👥</div>
                     <div class="stat-content">
@@ -151,17 +144,6 @@ if ($formSubmitted) {
                     </div>
                 </div>
             </div>
-            <!-- Quick Actions -->
-            <!-- <div class="quick-actions">
-            <button type="button" class="quick-btn" onclick="markAllTeachers('present')"><span
-                    class="quick-icon">✅</span><span class="quick-text">All Present</span></button>
-            <button type="button" class="quick-btn" onclick="markAllTeachers('absent')"><span
-                    class="quick-icon">❌</span><span class="quick-text">All Absent</span></button>
-            <button type="button" class="quick-btn" onclick="markAllTeachers('leave')"><span
-                    class="quick-icon">📝</span><span class="quick-text">All Leave</span></button>
-            <button type="button" class="quick-btn" onclick="resetAttendance()"><span class="quick-icon">🔄</span><span
-                    class="quick-text">Reset</span></button>
-        </div> -->
             <!-- Table -->
             <div class="attendance-table-container">
                 <form action="#" method="POST" id="teacherAttendanceForm">
@@ -239,6 +221,7 @@ if ($formSubmitted) {
     </div>
 </section>
 <script>
+    // Change CSS according to selected status
     function markTeacherStatus(id, status) {
         const row = document.querySelector(`tr[data-teacher-id="${id}"]`);
         const badge = document.getElementById(`status-${id}`);
@@ -254,42 +237,29 @@ if ($formSubmitted) {
         updateTeacherStats();
     }
 
-    function markAllTeachers(status) {
-        if (confirm(`Mark all teachers as ${status}?`)) {
-            document.querySelectorAll('.teacher-row').forEach(r => {
-                markTeacherStatus(r.dataset.teacherId, status);
-            });
-        }
-    }
-
-    function resetAttendance() {
-        if (confirm('Reset all changes?')) location.reload();
-    }
-
+    // Dynamically change stat cards
     function updateTeacherStats() {
         let present = 0,
-            absent = 0,
-            leave = 0;
+            absent = 0;
         const rows = document.querySelectorAll('.teacher-row');
         rows.forEach(r => {
             const s = r.dataset.status;
             if (s === 'present') present++;
             else if (s === 'absent') absent++;
-            else if (s === 'leave') leave++;
         });
         const total = rows.length;
         const pct = total ? Math.round((present / total) * 100) : 0;
         document.querySelector('.present-stat .stat-value').textContent = present;
         document.querySelector('.absent-stat .stat-value').textContent = absent;
-        document.querySelector('.leave-stat .stat-value').textContent = leave;
         document.querySelector('.total-stat .stat-value').textContent = pct + '%';
     }
 
+    // Cancel button
     function cancelAttendance() {
         if (confirm('Cancel attendance? Changes will be lost.')) window.history.back();
     }
 
-    // Submit
+    // Submit button
     document.getElementById('teacherAttendanceForm')?.addEventListener('submit', function(e) {
         e.preventDefault();
 
@@ -306,7 +276,8 @@ if ($formSubmitted) {
             attendance: attendanceData
         };
 
-        // Send to backend using Fetch API
+        // Send to backend using Fetch API 
+        // Read by ApiController.php
         fetch('/api/teacherAttendance', {
                 method: 'POST',
                 headers: {
@@ -332,6 +303,7 @@ if ($formSubmitted) {
                 alert('Failed to submit attendance. Please try again.');
             });
     });
+
     // Date validation
     document.getElementById('date')?.addEventListener('change', function() {
         const sel = new Date(this.value);
