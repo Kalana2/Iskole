@@ -110,7 +110,7 @@ $recentRequests = $absenceRequests ?? [
                     $submittedDate = isset($req['submittedDate']) && $req['submittedDate'] !== ''
                         ? date('M j, Y', strtotime($req['submittedDate']))
                         : 'N/A';
-                    $requestId = isset($req['reasonID']) ? (int) $req['reasonID'] : (isset($req['absenceID']) ? (int) $req['absenceID'] : 0);
+                    $requestId = isset($req['reasonID']) ? (int) $req['reasonID'] : 0;
                     $fromInput = $fromTs ? date('Y-m-d', $fromTs) : '';
                     $toInput = $toTs ? date('Y-m-d', $toTs) : '';
                     ?>
@@ -359,6 +359,24 @@ $recentRequests = $absenceRequests ?? [
         }
     }
 
+
+    // Date validation for main form
+    const from = document.getElementById('from-date');
+    const to = document.getElementById('to-date');
+
+    from.addEventListener('change', () => {
+        to.min = from.value;                 // toDate can't be before fromDate
+        if (to.value && to.value < from.value) to.value = from.value;
+    });
+
+    // Date validation Edit modal form
+    const eFrom = document.getElementById('edit-from-date');
+    const eTo = document.getElementById('edit-to-date');
+
+    eFrom.addEventListener('change', () => {
+        eTo.min = eFrom.value;
+        if (eTo.value && eTo.value < eFrom.value) eTo.value = eFrom.value;
+    });
 
 
 </script>
