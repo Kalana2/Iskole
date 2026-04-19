@@ -87,12 +87,13 @@ class ReportController extends Controller
         }
 
         $studentID = (int)($_POST['studentID'] ?? 0);
-        $reportType  = $_POST['report_type'] ?? '';
+        $reportType  = $_POST['report_type'] ?? '';  
+        $severityType = $_POST['severity_type'] ?? '';
         $category    = trim($_POST['category'] ?? '');
         $title       = trim($_POST['title'] ?? '');
         $description = trim($_POST['description'] ?? '');
 
-        if ($studentID <= 0 || $reportType === '' || $category === '' || $title === '' || $description === '') {
+        if ($studentID <= 0 || $reportType === '' || $category === '' || $title === '' || $description === ''|| $severityType === '') {
             if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'All fields are required.']);
             $_SESSION['report_msg'] = ['type' => 'error', 'text' => 'All fields are required.'];
             header('Location: /index.php?url=teacher&tab=Reports');
@@ -106,6 +107,7 @@ class ReportController extends Controller
             'studentID'   => $studentID,
             'teacherID'   => $teacherUserId,
             'report_type' => $reportType,
+            'severity_type' => $severityType,
             'category'    => $category,
             'title'       => $title,
             'description' => $description,
@@ -213,8 +215,9 @@ class ReportController extends Controller
         $category    = trim($_POST['category'] ?? '');
         $title       = trim($_POST['title'] ?? '');
         $description = trim($_POST['description'] ?? '');
+        $severityType = $_POST['severity_type'] ?? '';
 
-        if ($reportId <= 0 || $teacherUserId <= 0 || $reportType === '' || $category === '' || $title === '' || $description === '') {
+        if ($reportId <= 0 || $teacherUserId <= 0 || $reportType === '' || $category === '' || $title === '' || $description === '' || $severityType === '') {
             if ($this->isAjax()) $this->json(['ok' => false, 'message' => 'Missing fields']);
             header('Location: /index.php?url=teacher&tab=Reports');
             exit;
@@ -225,6 +228,7 @@ class ReportController extends Controller
 
         $ok = $reportModel->updateReportByTeacher($reportId, $teacherUserId, [
             'report_type' => $reportType,
+            'severity_type' => $severityType,
             'category'    => $category,
             'title'       => $title,
             'description' => $description,

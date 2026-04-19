@@ -1001,3 +1001,31 @@
   display: inline-block;
   color: currentColor;
 }
+
+/* base badge */
+.severity-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* LOW */
+.severity-low {
+  background: #e6f9f0;
+  color: #059669;
+}
+
+/* MEDIUM */
+.severity-medium {
+  background: #fff7e6;
+  color: #d97706;
+}
+
+/* HIGH */
+.severity-high {
+  background: #ffeaea;
+  color: #dc2626;
+}

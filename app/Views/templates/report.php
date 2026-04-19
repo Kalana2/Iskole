@@ -9,6 +9,7 @@ $editReport = $editReport ?? null;
 $isEdit = !empty($editReport);
 
 $formType     = $isEdit ? ($editReport['report_type'] ?? 'positive') : 'positive';
+$formSeverity = $isEdit ? ($editReport['severity_type'] ?? 'low') : 'low';
 $formCategory = $isEdit ? ($editReport['category'] ?? '') : '';
 $formTitle    = $isEdit ? ($editReport['title'] ?? '') : '';
 $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
@@ -215,6 +216,15 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
                   </div>
 
                   <div class="form-row">
+                    <label for="severity_type">Severity Type</label>
+                    <select id="severity_type" name="severity_type" required>
+                      <option value="low" <?= $formSeverity === 'low' ? 'selected' : '' ?>>Low</option>
+                      <option value="medium" <?= $formSeverity === 'medium' ? 'selected' : '' ?>>Medium</option>
+                      <option value="high" <?= $formSeverity === 'high' ? 'selected' : '' ?>>High</option>
+                    </select>
+                  </div>
+
+                  <div class="form-row">
                     <label for="category">Category</label>
                     <input type="text" id="category" name="category"
                       value="<?= htmlspecialchars($formCategory) ?>"
@@ -275,10 +285,17 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
                         </div>
 
                         <div class="report-meta">
-                          <span class="repo-date"><?= htmlspecialchars($reportDate) ?></span>
-                          <span class="category-badge js-category"><?= htmlspecialchars($category) ?></span>
-                        </div>
+  <span class="repo-date"><?= htmlspecialchars($reportDate) ?></span>
+  <span class="category-badge js-category"><?= htmlspecialchars($category) ?></span>
+
+ 
+  <span class="severity-badge severity-<?= htmlspecialchars($report['severity_type'] ?? 'low') ?>">
+    <?= htmlspecialchars(ucfirst($report['severity_type'] ?? 'low')) ?>
+  </span>
+</div>
                       </div>
+
+                      
 
                       <div class="report-type-indicator">
                         <span class="type-badge <?= htmlspecialchars($reportType) ?> js-typeBadge">
@@ -343,6 +360,15 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
           <option value="concern">Concern</option>
         </select>
       </div>
+
+       <div class="form-row">
+  <label for="edit_severity_type">Severity Type</label>
+  <select id="edit_severity_type" name="severity_type" required>
+    <option value="low">Low</option>
+    <option value="medium">Medium</option>
+    <option value="high">High</option>
+  </select>
+</div>
 
       <div class="form-row">
         <label for="edit_category">Category</label>
@@ -444,10 +470,10 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
               ${teacherSubject ? `<span class="subject-badge">${escapeHtml(teacherSubject)}</span>` : ""}
             </div>
             <div class="report-meta">
-              <span class="repo-date">${escapeHtml(reportDate)}</span>
-              <span class="category-badge js-category">${escapeHtml(category)}</span>
-            </div>
-          </div>
+  <span class="repo-date">${escapeHtml(reportDate)}</span>
+  <span class="category-badge js-category">${escapeHtml(category)}</span>
+  <span class="severity-badge js-severity">${escapeHtml(ucfirst(severity))}</span>
+</div>
 
           <div class="report-type-indicator">
             <span class="type-badge ${escapeHtml(reportType)} js-typeBadge">
@@ -541,7 +567,9 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
         if (String(addForm.action).includes("report/submit")) {
           addForm.reset();
           const typeSel = document.getElementById("report_type");
+          const severitySel = document.getElementById("severity_type");
           if (typeSel) typeSel.value = "positive";
+          if (severitySel) severitySel.value = "low";
         }
       });
     }
@@ -610,6 +638,7 @@ $formDesc     = $isEdit ? ($editReport['description'] ?? '') : '';
 
       document.getElementById('edit_report_id').value = data.report.id;
       document.getElementById('edit_report_type').value = data.report.report_type || 'neutral';
+      document.getElementById('edit_severity_type').value = data.report.severity_type || 'low';
       document.getElementById('edit_category').value = data.report.category || '';
       document.getElementById('edit_title').value = data.report.title || '';
       document.getElementById('edit_description').value = data.report.description || '';

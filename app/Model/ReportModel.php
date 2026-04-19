@@ -94,14 +94,15 @@ class ReportModel
     public function createReport(array $data)
     {
         $sql = "INSERT INTO {$this->table}
-                (studentID, teacherID, report_type, category, title, description, report_date)
-                VALUES (:studentID, :teacherID, :type, :category, :title, :description, NOW())";
+                (studentID, teacherID, report_type,severity_type, category, title, description, report_date)
+                VALUES (:studentID, :teacherID, :type, :severity_type, :category, :title, :description, NOW())";
 
         $stmt = $this->pdo->prepare($sql);
         $ok = $stmt->execute([
             ':studentID'   => $data['studentID'],
             ':teacherID'   => $data['teacherID'],
-            ':type'        => $data['report_type'],
+            ':type'        => $data['report_type'], 
+            ':severity_type' => $data['severity_type'],
             ':category'    => $data['category'],
             ':title'       => $data['title'],
             ':description' => $data['description'],
@@ -141,6 +142,7 @@ class ReportModel
     {
         $sql = "UPDATE report SET
                   report_type = :type,
+                  severity_type = :severity_type,
                   category    = :cat,
                   title       = :title,
                   description = :desc
@@ -150,6 +152,7 @@ class ReportModel
 
         return $stmt->execute([
             ':type'  => $data['report_type'],
+            ':severity_type' => $data['severity_type'],
             ':cat'   => $data['category'],
             ':title' => $data['title'],
             ':desc'  => $data['description'],
