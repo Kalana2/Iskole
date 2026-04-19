@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Student Attendance View Template
- * 
- * This template displays attendance data for the logged-in student.
- * Data is fetched from the database via the StudentAttendance model.
- */
-
-// Include the controller to fetch attendance data
 require_once __DIR__ . '/../../Controllers/studentAttendance/getStudentAttendanceController.php';
 
 // Fetch real attendance data from the database
@@ -39,7 +31,6 @@ if ($hasError) {
                         Attendance Record
                     </h1>
                     <p class="header-subtitle">Attendance distribution across the academic year</p>
-                    <!-- <p class="header-subtitle"><?php echo $studentInfo['name']; ?> - <?php echo $studentInfo['class']; ?> (<?php echo $studentInfo['reg_no']; ?>)</p> -->
                 </div>
                 <div class="header-badge">
                     <div class="badge-item">
@@ -128,8 +119,9 @@ if ($hasError) {
 <!-- Pass data to JavaScript -->
 <script>
     const attendanceData = {
-        // 'monthly' should be supplied by backend in production. Sample is provided above as $monthlyData.
+        // Supply monthly data to js from backend to render monthly distribution
         monthly: <?php echo json_encode($monthlyData); ?>,
+        // Supply present and absent distribution data to js from backend to render annual distribution
         distribution: {
             present: <?php echo $attendanceStats['present_days']; ?>,
             absent: <?php echo $attendanceStats['absent_days']; ?>

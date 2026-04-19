@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../Core/Database.php';
 require_once __DIR__ . '/../../Model/StudentAttendance.php';
 
-
+// Main controller function that takes data from the model
 function getStudentAttendanceData()
 {
     // Check if user is logged in
@@ -54,6 +54,10 @@ function getStudentAttendanceData()
         ];
     }
 }
+
+/**
+ * ======================= Functions to load default data ====================
+ */
 
 /**
  * Default student info when data is unavailable

@@ -45,10 +45,6 @@ class StudentAttendance extends StudentModel
         }
     }
 
-    public function getConnectionStatus()
-    {
-        return $this->pdo !== null;
-    }
 
     /**
      * Get all students with their attendance status for a specific class and date
@@ -166,20 +162,6 @@ class StudentAttendance extends StudentModel
         }
     }
 
-    /**
-     * Get all classes combining robust matching
-     */
-    public function getAllClasses()
-    {
-        try {
-            $sql = "SELECT grade, class FROM class ORDER BY grade, class";
-            $stmt = $this->pdo->query($sql);
-            return $stmt->fetchAll(PDO::FETCH_ASSOC);
-        } catch (Exception $e) {
-            error_log("Error fetching all classes: " . $e->getMessage());
-            return [];
-        }
-    }
 
     /**
      * Get class ID by grade and section
@@ -325,7 +307,6 @@ class StudentAttendance extends StudentModel
 
     /**
      * Get monthly attendance data from January 1st to current date
-     * Returns data for each month showing present and absent counts
      */
     public function getMonthlyAttendanceData($studentID)
     {
@@ -386,8 +367,7 @@ class StudentAttendance extends StudentModel
     }
 
     /**
-     * Get studentID from parent's userID by joining user and parents table
-     * Parents table has a direct studentID column linking to their child
+     * Get student_ID by parent's User_ID
      */
     public function getStudentIDByParentUserID($userID)
     {
@@ -406,13 +386,7 @@ class StudentAttendance extends StudentModel
     }
 
     /**
-     * Get complete attendance context for student view
-     * This combines all necessary data for the studentAttendance.php template
-     * Supports both student (role=3) and parent (role=4) users
-     * 
-     * @param int $userID The logged-in user's ID
-     * @param int $userRole The user's role (3=student, 4=parent)
-     * @return array Contains studentInfo, attendanceStats, and monthlyData
+     * Give attendance of a particular student
      */
     public function getStudentAttendanceContext($userID, $userRole = 3)
     {

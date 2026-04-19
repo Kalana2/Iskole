@@ -18,7 +18,7 @@ const colorScheme = {
   info: "rgba(59, 130, 246, 0.8)",
 };
 
-// Initialize attendance overview chart (4-week summary)
+// Initialize monthly attendance overview chart for parents and students view
 function initAttendanceChart() {
   const ctx = document.getElementById("attendanceChart");
   if (!ctx || typeof attendanceData === "undefined") {
@@ -161,6 +161,8 @@ function initAttendanceChart() {
 // Initialize distribution pie chart
 function initDistributionChart() {
   const ctx = document.getElementById("distributionChart");
+
+  // attendanceData got from templates/studentAttendance.php scripts section
   if (!ctx || typeof attendanceData === "undefined") {
     console.error("Chart canvas or distribution data not found");
     return;
@@ -244,83 +246,12 @@ function animateProgressBars() {
   });
 }
 
-// Export attendance data to CSV
-function exportToCSV() {
-  if (typeof attendanceData === "undefined") {
-    alert("No attendance data available to export");
-    return;
-  }
-
-  let csv = "Month,Present,Absent,Late,Total\n";
-
-  attendanceData.monthly.forEach((month) => {
-    csv += `${month.month},${month.present},${month.absent},${month.late},${month.total}\n`;
-  });
-
-  const blob = new Blob([csv], { type: "text/csv" });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "attendance_report.csv";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  window.URL.revokeObjectURL(url);
-}
-
-// Print attendance report
-function printAttendance() {
-  window.print();
-}
-
-// Calculate attendance trends (based on 4 weeks)
-function calculateTrend() {
-  // Use monthly data to compute trend (average of monthly present/total)
-  if (
-    typeof attendanceData === "undefined" ||
-    !attendanceData.monthly ||
-    !attendanceData.monthly.length
-  ) {
-    return null;
-  }
-
-  const monthlyData = attendanceData.monthly;
-
-  const avgAttendance =
-    monthlyData.reduce((sum, month) => {
-      const rate = month.total > 0 ? (month.present / month.total) * 100 : 0;
-      return sum + rate;
-    }, 0) / monthlyData.length;
-
-  return {
-    average: avgAttendance.toFixed(2),
-    status:
-      avgAttendance >= 90
-        ? "excellent"
-        : avgAttendance >= 75
-        ? "good"
-        : "needs improvement",
-  };
-}
-
-// Show attendance summary alert
-function showAttendanceSummary() {
-  const trend = calculateTrend();
-  if (trend) {
-    alert(
-      `Attendance Summary:\n\nAverage (Last 4 Weeks): ${
-        trend.average
-      }%\nStatus: ${trend.status.toUpperCase()}`
-    );
-  }
-}
-
 // Initialize everything when DOM is loaded
 document.addEventListener("DOMContentLoaded", function () {
   // Check if Chart.js is loaded
   if (typeof Chart === "undefined") {
     console.error(
-      "Chart.js is not loaded. Please include Chart.js in your HTML."
+      "Chart.js is not loaded. Please include Chart.js in your HTML.",
     );
     return;
   }
@@ -341,13 +272,3 @@ document.addEventListener("DOMContentLoaded", function () {
   // Log successful initialization
   console.log("Student Attendance charts initialized successfully");
 });
-
-// Export functions for external use
-window.attendanceModule = {
-  initAttendanceChart,
-  initDistributionChart,
-  exportToCSV,
-  printAttendance,
-  showAttendanceSummary,
-  calculateTrend,
-};
