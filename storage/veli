@@ -1,0 +1,56 @@
+// Function එක createSubject කියලා define කරනවා
+// parameter එකක් විදිහට subjectName (string type) ගන්නවා
+// return type එක boolean (true / false)
+public function createSubject(string $subjectName): bool
+{
+    // 🔹 Step 1: subjectName එකේ ඉස්සරහ සහ අග තියෙන spaces remove කරනවා
+    // Example: "  Maths  " → "Maths"
+    $subjectName = trim($subjectName);
+
+    // 🔹 Step 2: subjectName empty ද කියලා check කරනවා
+    // empty නම් ("" වගේ) → invalid input
+    if ($subjectName === '') {
+        return false; // function එක stop වෙලා false return කරනවා
+    }
+
+    // 🔹 Step 3: subjectName එක valid format එකක්ද කියලා check කරනවා
+    // regex එකෙන් allow කරනවා letters (A-Z, a-z) සහ spaces විතරයි
+    // Example:
+    // "Maths" → OK
+    // "Maths 123" → ❌
+    // "@Maths" → ❌
+    if (!preg_match('/^[A-Za-z ]+$/', $subjectName)) {
+        return false; // invalid format නම් stop වෙනවා
+    }
+
+    // 🔹 Step 4: duplicate check (DB එකේ already තියෙනවද කියලා බලනවා)
+
+    // SQL query එක define කරනවා
+    // subjectName එක match වෙන record එකක් තියෙනවද කියලා check කරනවා
+    $checkSql = "SELECT 1 FROM subject WHERE subjectName = ? LIMIT 1";
+
+    // query එක prepare කරනවා (SQL injection avoid කරන්න)
+    $checkStmt = $this->db->prepare($checkSql);
+
+    // query එක execute කරනවා, subjectName value එක pass කරලා
+    $checkStmt->execute([$subjectName]);
+
+    // 🔹 fetch() එකෙන් result එකක් තියෙනවද බලනවා
+    // result තියෙනවා නම් → already DB එකේ subject එක තියෙනවා
+    if ($checkStmt->fetch()) {
+        return false; // duplicate නිසා insert කරන්න බෑ
+    }
+
+    // 🔹 Step 5: new subject එක DB එකට insert කරනවා
+
+    // INSERT query එක define කරනවා
+    $sql = "INSERT INTO subject (subjectName) VALUES (?)";
+
+    // query එක prepare කරනවා
+    $stmt = $this->db->prepare($sql);
+
+    // query එක execute කරනවා subjectName value එකත් එක්ක
+    // success නම් true return වෙනවා
+    // fail නම් false return වෙනවා
+    return $stmt->execute([$subjectName]);
+}
