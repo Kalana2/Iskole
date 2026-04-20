@@ -1,86 +1,86 @@
 <?php
 // filepath: /d:/Semester 4/SCS2202 - Group Project/Iskole/app/Views/teacher/uploadedMaterials.php
 include_once __DIR__ . '/../../Controllers/material/readMaterialController.php';
-// Sample data for demonstration (remove when backend is implemented)
-$sampleMaterials = [
-    [
-        'materialID' => 1,
-        'title' => 'Introduction to Algebra',
-        'description' => 'Basic algebraic concepts including variables, equations, and problem-solving techniques. This worksheet covers linear equations and simple word problems.',
-        'grade' => '6',
-        'class' => 'A',
-        'subjectName' => 'Maths',
-        'subjectID' => 1,
-        'date' => '2025-11-01',
-        'visibility' => 1,
-        'fileName' => 'algebra_basics.pdf'
-    ],
-    [
-        'materialID' => 2,
-        'title' => 'Cell Structure and Functions',
-        'description' => 'Detailed study material on plant and animal cells, including diagrams of cell organelles and their functions. Includes practice questions.',
-        'grade' => '7',
-        'class' => 'B',
-        'subjectName' => 'Science',
-        'subjectID' => 2,
-        'date' => '2025-10-28',
-        'visibility' => 1,
-        'fileName' => 'cell_biology.pdf'
-    ],
-    [
-        'materialID' => 3,
-        'title' => 'Grammar Essentials - Tenses',
-        'description' => 'Comprehensive guide to English tenses with examples and exercises. Covers present, past, and future tenses with common usage patterns.',
-        'grade' => '8',
-        'class' => 'A',
-        'subjectName' => 'English',
-        'subjectID' => 3,
-        'date' => '2025-10-25',
-        'visibility' => 0,
-        'fileName' => 'tenses_worksheet.pdf'
-    ],
-    [
-        'materialID' => 4,
-        'title' => 'World War II - Key Events',
-        'description' => 'Timeline and analysis of major events during World War II. Includes maps, key figures, and the impact on global history.',
-        'grade' => '9',
-        'class' => 'A',
-        'subjectName' => 'History',
-        'subjectID' => 4,
-        'date' => '2025-10-20',
-        'visibility' => 1,
-        'fileName' => 'wwii_notes.pdf'
-    ],
-    [
-        'materialID' => 5,
-        'title' => 'Geometric Shapes and Properties',
-        'description' => 'Study guide on triangles, quadrilaterals, and circles. Includes formulas for area, perimeter, and angle calculations.',
-        'grade' => '6',
-        'class' => 'B',
-        'subjectName' => 'Maths',
-        'subjectID' => 1,
-        'date' => '2025-10-15',
-        'visibility' => 1,
-        'fileName' => 'geometry_basics.pdf'
-    ],
-    [
-        'materialID' => 6,
-        'title' => 'Climate Zones and Weather Patterns',
-        'description' => 'Overview of different climate zones around the world, factors affecting climate, and weather prediction basics.',
-        'grade' => '7',
-        'class' => 'A',
-        'subjectName' => 'Geography',
-        'subjectID' => 5,
-        'date' => '2025-10-10',
-        'visibility' => 0,
-        'fileName' => 'climate_study.pdf'
-    ],
-];
+// // Sample data for demonstration (remove when backend is implemented)
+// $sampleMaterials = [
+//     [
+//         'materialID' => 1,
+//         'title' => 'Introduction to Algebra',
+//         'description' => 'Basic algebraic concepts including variables, equations, and problem-solving techniques. This worksheet covers linear equations and simple word problems.',
+//         'grade' => '6',
+//         'class' => 'A',
+//         'subjectName' => 'Maths',
+//         'subjectID' => 1,
+//         'date' => '2025-11-01',
+//         'visibility' => 1,
+//         'fileName' => 'algebra_basics.pdf'
+//     ],
+//     [
+//         'materialID' => 2,
+//         'title' => 'Cell Structure and Functions',
+//         'description' => 'Detailed study material on plant and animal cells, including diagrams of cell organelles and their functions. Includes practice questions.',
+//         'grade' => '7',
+//         'class' => 'B',
+//         'subjectName' => 'Science',
+//         'subjectID' => 2,
+//         'date' => '2025-10-28',
+//         'visibility' => 1,
+//         'fileName' => 'cell_biology.pdf'
+//     ],
+//     [
+//         'materialID' => 3,
+//         'title' => 'Grammar Essentials - Tenses',
+//         'description' => 'Comprehensive guide to English tenses with examples and exercises. Covers present, past, and future tenses with common usage patterns.',
+//         'grade' => '8',
+//         'class' => 'A',
+//         'subjectName' => 'English',
+//         'subjectID' => 3,
+//         'date' => '2025-10-25',
+//         'visibility' => 0,
+//         'fileName' => 'tenses_worksheet.pdf'
+//     ],
+//     [
+//         'materialID' => 4,
+//         'title' => 'World War II - Key Events',
+//         'description' => 'Timeline and analysis of major events during World War II. Includes maps, key figures, and the impact on global history.',
+//         'grade' => '9',
+//         'class' => 'A',
+//         'subjectName' => 'History',
+//         'subjectID' => 4,
+//         'date' => '2025-10-20',
+//         'visibility' => 1,
+//         'fileName' => 'wwii_notes.pdf'
+//     ],
+//     [
+//         'materialID' => 5,
+//         'title' => 'Geometric Shapes and Properties',
+//         'description' => 'Study guide on triangles, quadrilaterals, and circles. Includes formulas for area, perimeter, and angle calculations.',
+//         'grade' => '6',
+//         'class' => 'B',
+//         'subjectName' => 'Maths',
+//         'subjectID' => 1,
+//         'date' => '2025-10-15',
+//         'visibility' => 1,
+//         'fileName' => 'geometry_basics.pdf'
+//     ],
+//     [
+//         'materialID' => 6,
+//         'title' => 'Climate Zones and Weather Patterns',
+//         'description' => 'Overview of different climate zones around the world, factors affecting climate, and weather prediction basics.',
+//         'grade' => '7',
+//         'class' => 'A',
+//         'subjectName' => 'Geography',
+//         'subjectID' => 5,
+//         'date' => '2025-10-10',
+//         'visibility' => 0,
+//         'fileName' => 'climate_study.pdf'
+//     ],
+// ];
 
 // Use sample data if backend materials not available
-if (!isset($materials) || empty($materials)) {
-    $materials = $sampleMaterials;
-}
+// if (!isset($materials) || empty($materials)) {
+//     $materials = $sampleMaterials;
+// }
 ?>
 <link rel="stylesheet" href="/css/announcements/announcements.css">
 <link rel="stylesheet" href="/css/materials/teacherMaterials.css">

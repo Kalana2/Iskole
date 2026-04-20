@@ -1011,6 +1011,40 @@ INSERT INTO `userName` (`userID`, `firstName`, `lastName`) VALUES
 
 -- --------------------------------------------------------
 
+SELECT * FROM table_name
+ORDER BY column DESC;
+
+SELECT * FROM table_name
+LIMIT 10;
+
+SELECT COUNT(*) FROM table_name;
+SELECT SUM(column) FROM table_name;
+SELECT AVG(column) FROM table_name;
+SELECT MIN(column) FROM table_name;
+SELECT MAX(column) FROM table_name;
+
+SELECT column, COUNT(*)
+FROM table_name
+GROUP BY column
+HAVING COUNT(*) > 5;
+
+UPDATE table_name
+SET column1 = 'new_value'
+WHERE condition;
+
+SELECT DISTINCT column FROM table_name;
+
+DELETE FROM table_name
+WHERE condition;
+
+ALTER TABLE orders
+ADD CONSTRAINT fk_student
+FOREIGN KEY (student_id)
+REFERENCES students(student_id);
+
+ALTER TABLE orders
+DROP FOREIGN KEY fk_student;
+
 --
 -- Table structure for table `userRoles`
 --
@@ -1487,3 +1521,4 @@ MODIFY status ENUM('pending', 'approved', 'rejected', 'cancelled') NOT NULL DEFA
 
 ALTER TABLE leaveRequests
 MODIFY status VARCHAR(20) NOT NULL DEFAULT 'pending';
+
