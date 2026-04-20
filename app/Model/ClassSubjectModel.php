@@ -65,7 +65,7 @@ class ClassSubjectModel
 
     public function getAllSubjects(): array
     {
-        $sql = "SELECT subjectID, subjectName FROM subject ORDER BY subjectName ASC";
+        $sql = "SELECT subjectID, subjectName, description FROM subject ORDER BY subjectName ASC";
         $stmt = $this->db->prepare($sql);
         $stmt->execute();
 
@@ -81,12 +81,15 @@ class ClassSubjectModel
         return (bool)$stmt->fetchColumn();
     }
 
-    public function createSubject(string $subjectName): bool
+    public function createSubject(string $subjectName,string $description = ''): bool
     {
-        $sql = "INSERT INTO subject (subjectName) VALUES (?)";
+        $sql = "INSERT INTO subject (subjectName, description) VALUES (?,?)";
         $stmt = $this->db->prepare($sql);
 
-        return $stmt->execute([trim($subjectName)]);
+        return $stmt->execute([
+        trim($subjectName),
+        trim($description)
+        ]);
     }
 
     public function deleteSubject(int $subjectId): bool

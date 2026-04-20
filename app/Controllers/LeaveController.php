@@ -149,7 +149,7 @@ public function update()
         exit;
     }
 
-    // ✅ same date allowed
+
     if ($dateTo < $dateFrom) {
         $_SESSION['leave_msg'] = [
             'type' => 'error',

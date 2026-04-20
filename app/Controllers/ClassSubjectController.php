@@ -119,6 +119,7 @@ class ClassSubjectController extends Controller
         }
 
         $name = trim($_POST['subjectName'] ?? '');
+        $description = trim($_POST['description'] ?? '');
 
         if ($name === '') {
             $_SESSION['cs_msg'] = [
@@ -138,7 +139,7 @@ class ClassSubjectController extends Controller
             $this->goBackToTab();
         }
 
-        if ($model->createSubject($name)) {
+        if ($model->createSubject($name, $description)) {
             $_SESSION['cs_msg'] = [
                 'type' => 'success',
                 'text' => 'Subject successfully added.'

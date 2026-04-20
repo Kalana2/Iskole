@@ -68,8 +68,7 @@
                             title="Enter one English letter only"
                             placeholder="A"
                             style="text-transform: uppercase;"
-                            required
-                        >
+                            required>
                     </div>
 
                     <button class="cs-btn" type="submit">Create</button>
@@ -105,7 +104,14 @@
                     <div class="cs-grid">
                         <?php foreach ($items as $s): ?>
                             <div class="cs-chip">
-                                <span><?= htmlspecialchars($s['subjectName'] ?? '') ?></span>
+                                <div>
+                                    <div><?= htmlspecialchars($s['subjectName'] ?? '') ?></div>
+                                    <?php if (!empty($s['description'])): ?>
+                                        <small style="display:block;color:#6b7280;margin-top:4px;">
+                                            <?= htmlspecialchars($s['description']) ?>
+                                        </small>
+                                    <?php endif; ?>
+                                </div>
 
                                 <form action="/index.php?url=classSubject/deleteSubject" method="post">
                                     <input type="hidden" name="subject_id" value="<?= (int)$s['subjectID'] ?>">
@@ -129,6 +135,11 @@
                     <div class="cs-field">
                         <label>Subject Name</label>
                         <input type="text" name="subjectName" placeholder="Mathematics" required>
+                    </div>
+
+                    <div class="cs-field">
+                        <label>Description</label>
+                        <input type="text" name="description" placeholder="Short description">
                     </div>
 
                     <button class="cs-btn" type="submit">Add</button>
