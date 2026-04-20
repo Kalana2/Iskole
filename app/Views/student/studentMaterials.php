@@ -14,102 +14,102 @@ $materials = $materialController->studentView();
 echo "<!-- Debug: Materials count: " . count($materials) . " -->";
 
 // Sample data for demonstration (remove when backend is implemented)
-$sampleMaterials = [
-    [
-        'materialID' => 1,
-        'title' => 'Introduction to Algebra',
-        'description' => 'Basic algebraic concepts including variables, equations, and problem-solving techniques. This worksheet covers linear equations and simple word problems.',
-        'subjectName' => 'Maths',
-        'fName' => 'John',
-        'lName' => 'Smith',
-        'date' => '2025-11-01'
-    ],
-    [
-        'materialID' => 2,
-        'title' => 'Cell Structure and Functions',
-        'description' => 'Detailed study material on plant and animal cells, including diagrams of cell organelles and their functions. Includes practice questions.',
-        'subjectName' => 'Science',
-        'fName' => 'Sarah',
-        'lName' => 'Johnson',
-        'date' => '2025-10-28'
-    ],
-    [
-        'materialID' => 3,
-        'title' => 'Grammar Essentials - Tenses',
-        'description' => 'Comprehensive guide to English tenses with examples and exercises. Covers present, past, and future tenses with common usage patterns.',
-        'subjectName' => 'English',
-        'fName' => 'Michael',
-        'lName' => 'Brown',
-        'date' => '2025-10-25'
-    ],
-    [
-        'materialID' => 4,
-        'title' => 'World War II - Key Events',
-        'description' => 'Timeline and analysis of major events during World War II. Includes maps, key figures, and the impact on global history.',
-        'subjectName' => 'History',
-        'fName' => 'Emily',
-        'lName' => 'Davis',
-        'date' => '2025-10-20'
-    ],
-    [
-        'materialID' => 5,
-        'title' => 'Geometric Shapes and Properties',
-        'description' => 'Study guide on triangles, quadrilaterals, and circles. Includes formulas for area, perimeter, and angle calculations.',
-        'subjectName' => 'Maths',
-        'fName' => 'John',
-        'lName' => 'Smith',
-        'date' => '2025-10-15'
-    ],
-    [
-        'materialID' => 6,
-        'title' => 'Climate Zones and Weather Patterns',
-        'description' => 'Overview of different climate zones around the world, factors affecting climate, and weather prediction basics.',
-        'subjectName' => 'Geography',
-        'fName' => 'David',
-        'lName' => 'Wilson',
-        'date' => '2025-10-10'
-    ],
-    [
-        'materialID' => 7,
-        'title' => 'Chemical Reactions and Equations',
-        'description' => 'Introduction to chemical reactions, balancing equations, and understanding different types of chemical changes.',
-        'subjectName' => 'Science',
-        'fName' => 'Sarah',
-        'lName' => 'Johnson',
-        'date' => '2025-10-05'
-    ],
-    [
-        'materialID' => 8,
-        'title' => 'Essay Writing Techniques',
-        'description' => 'Learn how to structure essays, develop arguments, and improve your writing style. Includes sample essays and writing prompts.',
-        'subjectName' => 'English',
-        'fName' => 'Michael',
-        'lName' => 'Brown',
-        'date' => '2025-09-30'
-    ],
-    [
-        'materialID' => 9,
-        'title' => 'Ancient Civilizations',
-        'description' => 'Explore the rise and fall of ancient civilizations including Egypt, Greece, and Rome. Learn about their contributions to modern society.',
-        'subjectName' => 'History',
-        'fName' => 'Emily',
-        'lName' => 'Davis',
-        'date' => '2025-09-25'
-    ],
-    [
-        'materialID' => 10,
-        'title' => 'Pythagoras Theorem Applications',
-        'description' => 'Practical applications of Pythagoras theorem in solving real-world problems. Includes step-by-step examples and practice exercises.',
-        'subjectName' => 'Maths',
-        'fName' => 'John',
-        'lName' => 'Smith',
-        'date' => '2025-09-20'
-    ],
-];
+// $sampleMaterials = [
+//     [
+//         'materialID' => 1,
+//         'title' => 'Introduction to Algebra',
+//         'description' => 'Basic algebraic concepts including variables, equations, and problem-solving techniques. This worksheet covers linear equations and simple word problems.',
+//         'subjectName' => 'Maths',
+//         'fName' => 'John',
+//         'lName' => 'Smith',
+//         'date' => '2025-11-01'
+//     ],
+//     [
+//         'materialID' => 2,
+//         'title' => 'Cell Structure and Functions',
+//         'description' => 'Detailed study material on plant and animal cells, including diagrams of cell organelles and their functions. Includes practice questions.',
+//         'subjectName' => 'Science',
+//         'fName' => 'Sarah',
+//         'lName' => 'Johnson',
+//         'date' => '2025-10-28'
+//     ],
+//     [
+//         'materialID' => 3,
+//         'title' => 'Grammar Essentials - Tenses',
+//         'description' => 'Comprehensive guide to English tenses with examples and exercises. Covers present, past, and future tenses with common usage patterns.',
+//         'subjectName' => 'English',
+//         'fName' => 'Michael',
+//         'lName' => 'Brown',
+//         'date' => '2025-10-25'
+//     ],
+//     [
+//         'materialID' => 4,
+//         'title' => 'World War II - Key Events',
+//         'description' => 'Timeline and analysis of major events during World War II. Includes maps, key figures, and the impact on global history.',
+//         'subjectName' => 'History',
+//         'fName' => 'Emily',
+//         'lName' => 'Davis',
+//         'date' => '2025-10-20'
+//     ],
+//     [
+//         'materialID' => 5,
+//         'title' => 'Geometric Shapes and Properties',
+//         'description' => 'Study guide on triangles, quadrilaterals, and circles. Includes formulas for area, perimeter, and angle calculations.',
+//         'subjectName' => 'Maths',
+//         'fName' => 'John',
+//         'lName' => 'Smith',
+//         'date' => '2025-10-15'
+//     ],
+//     [
+//         'materialID' => 6,
+//         'title' => 'Climate Zones and Weather Patterns',
+//         'description' => 'Overview of different climate zones around the world, factors affecting climate, and weather prediction basics.',
+//         'subjectName' => 'Geography',
+//         'fName' => 'David',
+//         'lName' => 'Wilson',
+//         'date' => '2025-10-10'
+//     ],
+//     [
+//         'materialID' => 7,
+//         'title' => 'Chemical Reactions and Equations',
+//         'description' => 'Introduction to chemical reactions, balancing equations, and understanding different types of chemical changes.',
+//         'subjectName' => 'Science',
+//         'fName' => 'Sarah',
+//         'lName' => 'Johnson',
+//         'date' => '2025-10-05'
+//     ],
+//     [
+//         'materialID' => 8,
+//         'title' => 'Essay Writing Techniques',
+//         'description' => 'Learn how to structure essays, develop arguments, and improve your writing style. Includes sample essays and writing prompts.',
+//         'subjectName' => 'English',
+//         'fName' => 'Michael',
+//         'lName' => 'Brown',
+//         'date' => '2025-09-30'
+//     ],
+//     [
+//         'materialID' => 9,
+//         'title' => 'Ancient Civilizations',
+//         'description' => 'Explore the rise and fall of ancient civilizations including Egypt, Greece, and Rome. Learn about their contributions to modern society.',
+//         'subjectName' => 'History',
+//         'fName' => 'Emily',
+//         'lName' => 'Davis',
+//         'date' => '2025-09-25'
+//     ],
+//     [
+//         'materialID' => 10,
+//         'title' => 'Pythagoras Theorem Applications',
+//         'description' => 'Practical applications of Pythagoras theorem in solving real-world problems. Includes step-by-step examples and practice exercises.',
+//         'subjectName' => 'Maths',
+//         'fName' => 'John',
+//         'lName' => 'Smith',
+//         'date' => '2025-09-20'
+//     ],
+// ];
 
 // Use sample data if backend materials not available
 if (empty($materials)) {
-    $materials = $sampleMaterials;
+    //$materials = $sampleMaterials;
 }
 ?>
 <link rel="stylesheet" href="/css/announcements/announcements.css">
