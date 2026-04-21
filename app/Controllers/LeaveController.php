@@ -50,6 +50,17 @@ class LeaveController extends Controller
             exit;
         }
 
+        
+
+        if ($dateTo < $dateFrom) {
+            $_SESSION['leave_msg'] = [
+                'type' => 'error',
+                'text' => 'Date To must be after Date From.'
+            ];
+            header('Location: /index.php?url=teacher&tab=Leave');
+            exit;
+        }
+
         try {
             $model = $this->model('LeaveRequestModel');
 
@@ -114,53 +125,63 @@ class LeaveController extends Controller
         exit;
     }
 
-    public function update()
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: /index.php?url=teacher&tab=Leave');
-            exit;
-        }
-
-        $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
-
-        $leaveId   = (int)($_POST['leave_id'] ?? 0);
-        $dateFrom  = $_POST['dateFrom'] ?? '';
-        $dateTo    = $_POST['dateTo'] ?? '';
-        $leaveType = $_POST['leaveType'] ?? '';
-        $reason    = trim($_POST['reason'] ?? '');
-
-        if (!$teacherUserId || !$leaveId || !$dateFrom || !$dateTo || !$leaveType) {
-            $_SESSION['leave_msg'] = [
-                'type' => 'error',
-                'text' => 'Missing required fields.'
-            ];
-            header('Location: /index.php?url=teacher&tab=Leave');
-            exit;
-        }
-
-        try {
-            $model = $this->model('LeaveRequestModel');
-
-            $ok = $model->updateByTeacher($leaveId, (int)$teacherUserId, [
-                'dateFrom'  => $dateFrom,
-                'dateTo'    => $dateTo,
-                'leaveType' => $leaveType,
-                'reason'    => $reason,
-            ]);
-
-            $_SESSION['leave_msg'] = $ok
-                ? ['type' => 'success', 'text' => 'Leave request updated successfully.']
-                : ['type' => 'error', 'text' => 'Only pending requests can be updated.'];
-        } catch (Exception $e) {
-            $_SESSION['leave_msg'] = [
-                'type' => 'error',
-                'text' => 'Database error: ' . $e->getMessage()
-            ];
-        }
-
+public function update()
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
         header('Location: /index.php?url=teacher&tab=Leave');
         exit;
     }
+
+    $teacherUserId = $_SESSION['userId'] ?? ($_SESSION['user_id'] ?? 0);
+
+    $leaveId   = (int)($_POST['leave_id'] ?? 0);
+    $dateFrom  = $_POST['dateFrom'] ?? '';
+    $dateTo    = $_POST['dateTo'] ?? '';
+    $leaveType = $_POST['leaveType'] ?? '';
+    $reason    = trim($_POST['reason'] ?? '');
+
+    if (!$teacherUserId || !$leaveId || !$dateFrom || !$dateTo || !$leaveType) {
+        $_SESSION['leave_msg'] = [
+            'type' => 'error',
+            'text' => 'Missing required fields.'
+        ];
+        header('Location: /index.php?url=teacher&tab=Leave');
+        exit;
+    }
+
+    // ✅ same date allowed
+    if ($dateTo < $dateFrom) {
+        $_SESSION['leave_msg'] = [
+            'type' => 'error',
+            'text' => 'Date To cannot be before Date From.'
+        ];
+        header('Location: /index.php?url=teacher&tab=Leave');
+        exit;
+    }
+
+    try {
+        $model = $this->model('LeaveRequestModel');
+
+        $ok = $model->updateByTeacher($leaveId, (int)$teacherUserId, [
+            'dateFrom'  => $dateFrom,
+            'dateTo'    => $dateTo,
+            'leaveType' => $leaveType,
+            'reason'    => $reason,
+        ]);
+
+        $_SESSION['leave_msg'] = $ok
+            ? ['type' => 'success', 'text' => 'Leave request updated successfully.']
+            : ['type' => 'error', 'text' => 'Only pending requests can be updated.'];
+    } catch (Exception $e) {
+        $_SESSION['leave_msg'] = [
+            'type' => 'error',
+            'text' => 'Database error: ' . $e->getMessage()
+        ];
+    }
+
+    header('Location: /index.php?url=teacher&tab=Leave');
+    exit;
+}
 
     public function cancel()
     {

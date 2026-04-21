@@ -123,32 +123,54 @@ $isEdit = !empty($editLeave);
         </form>
     </div>
 </section>
-
 <script>
-    (function() {
-        const $ = (s, ctx = document) => ctx.querySelector(s);
-        const formSection = document.currentScript.previousElementSibling;
-        if (!formSection) return;
+(function() {
+    const $ = (s, ctx = document) => ctx.querySelector(s);
+    const formSection = document.currentScript.previousElementSibling;
+    if (!formSection) return;
 
-        const formEl = formSection.querySelector('form');
-        formEl?.addEventListener('submit', (e) => {
-            if (!formEl.checkValidity()) {
-                e.preventDefault();
-                const invalid = formEl.querySelector(':invalid');
-                invalid?.focus();
-            }
-        });
+    const formEl = formSection.querySelector('form');
+    const dateFrom = $('#date-from', formSection);
+    const dateTo = $('#date-to', formSection);
 
-        const reason = $('#reason', formSection);
-        const counter = $('#reasonCount', formSection);
+    const validateDates = () => {
+        if (!dateFrom || !dateTo) return true;
 
-        if (reason && counter) {
-            const updateCount = () => {
-                counter.textContent = reason.value.length;
-            };
+        dateTo.setCustomValidity('');
 
-            reason.addEventListener('input', updateCount);
-            updateCount();
+        const fromVal = dateFrom.value;
+        const toVal = dateTo.value;
+
+        if (!fromVal || !toVal) return true;
+
+        
+        if (toVal < fromVal) {
+            dateTo.setCustomValidity('Date To cannot be before Date From.');
+            return false;
         }
-    })();
+
+        return true;
+    };
+
+  
+    dateFrom?.addEventListener('change', () => {
+        if (!dateFrom.value) return;
+
+        
+        dateTo.min = dateFrom.value;
+
+        validateDates();
+    });
+
+    dateTo?.addEventListener('change', validateDates);
+
+    formEl?.addEventListener('submit', (e) => {
+        if (!formEl.checkValidity() || !validateDates()) {
+            e.preventDefault();
+            const invalid = formEl.querySelector(':invalid');
+            invalid?.focus();
+            invalid?.reportValidity?.();
+        }
+    });
+})();
 </script>
