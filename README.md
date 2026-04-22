@@ -174,19 +174,19 @@ Core modules include authentication, student/teacher management, attendance, mar
 
 <!-- SCREENSHOT_TAG: Replace with your login page screenshot -->
 
-[Login Page](Documents/Screenshots/log-in.png)
+![Login Page](Documents/Screenshots/log-in.png)
 
 <!-- SCREENSHOT_TAG: Replace with your admin dashboard screenshot -->
 
-[Dashboard](Documents/Screenshots/dashboard.png)
+![Dashboard](Documents/Screenshots/dashboard.png)
 
 <!-- SCREENSHOT_TAG: Replace with your teacher dashboard screenshot -->
 
-[Mark-trends](Documents/Screenshots/mark-trends.png)
+![Mark Trends](Documents/Screenshots/mark-trends.png)
 
 <!-- SCREENSHOT_TAG: Replace with your student portal screenshot -->
 
-[Timetable](Documents/Screenshots/timetable.png)
+![Timetable](Documents/Screenshots/timetable.png)
 
 ## Testing Summary
 
